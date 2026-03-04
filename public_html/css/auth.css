@@ -1,0 +1,624 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Основной контент должен растягиваться */
+body > *:not(header):not(footer) {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+    margin: auto;
+    transition: max-width 0.3s ease;
+}
+
+.auth-panel {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.3s ease,
+                max-width 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+    width: 100%;
+    max-width: 100%;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-top: 30px;
+}
+
+.auth-header h2 {
+    color: #333;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.auth-header p {
+    color: #666;
+    font-size: 14px;
+}
+
+.auth-tabs {
+    display: flex;
+    background: #f5f5f7;
+    border-radius: 12px;
+    padding: 4px;
+    margin: 0 25px 25px;
+}
+
+.tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn.active {
+    color: #667eea;
+    background: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.tab-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.forms-container {
+    position: relative;
+    min-height: 290px;
+    padding: 0 25px;
+}
+
+.auth-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    padding: 0 25px;
+}
+
+.auth-form.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    position: relative;
+    pointer-events: all;
+}
+
+.form-fields {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.input-field {
+    position: relative;
+    width: 100%;
+}
+
+.input-field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.input-field input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-field input:focus + label,
+.input-field input:not(:placeholder-shown) + label {
+    top: -8px;
+    left: 10px;
+    font-size: 12px;
+    background: white;
+    padding: 0 8px;
+    color: #667eea;
+}
+
+.input-field label {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 14px;
+    color: #999;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.message {
+    width: 100%;
+    box-sizing: border-box;
+    display: none;
+    margin: 15px 0 20px 0;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    background: #fee;
+    color: #c33;
+    border: 1px solid #fcc;
+}
+
+.message.show {
+    display: block;
+}
+
+.submit-btn {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.success-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.9);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 20px;
+    padding: 40px;
+}
+
+.success-screen.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.success-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    animation: successBounce 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes successBounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.success-screen h3 {
+    color: #4CAF50;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.success-screen p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.btn-secondary {
+    padding: 12px 30px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+}
+
+/* Анимации для переключения форм */
+.auth-container[data-current-form="register"] .auth-form.active {
+    animation: slideFromRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.auth-container[data-current-form="login"] .auth-form.active {
+    animation: slideFromLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* Медиа-запросы для адаптивности */
+
+/* Мобильные устройства (до 768px) */
+@media (max-width: 768px) {
+    .auth-container {
+        width: 100%;
+        padding: 0 15px;
+    }
+    
+    .auth-panel {
+        padding: 1.5em 0;
+    }
+    
+    .auth-header {
+        padding-top: 25px;
+    }
+    
+    .auth-header h2 {
+        font-size: 29px;
+    }
+    
+    .auth-header p {
+        font-size: 14px;
+    }
+    
+    .auth-tabs {
+        margin: 0 20px 20px;
+    }
+    
+    .forms-container {
+        padding: 0 20px;
+    }
+    
+    .auth-form {
+        padding: 0 20px;
+    }
+    
+    .form-fields {
+        gap: 15px;
+    }
+    
+    .input-field input {
+        padding: 13px;
+    }
+    
+    .message {
+        font-size: 13px;
+        padding: 10px;
+        margin: 12px 0 18px 0;
+    }
+    
+    .submit-btn {
+        padding: 14px;
+        font-size: 15px;
+    }
+}
+
+/* Десктопы (1025px и больше) */
+@media (min-width: 1025px) {
+    .auth-container {
+        width: 100%;
+        max-width: 480px; /* Увеличьте максимальную ширину */
+    }
+    
+    .auth-panel {
+        padding: 1.5em 0;
+        width: 100%;
+    }
+    
+    .auth-header {
+        padding-top: 40px;
+    }
+    
+    .auth-header h2 {
+        font-size: 32px; /* Сделайте чуть меньше */
+    }
+    
+    .auth-header p {
+        font-size: 16px; /* Сделайте чуть меньше */
+    }
+    
+    .auth-tabs {
+        margin: 0 30px 25px;
+    }
+    
+    .tab-btn {
+        font-size: 16px;
+        padding: 12px;
+    }
+    
+    .forms-container {
+        padding: 0 30px; /* Уменьшите padding */
+    }
+    
+    .auth-form {
+        padding: 0 30px; /* Уменьшите padding */
+        width: 100%;
+    }
+    
+    .form-fields {
+        max-width: 100%; /* УБИРАЕМ фиксированную ширину */
+        width: 100%;
+        margin: 0 auto 20px;
+        gap: 20px;
+    }
+    
+    .input-field input {
+        width: 100%; /* Гарантируем 100% ширину */
+        padding: 16px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+    
+    .input-field label {
+        font-size: 16px;
+        top: 16px;
+        left: 16px;
+    }
+    
+    .input-field input:focus + label,
+    .input-field input:not(:placeholder-shown) + label {
+        font-size: 12px;
+        top: -8px;
+        left: 12px;
+    }
+    
+    .message {
+        max-width: 100%; /* УБИРАЕМ фиксированную ширину */
+        width: 100%;
+        margin: 15px 0 20px 0;
+        font-size: 14px;
+        padding: 12px;
+    }
+    
+    .submit-btn {
+        max-width: 100%; /* УБИРАЕМ фиксированную ширину */
+        width: 100%;
+        margin: 0 auto;
+        padding: 16px;
+        font-size: 16px;
+        border-radius: 10px;
+        display: block;
+    }
+    
+    .success-screen h3 {
+        font-size: 28px;
+    }
+    
+    .success-screen p {
+        font-size: 20px;
+    }
+}
+
+/* Планшеты (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .auth-container {
+        width: 100%;
+        max-width: 440px; /* Добавьте max-width */
+    }
+    
+    .auth-panel {
+        padding: 1.5em 0;
+        width: 100%;
+    }
+    
+    .auth-header {
+        padding-top: 30px;
+    }
+    
+    .auth-header h2 {
+        font-size: 28px; /* Сделайте меньше */
+    }
+    
+    .auth-header p {
+        font-size: 14px; /* Сделайте меньше */
+    }
+    
+    .auth-tabs {
+        margin: 0 20px 20px;
+    }
+    
+    .tab-btn {
+        font-size: 14px;
+        padding: 10px;
+    }
+    
+    .forms-container {
+        padding: 0 20px;
+    }
+    
+    .auth-form {
+        padding: 0 20px;
+        width: 100%;
+    }
+    
+    .form-fields {
+        width: 100%; /* Гарантируем 100% ширину */
+        gap: 16px;
+    }
+    
+    .input-field input {
+        width: 100%; /* Гарантируем 100% ширину */
+        padding: 14px;
+        font-size: 14px;
+    }
+    
+    .input-field label {
+        font-size: 14px;
+        top: 14px;
+        left: 14px;
+    }
+    
+    .input-field input:focus + label,
+    .input-field input:not(:placeholder-shown) + label {
+        font-size: 12px;
+        top: -8px;
+    }
+    
+    .message {
+        width: 100%; /* Гарантируем 100% ширину */
+        font-size: 13px;
+        padding: 10px;
+        margin: 12px 0 18px 0;
+    }
+    
+    .submit-btn {
+        width: 100%; /* Гарантируем 100% ширину */
+        padding: 14px;
+        font-size: 14px;
+    }
+}
+
+/* Большие экраны (1440px и больше) */
+@media (min-width: 1440px) {
+    .auth-container {
+        width: 100%;
+        max-width: 500px; /* Увеличьте максимальную ширину */
+    }
+    
+    .auth-header {
+        padding-top: 40px;
+    }
+    
+    .auth-tabs {
+        margin: 0 35px 25px;
+    }
+    
+    .forms-container {
+        padding: 0 35px;
+    }
+    
+    .auth-form {
+        padding: 0 35px;
+    }
+    
+    .form-fields {
+        max-width: 100%; /* УБИРАЕМ фиксированную ширину */
+        width: 100%;
+        gap: 20px;
+    }
+    
+    .message {
+        max-width: 100%; /* УБИРАЕМ фиксированную ширину */
+        width: 100%;
+        font-size: 14px;
+    }
+    
+    .submit-btn {
+        max-width: 100%; /* УБИРАЕМ фиксированную ширину */
+        width: 100%;
+    }
+}
+
+/* Гарантируем, что все инпуты всегда на 100% ширины */
+.input-field input {
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* Гарантируем, что header и footer остаются на своих местах */
+header, footer {
+    position: relative;
+    z-index: 100;
+    width: 100%;
+}
+
+/* Убедимся, что основной контент не влияет на другие элементы */
+.main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 20px;
+}

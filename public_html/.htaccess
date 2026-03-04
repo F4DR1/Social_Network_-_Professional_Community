@@ -1,0 +1,25 @@
+RewriteEngine On
+
+# Игнорируем реальные файлы/папки (ПЕРВЫЕ!)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+
+# 1. СПЕЦИФИЧНЫЕ страницы (приоритет!)
+RewriteRule ^(feed|messages|contacts|groups)$ pages/$1.php [L,QSA]
+
+RewriteRule ^search$ pages/search.php?act=$1 [L,QSA]
+RewriteRule ^settings$ pages/settings.php?act=$1 [L,QSA]
+RewriteRule ^(login|register)$ index.php?form=$1 [L,QSA]
+
+
+# 2. auth (конкретные файлы)
+RewriteRule ^auth$ index.php [L]
+
+# 3. Пользователи/группы по ID
+RewriteRule ^(user|group)(\d+)$ index.php?type=$1&id=$2 [L,QSA]
+RewriteRule ^(user|group)(\d+)/?$ index.php?type=$1&id=$2 [L,QSA]
+
+# 4. Linkname (после всех специфичных)
+RewriteRule ^([a-zA-Z0-9_-]+)$ index.php?linkname=$1 [L,QSA]
+RewriteRule ^([a-zA-Z0-9_-]+)/?$ index.php?linkname=$1 [L,QSA]

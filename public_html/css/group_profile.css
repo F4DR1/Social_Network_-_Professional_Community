@@ -1,0 +1,634 @@
+/* group_profile.css - Стили для страницы профиля группы */
+
+/* ============================================
+   ПРОФИЛЬ ГРУППЫ - ОСНОВНОЙ КОНТЕЙНЕР
+============================================= */
+.centered-container .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.centered-container .main-container img {
+    width: 200px;
+    height: 200px;
+    border-radius: 1rem;
+    object-fit: cover;
+    border: 4px solid #f3f4f6;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.centered-container .container h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+/* ============================================
+   НОВЫЙ ПОСТ
+============================================= */
+.new-post {
+    width: 100%;
+    margin: 1rem 0 2rem;
+}
+
+.new-post .input-field {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.new-post textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 1rem;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #1f2937;
+    background-color: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    resize: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.new-post textarea:hover {
+    border-color: #9ca3af;
+    background-color: #ffffff;
+}
+
+.new-post textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.new-post textarea::placeholder {
+    color: #9ca3af;
+}
+
+.new-post button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 2rem;
+    min-height: 48px;
+    font-weight: 600;
+    font-size: 1rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+}
+
+.new-post button:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.5);
+}
+
+.new-post button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px 0 rgba(59, 130, 246, 0.3);
+}
+
+/* ============================================
+   PROFILE PAGE - ACTIONS PANEL (из userProfile.css)
+============================================= */
+.profile-actions-panel {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    position: relative;
+    justify-content: center;
+}
+
+.profile-actions-panel .main-action {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* 🔥 ОСНОВНЫЕ КНОПКИ */
+.profile-actions-panel .standart-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    min-height: 48px;
+    min-width: 160px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+}
+
+.profile-actions-panel .standart-btn:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.5);
+}
+
+.profile-actions-panel .standart-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px 0 rgba(59, 130, 246, 0.3);
+}
+
+/* 🔥 КНОПКИ ВТОРИЧНЫЕ */
+.profile-actions-panel .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    min-height: 48px;
+    min-width: 160px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: #f8fafc;
+    color: #374151;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.profile-actions-panel .btn:hover {
+    background: #f1f5f9;
+    border-color: #3b82f6;
+    color: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* 🔥 DROPDOWN МЕНЮ */
+.profile-actions-panel .action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-actions-panel .action-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    min-height: 48px;
+    min-width: 160px;
+    background: #f8fafc;
+    color: #374151;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.profile-actions-panel .action-trigger:hover {
+    background: #f1f5f9;
+    border-color: #3b82f6;
+    color: #1e40af;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* 🔥 СПИСОК ДРОПДАУНА */
+.profile-actions-panel .dropdown-list {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 260px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-12px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10000;
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+}
+
+.profile-actions-panel .action-dropdown:hover .dropdown-list {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 🔥 КНОПКИ В ДРОПДАУНЕ */
+.profile-actions-panel .dropdown-button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    background: none;
+    border: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.profile-actions-panel .dropdown-button:hover {
+    background: #f8fafc;
+    color: #1f2937;
+    transform: translateX(4px);
+}
+
+/* 🔥 СКРЫТЫЕ ЭЛЕМЕНТЫ ПО УМОЛЧАНИЮ */
+#mainRequestSubscribe,
+#mainRequestUnsubscribe,
+#secondMessage {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    position: absolute !important;
+}
+
+/* 🔥 АКТИВНЫЕ ЭЛЕМЕНТЫ */
+#mainRequestSubscribe.active,
+#mainRequestUnsubscribe.active,
+#secondMessage.active {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 160px !important;
+    min-height: 48px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    position: relative !important;
+}
+
+/* ============================================
+   СПИСОК УЧАСТНИКОВ
+============================================= */
+.right-container .container h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.right-container .container h2 .count {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    margin-left: 0.5rem;
+}
+
+.members-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.member-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    background: #f9fafb;
+    border: 1px solid #f3f4f6;
+}
+
+.member-item:hover {
+    background: white;
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.member-item img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.member-item p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.3;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.member-item:hover p {
+    color: #3b82f6;
+}
+
+/* ============================================
+   АДМИН ПАНЕЛЬ
+============================================= */
+.right-container .container .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+}
+
+.right-container .container .btn:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4);
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ
+============================================= */
+@media (max-width: 1024px) {
+    .members-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .centered-container .main-container img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .centered-container .container h1 {
+        font-size: 1.75rem;
+    }
+
+    .profile-actions-panel {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        margin: 1.5rem 0;
+        width: 100%;
+    }
+
+    .profile-actions-panel .main-action {
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem;
+    }
+
+    .profile-actions-panel .standart-btn,
+    .profile-actions-panel .btn,
+    .profile-actions-panel .action-trigger {
+        min-width: 100%;
+        justify-content: center;
+    }
+
+    /* 🔥 МОБИЛЬНЫЕ ДРОПДАУНЫ */
+    .profile-actions-panel .dropdown-list {
+        position: static;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        margin-top: 0.75rem;
+        z-index: auto;
+        display: none;
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .profile-actions-panel .action-dropdown.active .dropdown-list {
+        display: block !important;
+    }
+
+    .profile-actions-panel .action-dropdown.active .action-trigger {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .members-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    #mainRequestSubscribe.active,
+    #mainRequestUnsubscribe.active,
+    #secondMessage.active {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .centered-container .main-container img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .centered-container .container h1 {
+        font-size: 1.5rem;
+    }
+
+    .profile-actions-panel .standart-btn,
+    .profile-actions-panel .btn,
+    .profile-actions-panel .action-trigger {
+        padding: 0.625rem 1rem;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+
+    .members-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .member-item {
+        padding: 0.5rem;
+    }
+
+    .member-item img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .member-item p {
+        font-size: 0.8rem;
+    }
+
+    .right-container .container h2 {
+        font-size: 1.1rem;
+    }
+    
+    .new-post textarea {
+        min-height: 80px;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+    
+    .new-post button {
+        width: 100%;
+        padding: 0.625rem 1rem;
+    }
+}
+
+/* ============================================
+   АНИМАЦИЯ ПОЯВЛЕНИЯ
+============================================= */
+.member-item {
+    animation: fadeIn 0.3s ease-out forwards;
+    opacity: 0;
+}
+
+.member-item:nth-child(4n+1) { animation-delay: 0.05s; }
+.member-item:nth-child(4n+2) { animation-delay: 0.1s; }
+.member-item:nth-child(4n+3) { animation-delay: 0.15s; }
+.member-item:nth-child(4n+4) { animation-delay: 0.2s; }
+
+
+
+
+
+
+/* 🔥 ГЛОБАЛЬНЫЕ DROPDOWN ДЛЯ ВСЕХ СТРАНИЦ */
+.action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.action-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 260px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10001 !important; /* Выше всех */
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+}
+
+/* Десктоп: hover для ВСЕХ dropdown */
+@media (min-width: 769px) {
+    .action-dropdown:hover .dropdown-list {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) !important;
+    }
+}
+
+/* Мобильные: класс active */
+@media (max-width: 768px) {
+    .dropdown-list {
+        position: static !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        margin-top: 0.75rem;
+        z-index: auto !important;
+        display: none !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    .action-dropdown.active .dropdown-list {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
+/* 🔥 КНОПКИ В ДРОПДАУНЕ - ГЛОБАЛЬНЫЕ */
+.dropdown-button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    background: none;
+    border: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.dropdown-button:hover {
+    background: #f8fafc;
+    color: #1f2937;
+    transform: translateX(4px);
+}

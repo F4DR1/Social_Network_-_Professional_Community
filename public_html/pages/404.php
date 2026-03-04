@@ -1,0 +1,22 @@
+<?php
+    $title = "Такой страницы нет";
+    ob_start();
+?>
+
+<?php http_response_code(404); ?>
+<div class="error-404">
+    <div class="error-icon">⚠️</div>
+    <h1>404</h1>
+    <p>Такой страницы нет</p>
+    <a href="/">На главную</a>
+</div>
+
+<?php
+    $content = ob_get_clean();
+    $stylesheet = 'css/404.css'; // Подключаем наш CSS файл
+    
+    require_once 'enums/layout.php';
+    $layout = Layout::Micro;
+    
+    require 'layout.php';
+?>

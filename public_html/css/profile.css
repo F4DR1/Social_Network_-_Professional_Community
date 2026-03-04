@@ -1,0 +1,406 @@
+/* ============================================
+   PROFILE PAGE - ACTIONS PANEL
+============================================= */
+
+/* 🔥 Основная панель действий */
+.profile-actions-panel {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+/* 🔥 КОНТЕЙНЕРЫ ГРУПП */
+.profile-actions-panel .main-action {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.profile-actions-panel .base-actions,
+.profile-actions-panel .contact-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* 🔥 ОСНОВНЫЕ КНОПКИ */
+.profile-actions-panel .standart-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    min-height: 48px;
+    min-width: 160px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Градиент для основных кнопок */
+.profile-actions-panel .standart-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+}
+
+.profile-actions-panel .standart-btn:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.5);
+}
+
+.profile-actions-panel .standart-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px 0 rgba(59, 130, 246, 0.3);
+}
+
+/* 🔥 МАЛЕНЬКИЕ КНОПКИ */
+.profile-actions-panel .small-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.profile-actions-panel .small-btn:hover {
+    background: #f1f5f9;
+    border-color: #3b82f6;
+    color: #3b82f6;
+    transform: scale(1.05);
+}
+
+/* 🔥 DROPDOWN МЕНЮ */
+.profile-actions-panel .action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-actions-panel .action-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    min-height: 48px;
+    min-width: 160px;
+    background: #f8fafc;
+    color: #374151;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.profile-actions-panel .action-trigger.has-lists {
+    min-width: 52px;
+    padding: 0.75rem;
+}
+
+.profile-actions-panel .action-trigger:hover {
+    background: #f1f5f9;
+    border-color: #3b82f6;
+    color: #1e40af;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* 🔥 СПИСОК ДРОПДАУНА */
+.profile-actions-panel .dropdown-list {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 260px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.12),
+        0 8px 16px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-12px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10000;
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+}
+
+.profile-actions-panel .action-dropdown:hover .dropdown-list {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 🔥 КНОПКИ В ДРОПДАУНЕ */
+.profile-actions-panel .dropdown-button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    background: none;
+    border: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.profile-actions-panel .dropdown-button:hover {
+    background: #f8fafc;
+    color: #1f2937;
+    transform: translateX(4px);
+}
+
+/* 🔥 ПОДСПИСОК "СПИСКИ" - ИСПРАВЛЕННЫЙ */
+.profile-actions-panel .lists-wrapper {
+    position: relative;
+}
+
+.profile-actions-panel .lists-dropdown {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    min-width: 200px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+    z-index: 10001;
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+}
+
+/* Открываем подсписок при наведении на элемент "Изменить список" */
+.profile-actions-panel .lists-wrapper:hover .lists-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 🔥 СКРЫТЫЕ ЭЛЕМЕНТЫ ПО УМОЛЧАНИЮ - ИСПРАВЛЕННЫЕ */
+#main-message,
+#main-request,
+#main-request-following,
+#main-request-follower,
+#base-action-message,
+#contact-action {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    position: absolute !important;
+}
+
+/* 🔥 АКТИВНЫЕ ЭЛЕМЕНТЫ - ИСПРАВЛЕННЫЕ */
+#main-message.active,
+#main-request.active,
+#main-request-following.active,
+#main-request-follower.active,
+#contact-action.active {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 160px !important;
+    min-height: 48px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    position: relative !important;
+}
+
+#base-action-message.active {
+    display: flex !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    position: relative !important;
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ
+============================================= */
+
+@media (max-width: 768px) {
+    .profile-actions-panel {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .profile-actions-panel .main-action {
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem;
+    }
+
+    .profile-actions-panel .standart-btn,
+    .profile-actions-panel .action-trigger {
+        min-width: 100%;
+        justify-content: center;
+    }
+
+    /* 🔥 МОБИЛЬНЫЕ ДРОПДАУНЫ */
+    .profile-actions-panel .dropdown-list {
+        position: static;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        margin-top: 0.75rem;
+        z-index: auto;
+        display: none;
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .profile-actions-panel .action-dropdown.active .dropdown-list {
+        display: block !important;
+    }
+
+    .profile-actions-panel .action-dropdown.active .action-trigger {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    /* 🔥 МОБИЛЬНЫЙ ПОДСПИСОК */
+    .profile-actions-panel .lists-dropdown {
+        position: static;
+        left: auto;
+        top: auto;
+        margin: 0.5rem 0 0 1.5rem;
+        max-height: none;
+        border-top: 1px solid #e5e7eb;
+        display: none;
+        box-shadow: none;
+        transform: none;
+        border-radius: 8px;
+    }
+
+    .profile-actions-panel .lists-wrapper.active .lists-dropdown {
+        display: block !important;
+    }
+
+    .profile-actions-panel .lists-wrapper.active .lists-toggle {
+        background: #f3f4f6;
+    }
+
+    /* 🔥 Базовые контейнеры на мобилках */
+    .profile-actions-panel .base-actions,
+    .profile-actions-panel .contact-actions {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    /* 🔥 Активные элементы на мобилках */
+    #main-message.active,
+    #main-request.active,
+    #main-request-following.active,
+    #main-request-follower.active,
+    #contact-action.active {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    #base-action-message.active {
+        width: auto !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-actions-panel .standart-btn,
+    .profile-actions-panel .action-trigger {
+        padding: 0.625rem 1rem;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+
+    .profile-actions-panel .small-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .profile-actions-panel .dropdown-list {
+        min-width: 240px;
+    }
+}
+
+/* ============================================
+   SVG И ИКОНКИ
+============================================= */
+.profile-actions-panel svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.profile-actions-panel .action-trigger svg:last-child {
+    width: 16px;
+    height: 12px;
+}
+
+/* Активная галочка в списках */
+.profile-actions-panel svg path[fill="currentColor"] {
+    transition: all 0.2s ease;
+}
+
+/* Стрелка для подсписков */
+.profile-actions-panel .dropdown-arrow {
+    margin-left: auto;
+    transition: transform 0.2s ease;
+}
+
+.profile-actions-panel .lists-wrapper:hover .dropdown-arrow {
+    transform: rotate(90deg);
+}
+
+/* Цвет активного элемента в списках */
+.profile-actions-panel .dropdown-button svg[style*="opacity: .25"] {
+    color: #9ca3af;
+}
+
+.profile-actions-panel .dropdown-button svg:not([style*="opacity: .25"]) {
+    color: #3b82f6;
+}
