@@ -1,10 +1,8 @@
 <?php
     require_once '../includes/init.php';
-    global $db, $current_user_id;
+    global $db_frontend, $current_user_id;
 
-
-    $list = [];
-    $stmt = $db->prepare("
+    $sql = "
         SELECT 
             g.id,
             g.name,
@@ -18,14 +16,8 @@
         JOIN group_members gm ON g.id = gm.group_id
         WHERE gm.user_id = ?
         ORDER BY gm.joined_at DESC
-    ");
-    $stmt->bindValue(1, $current_user_id, SQLITE3_INTEGER);
-    $result = $stmt->execute();
-
-    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-        $list[] = $row;
-    }
-
+    ";
+    $groups_list = $db_frontend->fetchAll($sql, [$current_user_id]);
     
     ob_start();
 ?>
@@ -36,10 +28,10 @@
     <div class="container">
         <h2>Группы</h2>
 
-        <?php if (empty($list)): ?>
+        <?php if (empty($groups_list)): ?>
             <p>Вы не подписаны ни на одну группу.</p>
         <?php else: ?>
-            <?php foreach ($list as $group): ?>
+            <?php foreach ($groups_list as $group): ?>
                 <div class="group-panel">
                     <img src="<?= $group['photo'] ?? 'images/empty.webp' ?>" alt="<?= htmlspecialchars($group['name']) ?>" width=80>
                     <a href="<?= empty($group['linkname']) ? 'group' . $group['id'] : $group['linkname'] ?>" class="name-line">
@@ -85,17 +77,18 @@
     ]) ?>;
 </script>
 
-<script src="../js/groups.js"></script>
-
 
 
 <?php
     $content = ob_get_clean();
     $title = 'Группы';
-    $stylesheet = 'css/groups.css';
-    
+    $scripts = [
+        'js/groups.js'
+    ];
+    $stylesheets = [
+        'css/groups.css'
+    ];
     require_once '../enums/layout.php';
     $layout = Layout::Standart;
-
     require '../layout.php';
 ?>

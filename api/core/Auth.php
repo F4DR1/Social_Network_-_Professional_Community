@@ -12,16 +12,13 @@
          * Проверяет авторизацию по токену
          */
         public function check() {
-            $headers = getallheaders();
-            $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : '';
+            $token = Helpers::extractToken();
             
-            if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
-                $token = $matches[1];
-
+            if ($token) {
                 // Ищем сессию с таким токеном
                 $session = $this->db->fetchOne(
                     "SELECT * FROM sessions 
-                    WHERE token = ? AND (expires_at IS NULL OR expires_at > NOW())",
+                    WHERE token = ?",
                     [$token]
                 );
 
@@ -47,8 +44,7 @@
                 }
             }
             
-            http_response_code(401);
-            die(json_encode(['error' => 'Не авторизован']));
+            Helpers::errorResponse('Не авторизован', 401);
         }
     
         public function getCurrentSession() {

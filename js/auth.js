@@ -1,3 +1,5 @@
+import { login, register } from './api.js';  // Импорт API функций
+
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.querySelector(".auth-container");
     const loginTab = document.querySelector('[data-form="login"]');
@@ -7,13 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const subtitle = document.getElementById("authSubtitle");
     const loginForm = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
-
     const successScreen = document.getElementById("successMessage");
 
 
 
-
-    // Обработка нажатия Enter в полях ввода
+    // Обработка Enter
     function setupEnterKeySubmit() {
         // Функция для получения активной формы
         function getActiveForm() {
@@ -79,10 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
-
-
-    // Устанавливаем сообщение
+    // Показ/скрытие сообщений
     function setMessage(el, text, type = 'error') {
         el.textContent = text;
         if (text && text.trim() !== '') {
@@ -92,15 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Очищаем сообщение
     function clearMessages() {
         document.querySelectorAll('.message').forEach(msg => {
             msg.textContent = '';
             msg.className = 'message';
         });
     }
-
-
 
     // Переключатель форм
     function switchForm(formName) {
@@ -151,61 +145,86 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+    // Инициализация
     loginTab.addEventListener("click", () => switchForm("login"));
     registerTab.addEventListener("click", () => switchForm("register"));
-
-    // При первом открытии задаем нужную форму
     switchForm(container.dataset.currentForm);
-    // setTimeout(focusActiveForm, 250);
-    
-    // Добавляем обработку Enter
     setupEnterKeySubmit();
 
 
 
-    // Отправить данные на скрипт
-    async function sendAuthData(url, data, messageEl) {
+    // === ЛОГИН ===
+    document.getElementById("loginBtn").addEventListener("click", async (e) => {
+        e.preventDefault();
+        clearMessages();
+
+        const data = {
+            login: document.getElementById("login").value,
+            password: document.getElementById("password").value
+        };
+
         try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(data)
-            });
-            const result = await response.json();
+            const result = await login(data);
+
             if (result.success) {
                 clearMessages();
                 loginForm.classList.remove("active");
                 registerForm.classList.remove("active");
                 successScreen.classList.add("active");
-
                 setTimeout(() => (window.location.href = container.dataset.returnUrl), 2000);
-            } else {
-                setMessage(messageEl, result.message || "Ошибка соединения", 'error'); 
-            }
-        } catch (err) {
-            setMessage(messageEl, "Ошибка сервера", 'error');
-        }
-    }
 
-    // Войти
-    document.getElementById("loginBtn").addEventListener("click", (e) => {
-        e.preventDefault();
-        const data = {
-            login: document.getElementById("login").value,
-            password: document.getElementById("password").value
-        };
-        sendAuthData("../actions/session/login.php", data, document.getElementById("loginMessage"));
+            } else {
+                setMessage(document.getElementById("loginMessage"), result.error || "Ошибка авторизации", 'error');
+            }
+
+        } catch (err) {
+            setMessage(document.getElementById("loginMessage"), err.error, 'error');
+        }
     });
 
-    // Зарегистрироваться
-    document.getElementById("registerBtn").addEventListener("click", (e) => {
+    // === РЕГИСТРАЦИЯ ===
+    document.getElementById("registerBtn").addEventListener("click", async (e) => {
         e.preventDefault();
+        clearMessages();
+
         const data = {
             phone: document.getElementById("regLogin").value,
             password: document.getElementById("regPassword").value,
             firstname: document.getElementById("regFirstname").value,
             lastname: document.getElementById("regLastname").value
         };
-        sendAuthData("../actions/session/register.php", data, document.getElementById("registerMessage"));
+
+        try {
+            // Регистрация
+            const registerResult = await register(data);
+
+            if (!registerResult.success) {
+                setMessage(document.getElementById("registerMessage"), registerResult.error || "Ошибка регистрации", 'error');
+                return;
+            }
+
+            // Автоматический вход после успешной регистрации
+            const loginData = {
+                login: data.phone,  // Используем телефон как логин
+                password: data.password
+            };
+
+            const loginResult = await login(loginData);
+
+            if (loginResult.success) {
+                // Токен записан в cookie
+                clearMessages();
+                loginForm.classList.remove("active");
+                registerForm.classList.remove("active");
+                successScreen.classList.add("active");
+                setTimeout(() => (window.location.href = container.dataset.returnUrl), 2000);
+
+            } else {
+                setMessage(document.getElementById("registerMessage"), loginResult.message || "Регистрация прошла, но вход не удался", 'error');
+            }
+
+        } catch (err) {
+            setMessage(document.getElementById("registerMessage"), err.message, 'error');
+        }
     });
 });

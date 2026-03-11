@@ -1,7 +1,6 @@
 <?php
     require_once 'includes/init.php';
-    global $db, $current_user_id;
-
+    global $db_frontend, $current_user_id;
 
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
@@ -15,32 +14,50 @@
 
     
     // Проверяем админ ли
-    $is_admin = false;
-
-    $stmt = $db->prepare('SELECT id FROM group_roles WHERE name = ?');
-    $stmt->bindValue(1, 'owner', SQLITE3_TEXT);
-    $result = $stmt->execute();
-    $role = $result->fetchArray(SQLITE3_ASSOC);
+    $admin_role_names = ['owner', 'moderator', 'superadmin'];
+    $placeholders = str_repeat('?,', count($admin_role_names) - 1) . '?';
+    $sql = "
+        SELECT 1 FROM group_members gm
+        JOIN group_roles gr ON gm.role_id = gr.id
+        WHERE gm.group_id = ? 
+            AND gm.user_id = ? 
+            AND gr.name IN ($placeholders)
+    ";
+    $is_admin = $db_frontend->fetchOne(sql, [
+            $group['id'],
+            $current_user_id,
+            $admin_role_names
+        ]
+    );
     
-    if ($role) {
-        $owner_role_id = $role['id'];
+    // // Проверяем админ ли
+    // $is_admin = false;
+    // $admin_roles = $db_frontend->fetchAll(
+    //     'SELECT id FROM group_roles WHERE name IN ("?")',
+    //     ['owner']
+    // );
+    // if (!empty($admin_roles)) {
+    //     $member = $db_frontend->fetchOne(
+    //         'SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?',
+    //         [
+    //             $group['id'],
+    //             $current_user_id
+    //         ]
+    //     );
+    //     foreach ($admin_roles as $role) {
+    //         if ($member['role_id'] === $role['id']) {
+    //             $is_admin = true;
+    //             break;
+    //         }
+    //     }
+    // }
 
-        // Проверка прав пользователя
-        $stmt = $db->prepare('SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND role_id = ?');
-        $stmt->bindValue(1, $group['id'], SQLITE3_INTEGER);
-        $stmt->bindValue(2, $current_user_id, SQLITE3_INTEGER);
-        $stmt->bindValue(3, $owner_role_id, SQLITE3_INTEGER);
-        $result = $stmt->execute();
-        if ($result->fetchArray(SQLITE3_ASSOC) !== false) {
-            // Пользователь админ
-            $is_admin = true;
-        }
-    }
 
 
     if (empty($action)) {
         
     } elseif ($action === 'edit') {
+        // Не пускаем на страницу редактирования группы если не админ
         if (!$is_admin) header('Location: ' . $path);
     }
 
@@ -170,9 +187,6 @@
             'currentUserId' => $current_user_id
         ]) ?>;
     </script>
-    <script src="js/group_profile.js"></script>
-    <script src="js/profile_dropdown.js"></script>
-    <script src="js/posts.js"></script>
 
 <?php elseif ($action === 'edit'): ?>
     <div class="centered-container">
@@ -223,8 +237,6 @@
             'currentUserId' => $current_user_id
         ]) ?>;
     </script>
-    <script src="js/group_profile_edit.js"></script>
-    <script src="js/profile_dropdown.js"></script>
 
 <?php endif; ?>
 
@@ -233,22 +245,30 @@
 <?php
     $content = ob_get_clean();
     $title = $group_name;
-
+    $scripts = [
+        'js/profile_dropdown.js'
+    ];
+    $stylesheets = [];
     
     if (empty($action)) {
-        $stylesheets = [
+        array_push($scripts,
+            'js/group_profile.js',
+            'js/posts.js'
+        );
+        array_push($stylesheets,
             'css/group_profile.css',
             'css/posts.css'
-        ];
+        );
     } elseif ($action === 'edit') {
-        $stylesheets = [
+        array_push($scripts,
+            'js/group_profile_edit.js'
+        );
+        array_push($stylesheets,
             'css/group_profile_edit.css'
-        ];
+        );
     }
-    
     
     require_once 'enums/layout.php';
     $layout = Layout::Standart;
-
     require 'layout.php';
 ?>

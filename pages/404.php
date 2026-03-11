@@ -1,5 +1,4 @@
 <?php
-    $title = "Такой страницы нет";
     ob_start();
 ?>
 
@@ -13,10 +12,12 @@
 
 <?php
     $content = ob_get_clean();
-    $stylesheet = 'css/404.css'; // Подключаем наш CSS файл
-    
+    $title = "Такой страницы нет";
+    $scripts = [];
+    $stylesheets = [
+        'css/404.css'
+    ];
     require_once 'enums/layout.php';
     $layout = Layout::Micro;
-    
     require 'layout.php';
 ?>

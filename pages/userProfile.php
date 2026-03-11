@@ -1,7 +1,6 @@
 <?php
     require_once 'includes/init.php';
-    global $db, $current_user_id;
-
+    global $db_frontend, $current_user_id;
 
 
     // Отформатированные данные пользователя
@@ -9,40 +8,16 @@
     $user_photo = $user['photo'];
     
     // Получаем статус пользователя
-    $stmt = $db->prepare('SELECT * FROM user_statuses WHERE id = ?');
-    $stmt->bindValue(1, $user['status_id'], SQLITE3_INTEGER);
-    $result = $stmt->execute();
-    $user_status = $result->fetchArray(SQLITE3_ASSOC) ?: null;
+    $user_status = $db_frontend->fetchOne('SELECT * FROM user_statuses WHERE id = ?', [$user['status_id']]);
 
     // Получаем роль пользователя
-    $stmt = $db->prepare('SELECT * FROM user_roles WHERE id = ?');
-    $stmt->bindValue(1, $user['role_id'], SQLITE3_INTEGER);
-    $result = $stmt->execute();
-    $user_role = $result->fetchArray(SQLITE3_ASSOC) ?: null;
-
-    
-
-    function getRelationship($db, $user_id, $related_user_id) {
-        $stmt = $db->prepare("SELECT * FROM relationships WHERE user_id = ? AND related_user_id = ?");
-        $stmt->bindValue(1, $user_id, SQLITE3_INTEGER);
-        $stmt->bindValue(2, $related_user_id, SQLITE3_INTEGER);
-        $result = $stmt->execute();
-        $row = $result->fetchArray(SQLITE3_ASSOC) ?: null;
-        
-        return $row;
-    }
+    $user_role = $db_frontend->fetchOne('SELECT * FROM user_roles WHERE id = ?', [$user['status_id']]);
 
 
 
     if ($user['id'] !== $current_user_id) {
         // Списки взаимоотношений
-        $relationship_lists = [];
-        $stmt = $db->prepare('SELECT * FROM relationship_lists');
-        $result = $stmt->execute();
-        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-            $relationship_lists[] = $row;
-        }
-        
+        $relationship_lists = $db_frontend->fetchAll('SELECT * FROM relationship_lists');
     }
 
     
@@ -210,19 +185,22 @@
         'userId' => $user['id']
     ]) ?>;
 </script>
-
-<script src="js/profile.js"></script>
-<script src="js/profile_dropdown.js"></script>
+<!-- <script src="js/profile.js"></script>
+<script src="js/profile_dropdown.js"></script> -->
 
 
 
 <?php
     $content = ob_get_clean();
     $title = $user_fullname;
-    $stylesheet = 'css/profile.css';
-
+    $scripts = [
+        'js/profile.js',
+        'js/profile_dropdown.js'
+    ];
+    $stylesheets = [
+        'css/profile.css'
+    ];
     require_once 'enums/layout.php';
     $layout = Layout::Standart;
-
     require 'layout.php';
 ?>

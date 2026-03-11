@@ -1,31 +1,24 @@
 <?php
     require_once 'includes/init.php';
-    
+    global $db_frontend, $current_user_id;
 
     // Проверяем параметры URL
     $linkname = $_GET['linkname'] ?? '';
     $type = $_GET['type'] ?? '';
     $id = $_GET['id'] ?? '';
-    
+
     // 1. Поиск по linkname (site.ru/linkname)
     if (!empty($linkname)) {
         // Ищем пользователя
-        $stmt = $db->prepare('SELECT * FROM users WHERE linkname = ?');
-        $stmt->bindValue(1, $linkname);
-        $result = $stmt->execute();
-        $user = $result->fetchArray(SQLITE3_ASSOC);
+        $user = $db_frontend->fetchOne('SELECT * FROM users WHERE linkname = ?', [$linkname]);
         
         if ($user) {
             gotoUserProfile($user);
             exit;
         }
 
-
-        // Ищем группу
-        $stmt = $db->prepare('SELECT * FROM groups WHERE linkname = ?');
-        $stmt->bindValue(1, $linkname);
-        $result = $stmt->execute();
-        $group = $result->fetchArray(SQLITE3_ASSOC);
+        // Ищем группу  
+        $group = $db_frontend->fetchOne('SELECT * FROM groups WHERE linkname = ?', [$linkname]);
         
         if ($group) {
             gotoGroupProfile($group);
@@ -39,23 +32,17 @@
 
     // 2. Поиск по ID (site.ru/user123, site.ru/group456)
     if (!empty($type) && !empty($id) && is_numeric($id)) {
+        global $db_frontend;
+        
         if ($type === 'user') {
-            // Ищем пользователя по ID
-            $stmt = $db->prepare('SELECT * FROM users WHERE id = ?');
-            $stmt->bindValue(1, $id, SQLITE3_INTEGER);
-            $result = $stmt->execute();
-            $user = $result->fetchArray(SQLITE3_ASSOC);
+            $user = $db_frontend->fetchOne('SELECT * FROM users WHERE id = ?', [$id]);
             
             if ($user) {
                 gotoUserProfile($user);
                 exit;
             }
         } elseif ($type === 'group') {
-            // Ищем группу по ID
-            $stmt = $db->prepare('SELECT * FROM groups WHERE id = ?');
-            $stmt->bindValue(1, $id, SQLITE3_INTEGER);
-            $result = $stmt->execute();
-            $group = $result->fetchArray(SQLITE3_ASSOC);
+            $group = $db_frontend->fetchOne('SELECT * FROM groups WHERE id = ?', [$id]);
             
             if ($group) {
                 gotoGroupProfile($group);
@@ -63,23 +50,17 @@
             }
         }
 
-        // Error 404
         include 'pages/404.php';
         exit;
     }
 
-    
-    $user_id = isset($_SESSION['user_id']);
-
-    if (!empty($user_id)) {
-        // Главная страница
+    if (!empty($current_user_id)) {
         header('Location: feed');
         exit;
-    }
-    else {
+    } else {
         // Авторизация
         $form = $_GET['form'] ?? '';
-        $return_url = $_GET['return_url'] ?? '/';
+        $return_url = $_GET['return_url'] ?? '/social_network';
 
         require_once 'enums/auth.php';
         $is_register = $form === Auth::Register->text() ? true : false;
@@ -91,19 +72,15 @@
 
 
 
-
-
-
-
-
+    
     function gotoUserProfile($user) {
-        global $db;
+        $_GET['user'] = $user;
         include 'pages/userProfile.php';
         exit;
     }
 
     function gotoGroupProfile($group) {
-        global $db;
+        $_GET['group'] = $group;
         include 'pages/groupProfile.php';
         exit;
     }

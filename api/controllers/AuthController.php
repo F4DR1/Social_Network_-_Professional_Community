@@ -1,5 +1,6 @@
 <?php
     require_once 'core/Helpers.php';
+    require_once 'core/DeviceDetector.php';
 
     class AuthController {
         private $db;
@@ -7,253 +8,183 @@
         public function __construct($db, $auth = null) {
             $this->db = $db;
         }
+
+        /**
+         * POST /auth/check - проверка токена и возврат данных пользователя
+         */
+        public function check() {
+            $token = Helpers::extractToken();
+            
+            if (!$token) {
+                Helpers::errorResponse('Токен не найден', 401);
+            }
+            
+            // Проверяем сессию в БД (используем логику из Auth.php)
+            $session = $this->db->fetchOne(
+                "SELECT s.*, u.id, u.linkname, u.phone, u.firstname, u.lastname, u.photo 
+                FROM sessions s 
+                JOIN users u ON s.user_id = u.id 
+                WHERE s.token = ? AND s.last_activity > DATE_SUB(NOW(), INTERVAL 30 DAY)",
+                [$token]
+            );
+            
+            if (!$session) {
+                Helpers::errorResponse('Сессия недействительна или истекла', 401);
+            }
+            
+            // Обновляем last_activity
+            $this->db->query(
+                "UPDATE sessions SET last_activity = NOW() WHERE token = ?",
+                [$token]
+            );
+            
+            Helpers::jsonResponse([
+                'success' => true,
+                'user_id' => $session['user_id'],
+                'user' => [
+                    'id' => $session['id'],
+                    'linkname' => $session['linkname'],
+                    'phone' => $session['phone'],
+                    'firstname' => $session['firstname'],
+                    'lastname' => $session['lastname'],
+                    'photo' => $session['photo']
+                ]
+            ]);
+        }
         
-        // POST /register
+        /**
+         * POST /register
+         */
         public function register() {
             $data = json_decode(file_get_contents('php://input'), true);
             
-            // Валидация
+            // Валидация обязательных полей
             if (empty($data['phone']) || empty($data['password']) || empty($data['lastname']) || empty($data['firstname'])) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Телефон, пароль и имя обязательны']);
-                return;
+                Helpers::errorResponse('Телефон, пароль и имя обязательны');
             }
 
-            // Приводим телефон к единому формату
+            // Проверка сложности пароля
+            $passwordCheck = Helpers::validatePassword($data['password']);
+            if ($passwordCheck !== true) {
+                Helpers::errorResponse($passwordCheck);
+            }
+
+            // Форматируем телефон
             $cleanPhone = Helpers::formatPhone($data['phone']);
-
-            // Проверка что номер не пустой
             if (strlen($cleanPhone) <= 0) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Не верный формат телефона']);
-                return;
+                Helpers::errorResponse('Неверный формат телефона');
             }
 
-            // Проверяем, есть ли уже такой телефон
+            // Проверка уникальности телефона
             $exists = $this->db->fetchOne(
                 "SELECT id FROM users WHERE phone = ?",
                 [$cleanPhone]
             );
-            
             if ($exists) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Пользователь с таким номером телефона уже зарегистрирован']);
-                return;
+                Helpers::errorResponse('Пользователь с таким номером телефона уже зарегистрирован');
             }
             
-            // Создаем токен для API
-            $token = bin2hex(random_bytes(32));
-            
-            // Хешируем пароль
+            // Создание пользователя
             $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
             
-            // Сохраняем в БД
             $this->db->query(
-                "INSERT INTO users (phone, password_hash, lastname, firstname, api_token, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))",
-                [$cleanPhone, $passwordHash, $data['lastname'], $data['firstname'], $token]
+                "INSERT INTO users (phone, password_hash, lastname, firstname, created_at) 
+                VALUES (?, ?, ?, ?, NOW())",
+                [$cleanPhone, $passwordHash, $data['lastname'], $data['firstname']]
             );
             
-            $userId = $this->db->lastInsertId();
-            
-            // Отдаем токен клиенту
-            echo json_encode([
+            Helpers::jsonResponse([
                 'success' => true,
-                'user_id' => $userId,
-                'token' => $token
+                'user_id' => $this->db->lastInsertId()
             ]);
         }
         
-        // POST /login
+        /**
+         * POST /login
+         */
         public function login() {
             $data = json_decode(file_get_contents('php://input'), true);
             
             if (empty($data['login']) || empty($data['password'])) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Логин и пароль обязательны']);
-                return;
+                Helpers::errorResponse('Логин и пароль обязательны');
             }
 
-            // Определяем, что ввели: email или телефон?
-            $login = $data['login'];
-            $user = null;
+            // Поиск пользователя
+            $user = $this->findUserByLogin($data['login']);
             
-            // Проверяем, похоже ли на email (содержит @)
-            if (Helpers::validateEmail($login)) {
-                // Это email
-                $user = $this->db->fetchOne(
-                    "SELECT * FROM users WHERE email = ?",
-                    [$login]
-                );
-            } else {
-                // Считаем, что это телефон - приводим к единому формату
-                $cleanPhone = Helpers::formatPhone($login);
-                $user = $this->db->fetchOne(
-                    "SELECT * FROM users WHERE phone = ?",
-                    [$cleanPhone]
-                );
-            }
-            
-            // Проверяем пароль
             if (!$user || !password_verify($data['password'], $user['password_hash'])) {
-                http_response_code(401);
-                echo json_encode(['error' => 'Неверный логин или пароль']);
-                return;
+                Helpers::errorResponse('Неверный логин или пароль', 401);
             }
 
-            // Проверяем количество активных сессий
-            $activeSessions = $this->db->fetchOne(
-                "SELECT COUNT(*) as count FROM sessions WHERE user_id = ?",
-                [$user['id']]
-            )['count'];
+            // Создание сессии
+            $token = Helpers::generateToken();
+            $deviceInfo = DeviceDetector::getDeviceInfo();
             
-            if ($activeSessions >= 5) {
-                // Удаляем самую старую сессию
-                $this->db->query(
-                    "DELETE FROM sessions WHERE user_id = ? ORDER BY last_activity ASC LIMIT 1",
-                    [$user['id']]
-                );
-            }
-            
-            // Получаем информацию об устройстве (передаем с клиента)
-            $deviceInfo = $this->getDeviceInfo();
-            
-            // Генерируем новый токен для ЭТОЙ сессии
-            $token = bin2hex(random_bytes(32));
-            
-            // Создаем запись в таблице sessions
             $this->db->query(
                 "INSERT INTO sessions (user_id, token, device_name, device_type, ip_address, last_activity, created_at) 
-                VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
+                VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
                 [
                     $user['id'],
                     $token,
                     $deviceInfo['name'],
                     $deviceInfo['type'],
-                    $_SERVER['REMOTE_ADDR']
+                    DeviceDetector::getClientIP()
                 ]
             );
-            
-            // Отдаем токен клиенту
-            echo json_encode([
-                'success' => true,
-                'user_id' => $user['id'],
-                'token' => $token,
-                'session_id' => $this->db->lastInsertId()
-            ]);
-        }
 
-
-
-
-
-        /**
-         * Получает информацию об устройстве из User-Agent
-         */
-        private function getDeviceInfo() {
-            // По умолчанию
-            $deviceInfo = [
-                'name' => 'Неизвестное устройство',
-                'type' => 'web'
-            ];
-            
-            // Получаем User-Agent
-            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-            
-            if (empty($userAgent)) {
-                return $deviceInfo;
-            }
-            
-            // Определяем тип устройства
-            if (preg_match('/(mobile|iphone|ipod|android|blackberry|opera mini|iemobile|wp desktop)/i', $userAgent)) {
-                $deviceInfo['type'] = 'mobile';
-                $deviceInfo['name'] = $this->parseMobileDevice($userAgent);
-            } elseif (preg_match('/(tablet|ipad|kindle|playbook)/i', $userAgent)) {
-                $deviceInfo['type'] = 'tablet';
-                $deviceInfo['name'] = $this->parseMobileDevice($userAgent);
+            $sessionId = $this->db->lastInsertId();
+        
+            // Ответ в зависимости от типа клиента
+            if (Helpers::isWebRequest()) {
+                Helpers::setAuthCookie($token);
+                Helpers::jsonResponse([
+                    'success' => true,
+                    'user_id' => $user['id'],
+                    'session_id' => $sessionId
+                ]);
             } else {
-                $deviceInfo['type'] = 'desktop';
-                $deviceInfo['name'] = $this->parseDesktopDevice($userAgent);
+                Helpers::jsonResponse([
+                    'success' => true,
+                    'user_id' => $user['id'],
+                    'token' => $token,
+                    'session_id' => $sessionId
+                ]);
             }
-            
-            return $deviceInfo;
         }
-
+        
         /**
-         * Парсит мобильное устройство из User-Agent
+         * POST /logout
          */
-        private function parseMobileDevice($userAgent) {
-            $deviceName = 'Мобильное устройство';
+        public function logout() {
+            $token = Helpers::extractToken();
             
-            // Определяем модель iPhone
-            if (preg_match('/iPhone OS (\d+)_(\d+)/i', $userAgent, $matches)) {
-                $deviceName = 'iPhone (iOS ' . $matches[1] . '.' . $matches[2] . ')';
-            } elseif (preg_match('/iPhone/', $userAgent)) {
-                $deviceName = 'iPhone';
-            }
-            
-            // Определяем модель iPad
-            if (preg_match('/iPad.*OS (\d+)_(\d+)/i', $userAgent, $matches)) {
-                $deviceName = 'iPad (iOS ' . $matches[1] . '.' . $matches[2] . ')';
-            } elseif (preg_match('/iPad/', $userAgent)) {
-                $deviceName = 'iPad';
-            }
-            
-            // Определяем Android устройство
-            if (preg_match('/Android (\d+(?:\.\d+)?)/i', $userAgent, $matches)) {
-                $androidVersion = $matches[1];
+            if ($token) {
+                $this->db->query("DELETE FROM sessions WHERE token = ?", [$token]);
                 
-                // Пытаемся определить модель
-                if (preg_match('/; ?([^;]+) Build/', $userAgent, $modelMatches)) {
-                    $model = trim($modelMatches[1]);
-                    $deviceName = $model . ' (Android ' . $androidVersion . ')';
-                } else {
-                    $deviceName = 'Android (версия ' . $androidVersion . ')';
+                if (Helpers::isWebRequest()) {
+                    Helpers::deleteAuthCookie();
                 }
             }
             
-            return $deviceName;
+            Helpers::jsonResponse(['success' => true]);
         }
-
+        
         /**
-         * Парсит десктопное устройство из User-Agent
+         * Поиск пользователя по логину (email или телефон)
          */
-        private function parseDesktopDevice($userAgent) {
-            $os = 'Unknown OS';
-            $browser = 'Unknown Browser';
-            
-            // Определяем ОС
-            if (preg_match('/Windows NT (\d+\.\d+)/i', $userAgent, $matches)) {
-                $windowsVersions = [
-                    '10.0' => 'Windows 10/11',
-                    '6.3' => 'Windows 8.1',
-                    '6.2' => 'Windows 8',
-                    '6.1' => 'Windows 7',
-                    '6.0' => 'Windows Vista',
-                    '5.2' => 'Windows XP x64',
-                    '5.1' => 'Windows XP'
-                ];
-                $version = $matches[1];
-                $os = $windowsVersions[$version] ?? 'Windows ' . $version;
-            } elseif (preg_match('/Mac OS X (\d+)[_.](\d+)/i', $userAgent, $matches)) {
-                $os = 'macOS ' . $matches[1] . '.' . $matches[2];
-            } elseif (preg_match('/Linux/i', $userAgent)) {
-                $os = 'Linux';
+        private function findUserByLogin($login) {
+            if (Helpers::validateEmail($login)) {
+                return $this->db->fetchOne(
+                    "SELECT * FROM users WHERE email = ?",
+                    [$login]
+                );
+            } else {
+                $cleanPhone = Helpers::formatPhone($login);
+                return $this->db->fetchOne(
+                    "SELECT * FROM users WHERE phone = ?",
+                    [$cleanPhone]
+                );
             }
-            
-            // Определяем браузер
-            if (preg_match('/Chrome\/(\d+)/i', $userAgent, $matches)) {
-                $browser = 'Chrome ' . $matches[1];
-            } elseif (preg_match('/Firefox\/(\d+)/i', $userAgent, $matches)) {
-                $browser = 'Firefox ' . $matches[1];
-            } elseif (preg_match('/Safari\/(\d+)/i', $userAgent, $matches)) {
-                $browser = 'Safari';
-            } elseif (preg_match('/Edge\/(\d+)/i', $userAgent, $matches)) {
-                $browser = 'Edge ' . $matches[1];
-            } elseif (preg_match('/MSIE (\d+)/i', $userAgent, $matches)) {
-                $browser = 'Internet Explorer ' . $matches[1];
-            }
-            
-            return $os . ', ' . $browser;
         }
     }
 ?>

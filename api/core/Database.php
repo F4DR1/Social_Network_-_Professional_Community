@@ -1,22 +1,22 @@
 <?php
     class Database {
-        private $connection;
+        private $pdo;
         
         // При создании объекта сразу подключаемся к БД
         public function __construct() {
             $host = 'localhost';
-            $dbname = 'social_network';
+            $dbname = 'social_network_pc';
             $user = 'root';
             $pass = '';
             
             try {
-                $this->connection = new PDO(
+                $this->pdo = new PDO(
                     "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
                     $user,
                     $pass
                 );
                 // Режим ошибок - исключения
-                $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
                 die(json_encode(['error' => 'Ошибка подключения к БД']));
             }
@@ -24,7 +24,7 @@
         
         // Выполнить запрос с параметрами (защита от SQL-инъекций!)
         public function query($sql, $params = []) {
-            $stmt = $this->connection->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
             return $stmt;
         }
@@ -43,7 +43,7 @@
         
         // Получить последний вставленный ID
         public function lastInsertId() {
-            return $this->connection->lastInsertId();
+            return $this->pdo->lastInsertId();
         }
     }
 ?>

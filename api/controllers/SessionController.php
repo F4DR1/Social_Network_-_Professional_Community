@@ -1,4 +1,6 @@
 <?php
+    require_once 'core/Helpers.php';
+    
     class SessionController {
         private $db;
         private $auth;
@@ -8,8 +10,10 @@
             $this->auth = $auth;
         }
         
-        // GET /sessions - получить все мои сессии
-        public function getMySessions() {
+        /**
+         * GET /sessions - получить все мои сессии
+         */
+        public function getAllMySessions() {
             $this->auth->check();
             $sessions = $this->auth->getAllUserSessions();
             
@@ -24,7 +28,27 @@
             echo json_encode(['sessions' => $sessions]);
         }
         
-        // DELETE /sessions/{id} - завершить конкретную сессию
+        /**
+         * DELETE /sessions/current - завершить текущую сессию
+         */
+        public function terminateCurrentSession() {
+            $this->auth->check();
+            $currentSession = $this->auth->getCurrentSession();
+            
+            if ($currentSession) {
+                $this->db->query("DELETE FROM sessions WHERE id = ?", [$currentSession['id']]);
+                
+                if (Helpers::isWebRequest()) {
+                    Helpers::deleteAuthCookie();
+                }
+            }
+            
+            Helpers::jsonResponse(['success' => true]);
+        }
+        
+        /**
+         * DELETE /sessions/{id} - завершить конкретную сессию
+         */
         public function terminateSession($sessionId) {
             $this->auth->check();
             $currentUser = $this->auth->user();
@@ -37,8 +61,10 @@
             
             echo json_encode(['success' => true]);
         }
-        
-        // DELETE /sessions - завершить ВСЕ сессии, кроме текущей
+
+        /**
+         * DELETE /sessions - завершить ВСЕ сессии, кроме текущей
+         */
         public function terminateAllOtherSessions() {
             $this->auth->check();
             $currentUser = $this->auth->user();

@@ -1,12 +1,12 @@
 <?php
     require_once '../includes/init.php';
+    global $db_frontend, $current_user_id;
     
-    if (empty($GLOBALS['current_user_id'])) {
-        header('Location: /');
+    if (!$current_user_id) {
+        $return_url = urlencode($_SERVER['REQUEST_URI']);
+        header("Location: /auth.php?return_url=" . $return_url);
         exit;
     }
-
-    $title = 'Лента новостей';
     
     ob_start();
 ?>
@@ -23,9 +23,10 @@
 
 <?php
     $content = ob_get_clean();
-    
+    $title = 'Лента новостей';
+    $scripts = [];
+    $stylesheets = [];
     require_once '../enums/layout.php';
     $layout = Layout::Standart;
-
     require '../layout.php';
 ?>

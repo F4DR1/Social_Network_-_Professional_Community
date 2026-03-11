@@ -1,16 +1,9 @@
 <?php
     require_once '../includes/init.php';
-    global $db, $current_user_id;
+    global $db_frontend, $current_user_id;
 
-
-    // Списки взаимоотношений
-    $relationship_lists = [];
-    $stmt = $db->prepare('SELECT * FROM users');
-    $result = $stmt->execute();
-    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-        $users_list[] = $row;
-    }
-
+    // Списки пользователей
+    $users_list = $db_frontend->fetchAll('SELECT * FROM users');
 
     ob_start();
 ?>
@@ -45,10 +38,11 @@
 <?php
     $content = ob_get_clean();
     $title = 'Поиск';
-    $stylesheet = 'css/search.css';
-    
+    $scripts = [];
+    $stylesheets = [
+        'css/search.css'
+    ];
     require_once '../enums/layout.php';
     $layout = Layout::Standart;
-
     require '../layout.php';
 ?>

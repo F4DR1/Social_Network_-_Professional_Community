@@ -1,6 +1,6 @@
 <?php
     require_once '../includes/init.php';
-    global $db, $current_user_id;
+    global $db_frontend, $current_user_id;
 
 
     
@@ -32,16 +32,18 @@
 
 
 
-<script src="js/messages.js"></script>
+<!-- <script src="js/messages.js"></script> -->
 
 
 
 <?php
     $content = ob_get_clean();
     $title = 'Сообщения';
-    
+    $scripts = [
+        'js/messages.js'
+    ];
+    $stylesheets = [];
     require_once '../enums/layout.php';
     $layout = Layout::Standart;
-
     require '../layout.php';
 ?>

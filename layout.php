@@ -1,34 +1,46 @@
 <?php
     require_once 'includes/init.php';
-    
+    global $db_frontend;
+
     require_once 'enums/auth.php';
     require_once 'enums/layout.php';
+
+
+    if (isset($scripts) && $scripts > 0) {
+        foreach ($scripts as $script) {
+            echo "<script src=\"/social_network/$script\" type=\"module\"></script>";
+        }
+    }
+
+
+
     if (empty($layout)) {
         $layout = Layout::Standart;
     }
 
     if ($layout === Layout::Standart) {
-        global $db, $current_user_id, $current_user;
-        if ($current_user_id && $current_user) {
+        global $current_user_id, $current_user;
+        
+        if (!empty($current_user_id) && !empty($current_user)) {
             $current_user_fullname = $current_user['firstname'] . ' ' . $current_user['lastname'];
             $current_user_link = empty($current_user['linkname']) ? 'user' . $current_user_id : $current_user['linkname'];
-            $current_user_photo = $current_user['photo'];
+            $current_user_photo = $current_user['photo'] ?? null;
 
-            # Получаем статус пользователя
-            $stmt = $db->prepare('SELECT * FROM user_statuses WHERE id = ?');
-            $stmt->bindValue(1, $current_user['status_id'], SQLITE3_INTEGER);
-            $result = $stmt->execute();
-            $current_user_status = $result->fetchArray(SQLITE3_ASSOC) ?: null;
+        //     // Получаем статус пользователя (PDO)
+        //     $current_user_status = $db_frontend->fetchOne(
+        //         'SELECT * FROM user_statuses WHERE id = ?',
+        //         [$current_user['status_id']]
+        //     );
 
-            # Получаем роль пользователя
-            $stmt = $db->prepare('SELECT * FROM user_roles WHERE id = ?');
-            $stmt->bindValue(1, $current_user['role_id'], SQLITE3_INTEGER);
-            $result = $stmt->execute();
-            $current_user_role = $result->fetchArray(SQLITE3_ASSOC) ?: null;
+        //     // Получаем роль пользователя (PDO)
+        //     $current_user_role = $db_frontend->fetchOne(
+        //         'SELECT * FROM user_roles WHERE id = ?',
+        //         [$current_user['role_id']]
+        //     );
         }
     }
 
-    // Полная ссылка
+    // Полная ссылка для return_url
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
     $path = $_SERVER['REQUEST_URI'];
@@ -44,26 +56,22 @@
     <title>
         <?php
             $base_title = 'NNN';
-            if (!empty($title)) {
-                echo $title;
-            } else {
-                echo $base_title;
-            }
+            echo $title ?? $base_title;
         ?>
     </title>
 
-    <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../css/global.css">
+    <link rel="icon" href="/social_network/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/social_network/css/global.css">
 
     <!-- Подгружаем стиль определённой страницы -->
     <?php
         if (isset($stylesheets) && $stylesheets > 0) {
             foreach ($stylesheets as $sh) {
-                echo "<link rel=\"stylesheet\" href=$sh>";
+                echo "<link rel=\"stylesheet\" href=/social_network/$sh>";
             }
         }
         if (!empty($stylesheet)) {
-            echo "<link rel=\"stylesheet\" href=$stylesheet>";
+            echo "<link rel=\"stylesheet\" href=/social_network/$stylesheet>";
         }
     ?>
 </head>
@@ -72,7 +80,7 @@
         <header>
             <div class="header-container">
                 <a href="/" class="logo-row">
-                    <img src="../images/logo.png" alt="Логотип NNN" class="logo">
+                    <img src="/social_network/images/logo.png" alt="Логотип NNN" class="logo">
                     <h1>NNN</h1>
                 </a>
                 <?php if ($layout === Layout::Standart): ?>
@@ -89,7 +97,7 @@
                             <nav class="profile-dropdown">
                                 <button class="profile-trigger" aria-label="Меню профиля">
                                     <div class="profile-avatar">
-                                        <img src="<?= $current_user_photo ?: 'images/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="32" height="32">
+                                        <img src="<?= $current_user_photo ?: '/social_network/images/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="32" height="32">
                                     </div>
                                     <span class="profile-name"><?= htmlspecialchars($current_user_fullname) ?></span>
                                     <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -99,7 +107,7 @@
                                 
                                 <div class="dropdown-menu">
                                     <div class="profile-info">
-                                        <img src="<?= $current_user_photo ?: 'images/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="48" height="48">
+                                        <img src="<?= $current_user_photo ?: '/social_network/images/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="48" height="48">
                                         <div>
                                             <div class="profile-fullname"><?= htmlspecialchars($current_user_fullname) ?></div>
                                             <div class="profile-link">@<?= htmlspecialchars($current_user['linkname'] ?: 'user' . $current_user_id) ?></div>

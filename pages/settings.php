@@ -1,12 +1,12 @@
 <?php
     require_once '../includes/init.php';
+    global $db_frontend, $current_user_id;
     
-    if (empty($GLOBALS['current_user_id'])) {
+    // if (empty($GLOBALS['current_user_id'])) {
+    if (!isset($current_user_id)) {
         header('Location: /');
         exit;
     }
-
-    $title = 'Мои настройки';
     
     ob_start();
 ?>
@@ -42,9 +42,10 @@
 
 <?php
     $content = ob_get_clean();
-    
+    $title = 'Мои настройки';
+    $scripts = [];
+    $stylesheets = [];
     require_once '../enums/layout.php';
     $layout = Layout::Standart;
-
     require '../layout.php';
 ?>
