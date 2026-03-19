@@ -2,7 +2,6 @@
     require_once '../includes/init.php';
     global $db_frontend, $current_user_id;
     
-    // if (empty($GLOBALS['current_user_id'])) {
     if (!isset($current_user_id)) {
         header('Location: /');
         exit;
@@ -45,7 +44,7 @@
     $title = 'Мои настройки';
     $scripts = [];
     $stylesheets = [];
-    require_once '../enums/layout.php';
+    require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;
-    require '../layout.php';
+    require ROOT_PATH . '/layout.php';
 ?>

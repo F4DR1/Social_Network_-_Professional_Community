@@ -2,6 +2,14 @@
     require_once 'DeviceDetector.php';
 
     class Helpers {
+
+    
+        /**
+         * Возвращает список ролей администраторов групп
+         */
+        public static function getGroupAdminRoles() {
+            return ['owner', 'admin', 'moderator'];
+        }
         
         /**
          * Извлекает токен из запроса
@@ -100,6 +108,7 @@
          * JSON ответ
          */
         public static function jsonResponse($data, $statusCode = 200) {
+            array_merge($data);
             http_response_code($statusCode);
             header('Content-Type: application/json');
             echo json_encode($data, JSON_UNESCAPED_UNICODE);
@@ -110,7 +119,7 @@
          * Ошибка в JSON
          */
         public static function errorResponse($message, $statusCode = 400) {
-            self::jsonResponse(['error' => $message], $statusCode);
+            self::jsonResponse(['success' => false, 'error' => $message], $statusCode);
         }
         
         /**

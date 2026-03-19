@@ -1,103 +1,142 @@
 <?php
-    require_once 'session_start.php';
+    require_once __DIR__ . '/../bootstrap.php';
+    require_once CONFIG_PATH . '/config.php';
+    require_once INCLUDES_PATH . '/session_start.php';
+    global $current_user_id, $current_user;
 
-    // Локальная PDO БД для фронтенда (простые запросы)
-    class FrontendDB {
-        private $pdo;
-        
-        public function __construct() {
-            $host = 'localhost';
-            $dbname = 'social_network_pc';  // БД
-            $user = 'root';
-            $pass = '';
-            
-            try {
-                $this->pdo = new PDO(
-                    "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
-                    $user, $pass
-                );
-                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            } catch (PDOException $e) {
-                die('Ошибка подключения к БД: ' . $e->getMessage());
-            }
-        }
-        
-        public function fetchOne($sql, $params = []) {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        }
-        
-        public function fetchAll($sql, $params = []) {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-    }
 
-    global $db_frontend, $current_user_id, $current_user;
-
-    // Инициализация фронтенд БД
-    $db_frontend = new FrontendDB();
-
-    // API клиент
-    function getApiUrl() {
-        $host = $_SERVER['HTTP_HOST'];
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-
-        if ($host === 'localhost' || $host === '127.0.0.1') {
-            return $protocol . '://localhost/social_network/api';
-        }
-        return $protocol . '://api.website.com';
-    }
-
-    function apiRequest($endpoint, $data = null) {
-        $url = getApiUrl() . $endpoint;
-
-        $cookies = [];
-        if (isset($_COOKIE['auth_token']) && !empty($_COOKIE['auth_token'])) {
-            $cookies[] = 'Cookie: auth_token=' . $_COOKIE['auth_token'];
-        }
-        
-        $options = [
-            'http' => [
-                'header' => implode("\r\n", $cookies) . "\r\n" . "Content-Type: application/json\r\n",
-                'method' => 'POST',
-                'content' => json_encode($data ?? []),
-                'ignore_errors' => true
-            ]
-        ];
-        
-        $context = stream_context_create($options);
-        $result = @file_get_contents($url, false, $context);
-
-        if ($result === false) {
-            error_log("API Request failed: " . error_get_last()['message']);
-            return false;
-        }
-
-        return json_decode($result, true);
-    }
-
-    function checkAuth() {
+    /**
+     * Универсальная функция для запросов к API (укороченная)
+     */
+    function apiRequest($endpoint, $options = []) {
         try {
-            $response = apiRequest('/auth/check');
-            
-            if ($response && isset($response['success']) && $response['success'] === true) {
-                return [
-                    'user_id' => $response['user_id'],
-                    'user' => $response['user']
-                ];
+            $url = API . $endpoint;
+            $method = strtoupper($options['method'] ?? 'POST');
+            $timeout = $options['timeout'] ?? 30;
+            $sendCookies = $options['send_cookies'] ?? true;
+
+            // Заголовки
+            $headers = array_merge(['Content-Type: application/json'], $options['headers'] ?? []);
+
+            // Тело запроса
+            $body = null;
+            if (isset($options['body']) && is_array($options['body'])) {
+                $body = json_encode($options['body'], JSON_UNESCAPED_UNICODE);
+                if ($body === false) throw new Exception('JSON error');
             }
+
+            $ch = curl_init();
+            $curlOptions = [
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_CUSTOMREQUEST => $method,
+                CURLOPT_HTTPHEADER => $headers,
+                CURLOPT_TIMEOUT => $timeout,
+                CURLOPT_FOLLOWLOCATION => true,
+            ];
+
+            // Тело только для не-GET методов
+            if ($method !== 'GET' && $body !== null) {
+                $curlOptions[CURLOPT_POSTFIELDS] = $body;
+            }
+
+            // Куки в правильном формате
+            if ($sendCookies && !empty($_COOKIE)) {
+                $cookieString = '';
+                foreach ($_COOKIE as $name => $value) {
+                    $cookieString .= $name . '=' . $value . '; ';
+                }
+                $curlOptions[CURLOPT_COOKIE] = rtrim($cookieString, '; ');
+            }
+
+            curl_setopt_array($ch, $curlOptions);
+
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($error) throw new Exception("cURL: $error");
+
+            // Диагностика JSON
+            $decoded = json_decode($response, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("JSON error: " . json_last_error_msg());
+            }
+
+
+            // Возвращаем HTTP код и данные
+            return [
+                'success' => $httpCode < 400,
+                'http_code' => $httpCode,
+                'data' => $decoded ?? $response,
+                'raw' => $response
+            ];
+
         } catch (Exception $e) {
-            error_log('Auth check error: ' . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'http_code' => $httpCode
+            ];
         }
-        
-        return false;
     }
+
+
+
+
+    
+    // === АВТОРИЗАЦИЯ ===
+    function authCheck() {
+        return apiRequest('/auth/check', [
+            'method' => 'POST'
+        ]);
+    }
+
+    
+    // === ОТНОШЕНИЯ ===
+    function relationshipsList() {
+        return apiRequest("/relationships/list", [
+            'method' => 'GET'
+        ]);
+    }
+
+    
+    // === ПОЛЬЗОВАТЕЛИ ===
+    function usersGetId($userId) {
+        return apiRequest("/users/{$userId}", [
+            'method' => 'GET'
+        ]);
+    }
+    function usersGetLinkname($userLinkname) {
+        return apiRequest("/users/by-link/{$userLinkname}", [
+            'method' => 'GET'
+        ]);
+    }
+
+
+    // === ГРУППЫ ===
+    function groupsGetId($groupId) {
+        return apiRequest("/groups/{$groupId}", [
+            'method' => 'GET'
+        ]);
+    }
+    function groupsGetLinkname($groupLinkname) {
+        return apiRequest("/groups/by-link/{$groupLinkname}", [
+            'method' => 'GET'
+        ]);
+    }
+    function groupsUserIsAdmin($groupId, $userId) {
+        return apiRequest("/groups/is-admin/$groupId/$userId", [
+            'method' => 'GET'
+        ]);
+    }
+
+
 
     // Получение данных текущего пользователя
-    $auth_check = checkAuth();
-    $current_user_id = $auth_check ? $auth_check['user_id'] : null;
-    $current_user = $auth_check ? $auth_check['user'] : null;
+    $auth_check = authCheck();
+    $current_user_id = $auth_check['success'] ? $auth_check['data']['user_id'] : null;
+    $current_user = $auth_check['success'] ? $auth_check['data']['user'] : null;
 ?>

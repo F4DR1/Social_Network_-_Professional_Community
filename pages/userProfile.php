@@ -1,25 +1,19 @@
 <?php
-    require_once 'includes/init.php';
-    global $db_frontend, $current_user_id;
+    require_once __DIR__ . '/../bootstrap.php';
+    require_once INCLUDES_PATH . '/init.php';
+    global $current_user_id;
 
 
     // Отформатированные данные пользователя
     $user_fullname = $user['firstname'] . ' ' . $user['lastname'];
     $user_photo = $user['photo'];
-    
-    // Получаем статус пользователя
-    $user_status = $db_frontend->fetchOne('SELECT * FROM user_statuses WHERE id = ?', [$user['status_id']]);
-
-    // Получаем роль пользователя
-    $user_role = $db_frontend->fetchOne('SELECT * FROM user_roles WHERE id = ?', [$user['status_id']]);
 
 
 
     if ($user['id'] !== $current_user_id) {
-        // Списки взаимоотношений
-        $relationship_lists = $db_frontend->fetchAll('SELECT * FROM relationship_lists');
+        $result = relationshipsList();
+        $relationship_lists = $result['data']['list'];
     }
-
     
     ob_start();
 ?>
@@ -172,8 +166,7 @@
         </div>
 
         <div>
-            <p>Роль: <?= $user_role['name']; ?></p>
-            <p>Статус: <?= $user_status['name']; ?></p>
+            
         </div>
     </div>
 </div>
@@ -185,8 +178,6 @@
         'userId' => $user['id']
     ]) ?>;
 </script>
-<!-- <script src="js/profile.js"></script>
-<script src="js/profile_dropdown.js"></script> -->
 
 
 
@@ -194,13 +185,13 @@
     $content = ob_get_clean();
     $title = $user_fullname;
     $scripts = [
-        'js/profile.js',
-        'js/profile_dropdown.js'
+        'user_profile.js',
+        'profile_dropdown.js'
     ];
     $stylesheets = [
-        'css/profile.css'
+        'user_profile.css'
     ];
-    require_once 'enums/layout.php';
+    require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;
-    require 'layout.php';
+    require ROOT_PATH . '/layout.php';
 ?>

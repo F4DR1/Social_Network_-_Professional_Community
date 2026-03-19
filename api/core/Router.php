@@ -18,7 +18,7 @@
         public function dispatch($method, $uri) {
             // Убираем GET-параметры из URL (/?id=5 -> /)
             // $uri = parse_url($uri, PHP_URL_PATH);
-            $scriptName = dirname($_SERVER['SCRIPT_NAME']);  // /social_network/api
+            $scriptName = dirname($_SERVER['SCRIPT_NAME']);
             $scriptName = rtrim($scriptName, '/');
 
             if (strpos($uri, $scriptName) === 0) {
@@ -27,9 +27,9 @@
             
             // Убираем GET-параметры
             $uri = parse_url($uri, PHP_URL_PATH);
-            $uri = trim($uri, '/');  // ✅ Убираем начальный слеш
+            $uri = trim($uri, '/');  // Убираем начальный слеш
             
-            error_log("Clean URI: " . $uri);  // DEBUG
+            // error_log("Clean URI: " . $uri);
             
             
             // Ищем подходящий маршрут
@@ -63,7 +63,7 @@
         
         // Конвертирует /users/{id} в регулярку /^\/users\/([^\/]+)$/
         private function convertToRegex($path) {
-            // ✅ Убираем начальный слеш из пути роута
+            // Убираем начальный слеш из пути роута
             $path = trim($path, '/');  
             
             // Заменяем {id} на capturing group

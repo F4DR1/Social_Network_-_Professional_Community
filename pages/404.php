@@ -1,4 +1,5 @@
 <?php
+    require_once __DIR__ . '/../bootstrap.php';
     ob_start();
 ?>
 
@@ -15,9 +16,9 @@
     $title = "Такой страницы нет";
     $scripts = [];
     $stylesheets = [
-        'css/404.css'
+        '404.css'
     ];
-    require_once 'enums/layout.php';
+    require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Micro;
-    require 'layout.php';
+    require ROOT_PATH . '/layout.php';
 ?>

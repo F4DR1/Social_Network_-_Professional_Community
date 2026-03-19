@@ -1,23 +1,7 @@
 <?php
-    require_once '../includes/init.php';
-    global $db_frontend, $current_user_id;
-
-    $sql = "
-        SELECT 
-            g.id,
-            g.name,
-            g.linkname,
-            g.photo,
-            gm.role_id,
-            gm.joined_at,
-            (SELECT COUNT(*) FROM group_members gm2 WHERE gm2.group_id = g.id) as member_count,
-            (SELECT gr.name FROM group_roles gr WHERE gr.id = gm.role_id) as role_name
-        FROM groups g
-        JOIN group_members gm ON g.id = gm.group_id
-        WHERE gm.user_id = ?
-        ORDER BY gm.joined_at DESC
-    ";
-    $groups_list = $db_frontend->fetchAll($sql, [$current_user_id]);
+    require_once __DIR__ . '/../bootstrap.php';
+    require_once INCLUDES_PATH . '/init.php';
+    global $current_user_id;
     
     ob_start();
 ?>
@@ -28,19 +12,9 @@
     <div class="container">
         <h2>Группы</h2>
 
-        <?php if (empty($groups_list)): ?>
-            <p>Вы не подписаны ни на одну группу.</p>
-        <?php else: ?>
-            <?php foreach ($groups_list as $group): ?>
-                <div class="group-panel">
-                    <img src="<?= $group['photo'] ?? 'images/empty.webp' ?>" alt="<?= htmlspecialchars($group['name']) ?>" width=80>
-                    <a href="<?= empty($group['linkname']) ? 'group' . $group['id'] : $group['linkname'] ?>" class="name-line">
-                        <?= htmlspecialchars($group['name']) ?>
-                    </a>
-                    <a href="messages?type=group&id=<?= $group['id'] ?>" class="message-line">Написать в чат группы</a>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
+        <div class="groups" id="groupsList">
+
+        </div>
     </div>
 </div>
 
@@ -83,12 +57,12 @@
     $content = ob_get_clean();
     $title = 'Группы';
     $scripts = [
-        'js/groups.js'
+        'groups.js'
     ];
     $stylesheets = [
-        'css/groups.css'
+        'groups.css'
     ];
-    require_once '../enums/layout.php';
+    require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;
-    require '../layout.php';
+    require ROOT_PATH . '/layout.php';
 ?>

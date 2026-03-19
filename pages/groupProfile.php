@@ -1,6 +1,7 @@
 <?php
-    require_once 'includes/init.php';
-    global $db_frontend, $current_user_id;
+    require_once __DIR__ . '/../bootstrap.php';
+    require_once INCLUDES_PATH . '/init.php';
+    global $current_user_id;
 
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
@@ -12,46 +13,8 @@
     $group_photo = $group['photo'];
 
 
-    
     // Проверяем админ ли
-    $admin_role_names = ['owner', 'moderator', 'superadmin'];
-    $placeholders = str_repeat('?,', count($admin_role_names) - 1) . '?';
-    $sql = "
-        SELECT 1 FROM group_members gm
-        JOIN group_roles gr ON gm.role_id = gr.id
-        WHERE gm.group_id = ? 
-            AND gm.user_id = ? 
-            AND gr.name IN ($placeholders)
-    ";
-    $is_admin = $db_frontend->fetchOne(sql, [
-            $group['id'],
-            $current_user_id,
-            $admin_role_names
-        ]
-    );
-    
-    // // Проверяем админ ли
-    // $is_admin = false;
-    // $admin_roles = $db_frontend->fetchAll(
-    //     'SELECT id FROM group_roles WHERE name IN ("?")',
-    //     ['owner']
-    // );
-    // if (!empty($admin_roles)) {
-    //     $member = $db_frontend->fetchOne(
-    //         'SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?',
-    //         [
-    //             $group['id'],
-    //             $current_user_id
-    //         ]
-    //     );
-    //     foreach ($admin_roles as $role) {
-    //         if ($member['role_id'] === $role['id']) {
-    //             $is_admin = true;
-    //             break;
-    //         }
-    //     }
-    // }
-
+    $is_admin = groupsUserIsAdmin($group['id'], $current_user_id);
 
 
     if (empty($action)) {
@@ -61,7 +24,6 @@
         if (!$is_admin) header('Location: ' . $path);
     }
 
-    
     ob_start();
 ?>
 
@@ -246,29 +208,29 @@
     $content = ob_get_clean();
     $title = $group_name;
     $scripts = [
-        'js/profile_dropdown.js'
+        'profile_dropdown.js'
     ];
     $stylesheets = [];
     
     if (empty($action)) {
         array_push($scripts,
-            'js/group_profile.js',
-            'js/posts.js'
+            'group_profile.js',
+            'posts.js'
         );
         array_push($stylesheets,
-            'css/group_profile.css',
-            'css/posts.css'
+            'group_profile.css',
+            'posts.css'
         );
     } elseif ($action === 'edit') {
         array_push($scripts,
-            'js/group_profile_edit.js'
+            'group_profile_edit.js'
         );
         array_push($stylesheets,
-            'css/group_profile_edit.css'
+            'group_profile_edit.css'
         );
     }
     
-    require_once 'enums/layout.php';
+    require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;
-    require 'layout.php';
+    require ROOT_PATH . '/layout.php';
 ?>

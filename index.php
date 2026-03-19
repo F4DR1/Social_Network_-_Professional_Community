@@ -1,71 +1,72 @@
 <?php
-    require_once 'includes/init.php';
-    global $db_frontend, $current_user_id;
+    require_once __DIR__ . '/bootstrap.php';
+    require_once INCLUDES_PATH . '/init.php';
+    require_once INCLUDES_PATH . '/http_errors.php';
+    global $current_user_id;
 
     // Проверяем параметры URL
     $linkname = $_GET['linkname'] ?? '';
     $type = $_GET['type'] ?? '';
     $id = $_GET['id'] ?? '';
 
-    // 1. Поиск по linkname (site.ru/linkname)
+    // Поиск по linkname (site.ru/linkname)
     if (!empty($linkname)) {
-        // Ищем пользователя
-        $user = $db_frontend->fetchOne('SELECT * FROM users WHERE linkname = ?', [$linkname]);
-        
-        if ($user) {
-            gotoUserProfile($user);
+        // Пользователи
+        $result = usersGetLinkname($linkname);
+        if ($result['success']) {
+            gotoUserProfile($result['data']['user']);
+            exit;
+        } else {
+            httpErrorCheck($result['http_code']);
             exit;
         }
 
-        // Ищем группу  
-        $group = $db_frontend->fetchOne('SELECT * FROM groups WHERE linkname = ?', [$linkname]);
-        
-        if ($group) {
-            gotoGroupProfile($group);
+        // Группы
+        $result = groupsGetLinkname($linkname);
+        if ($result['success']) {
+            gotoGroupProfile($result['data']['group']);
+            exit;
+        } else{
+            httpErrorCheck($result['http_code']);
             exit;
         }
-
-        // Error 404
-        include 'pages/404.php';
-        exit;
     }
 
-    // 2. Поиск по ID (site.ru/user123, site.ru/group456)
+    // Поиск по ID (site.ru/user123, site.ru/group456)
     if (!empty($type) && !empty($id) && is_numeric($id)) {
-        global $db_frontend;
-        
-        if ($type === 'user') {
-            $user = $db_frontend->fetchOne('SELECT * FROM users WHERE id = ?', [$id]);
+        switch ($type) {
+            case 'user':
+                $result = usersGetId($id);
+                if ($result['success']) {
+                    gotoUserProfile($result['data']['user']);
+                } else {
+                    httpErrorCheck($result['http_code']);
+                }
+                break;
+                
+            case 'group':
+                $result = groupsGetId($id);
+                if ($result['success']) {
+                    gotoGroupProfile($result['data']['group']);
+                } else {
+                    httpErrorCheck($result['http_code']);
+                }
+                break;
             
-            if ($user) {
-                gotoUserProfile($user);
-                exit;
-            }
-        } elseif ($type === 'group') {
-            $group = $db_frontend->fetchOne('SELECT * FROM groups WHERE id = ?', [$id]);
-            
-            if ($group) {
-                gotoGroupProfile($group);
-                exit;
-            }
+            default:
+                httpErrorCheck(404);
+                break;
         }
-
-        include 'pages/404.php';
         exit;
     }
 
+    // Остальные случаи
     if (!empty($current_user_id)) {
-        header('Location: feed');
+        include PAGES_PATH . '/feed.php';
         exit;
-    } else {
-        // Авторизация
-        $form = $_GET['form'] ?? '';
-        $return_url = $_GET['return_url'] ?? '/social_network';
-
-        require_once 'enums/auth.php';
-        $is_register = $form === Auth::Register->text() ? true : false;
         
-        include 'pages/auth.php';
+    } else {
+        include PAGES_PATH . '/auth.php';
         exit;
     }
 

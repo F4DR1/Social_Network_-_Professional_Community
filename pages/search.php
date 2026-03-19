@@ -1,6 +1,7 @@
 <?php
-    require_once '../includes/init.php';
-    global $db_frontend, $current_user_id;
+    require_once __DIR__ . '/../bootstrap.php';
+    require_once INCLUDES_PATH . '/init.php';
+    global $current_user_id;
 
     // Списки пользователей
     $users_list = $db_frontend->fetchAll('SELECT * FROM users');
@@ -40,9 +41,9 @@
     $title = 'Поиск';
     $scripts = [];
     $stylesheets = [
-        'css/search.css'
+        'search.css'
     ];
-    require_once '../enums/layout.php';
+    require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;
-    require '../layout.php';
+    require ROOT_PATH . '/layout.php';
 ?>

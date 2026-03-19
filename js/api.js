@@ -1,15 +1,6 @@
-
-// Базовый URL API (localhost / production)
-function getApiUrl() {
-    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-        return '/social_network/api';  // Относительный путь для localhost
-    }
-    return 'https://api.sitename.com';
-}
-
 // Универсальная функция для всех AJAX запросов
 async function apiRequest(endpoint, options = {}) {
-    const url = `${getApiUrl()}${endpoint}`;
+    const url = `${window.APP_CONFIG.API}${endpoint}`;
     
     const config = {
         method: options.method || 'POST',
@@ -35,46 +26,121 @@ async function apiRequest(endpoint, options = {}) {
 }
 
 
+
 // === АВТОРИЗАЦИЯ ===
-export async function login(data) {
-    return apiRequest('/login', { body: data });
+export async function authLogout() {
+    return apiRequest('/logout', {
+        method: 'POST'
+    });
 }
-
-export async function register(data) {
-    return apiRequest('/register', { body: data });
+export async function authLogin(data) {
+    return apiRequest('/login', {
+        method: 'POST',
+        body: data
+    });
 }
-
-export async function logout() {
-    return apiRequest('/logout');
+export async function authRegister(data) {
+    return apiRequest('/register', {
+        method: 'POST',
+        body: data
+    });
+}
+export async function authCheck() {
+    return apiRequest('/auth/check', {
+        method: 'POST'
+    });
 }
 
 
 // === СЕССИИ ===
-export async function getMySessions() {
-    return apiRequest('/sessions');
+export async function sessionsGetMy() {
+    return apiRequest('/sessions', {
+        method: 'GET'
+    });
+}
+export async function sessionsTerminateCurrent() {
+    return apiRequest('/sessions/current', {
+        method: 'DELETE'
+    });
+}
+export async function sessionsTerminate(data) {
+    return apiRequest(`/sessions/id`, {
+        method: 'DELETE',
+        body: data
+    });
+}
+export async function sessionsTerminateAll() {
+    return apiRequest('/sessions', {
+        method: 'DELETE'
+    });
 }
 
-export async function terminateCurrentSession() {
-    return apiRequest('/sessions/current', { method: 'DELETE' });
-}
 
-export async function terminateSession(sessionId) {
-    return apiRequest(`/sessions/${sessionId}`, { method: 'DELETE' });
+// === ОТНОШЕНИЯ ===
+export async function relationshipsList() {
+    return apiRequest(`/relationships/list`, {
+        method: 'GET'
+    });
 }
-
-export async function terminateAllOtherSessions() {
-    return apiRequest('/sessions', { method: 'DELETE' });
+export async function relationshipsGet(userId, relatedUserId) {
+    return apiRequest(`/relationships/get/${userId}/${relatedUserId}`, {
+        method: 'GET',
+    });
+}
+export async function relationshipsSubscribe(data) {
+    return apiRequest(`/relationships/subscribe`, {
+        method: 'PUT',
+        body: data
+    });
+}
+export async function relationshipsUnsubscribe(data) {
+    return apiRequest(`/relationships/unsubscribe`, {
+        method: 'DELETE',
+        body: data
+    });
+}
+export async function relationshipsBlock(data) {
+    return apiRequest(`/relationships/block`, {
+        method: 'PUT',
+        body: data
+    });
+}
+export async function relationshipsChangeList(data) {
+    return apiRequest(`/relationships/change-list`, {
+        method: 'PUT',
+        body: data
+    });
 }
 
 
 // === ПРОФИЛЬ ===
-export async function getUserProfile(userId) {
-    return apiRequest(`/users/${userId}`);
-}
+// export async function getUserProfile(userId) {
+//     return apiRequest(`/users/${userId}`);
+// }
 
-export async function updateUserProfile(userId, data) {
-    return apiRequest(`/users/${userId}`, { 
-        method: 'PUT', 
-        body: data 
+// export async function updateUserProfile(userId, data) {
+//     return apiRequest(`/users/${userId}`, { 
+//         method: 'PUT', 
+//         body: data 
+//     });
+// }
+
+
+// === ГРУППЫ ===
+export async function groupsListGet(userId, isAdmin) {
+    return apiRequest(`/groups/list/${userId}/${isAdmin}`, {
+        method: 'GET'
+    });
+}
+export async function groupsCreate(data) {
+    return apiRequest(`/groups/create`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function groupsEdit(userId, data) {
+    return apiRequest(`/groups/edit/${userId}`, {
+        method: 'POST',
+        body: data
     });
 }

@@ -1,42 +1,22 @@
 <?php
-    require_once 'includes/init.php';
-    global $db_frontend;
+    require_once __DIR__ . '/bootstrap.php';
+    require_once INCLUDES_PATH . '/init.php';
+    global $client_config, $current_user_id, $current_user;
 
-    require_once 'enums/auth.php';
-    require_once 'enums/layout.php';
-
-
-    if (isset($scripts) && $scripts > 0) {
-        foreach ($scripts as $script) {
-            echo "<script src=\"/social_network/$script\" type=\"module\"></script>";
-        }
-    }
+    require_once ENUMS_PATH . '/auth.php';
+    require_once ENUMS_PATH . '/layout.php';
 
 
-
+    // Шаблон по умолчанию
     if (empty($layout)) {
         $layout = Layout::Standart;
     }
 
     if ($layout === Layout::Standart) {
-        global $current_user_id, $current_user;
-        
         if (!empty($current_user_id) && !empty($current_user)) {
             $current_user_fullname = $current_user['firstname'] . ' ' . $current_user['lastname'];
-            $current_user_link = empty($current_user['linkname']) ? 'user' . $current_user_id : $current_user['linkname'];
+            $current_user_link = $current_user['linkname'] ?? 'user' . $current_user_id ;
             $current_user_photo = $current_user['photo'] ?? null;
-
-        //     // Получаем статус пользователя (PDO)
-        //     $current_user_status = $db_frontend->fetchOne(
-        //         'SELECT * FROM user_statuses WHERE id = ?',
-        //         [$current_user['status_id']]
-        //     );
-
-        //     // Получаем роль пользователя (PDO)
-        //     $current_user_role = $db_frontend->fetchOne(
-        //         'SELECT * FROM user_roles WHERE id = ?',
-        //         [$current_user['role_id']]
-        //     );
         }
     }
 
@@ -60,18 +40,25 @@
         ?>
     </title>
 
-    <link rel="icon" href="/social_network/images/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="/social_network/css/global.css">
+    <link rel="icon" href="<?= IMAGES_URL ?>/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="<?= CSS_URL ?>/global.css">
 
-    <!-- Подгружаем стиль определённой страницы -->
+    <script>
+        window.APP_CONFIG = <?= isset($client_config) ? json_encode($client_config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) : json_encode([]) ?>;
+    </script>
     <?php
-        if (isset($stylesheets) && $stylesheets > 0) {
-            foreach ($stylesheets as $sh) {
-                echo "<link rel=\"stylesheet\" href=/social_network/$sh>";
+        // Подгружаем скрипты определённых страниц
+        if (isset($scripts) && $scripts > 0) {
+            foreach ($scripts as $script) {
+                echo "<script src=\"" . JS_URL ."/$script\" type=\"module\"></script>";
             }
         }
-        if (!empty($stylesheet)) {
-            echo "<link rel=\"stylesheet\" href=/social_network/$stylesheet>";
+
+        // Подгружаем стили определённой страницы
+        if (isset($stylesheets) && $stylesheets > 0) {
+            foreach ($stylesheets as $sh) {
+                echo "<link rel=\"stylesheet\" href=" . CSS_URL . "/$sh>";
+            }
         }
     ?>
 </head>
@@ -80,7 +67,7 @@
         <header>
             <div class="header-container">
                 <a href="/" class="logo-row">
-                    <img src="/social_network/images/logo.png" alt="Логотип NNN" class="logo">
+                    <img src="<?= IMAGES_URL ?>/logo.png" alt="Логотип NNN" class="logo">
                     <h1>NNN</h1>
                 </a>
                 <?php if ($layout === Layout::Standart): ?>
@@ -97,7 +84,7 @@
                             <nav class="profile-dropdown">
                                 <button class="profile-trigger" aria-label="Меню профиля">
                                     <div class="profile-avatar">
-                                        <img src="<?= $current_user_photo ?: '/social_network/images/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="32" height="32">
+                                        <img src="<?= $current_user_photo ?: IMAGES_URL . '/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="32" height="32">
                                     </div>
                                     <span class="profile-name"><?= htmlspecialchars($current_user_fullname) ?></span>
                                     <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -107,7 +94,7 @@
                                 
                                 <div class="dropdown-menu">
                                     <div class="profile-info">
-                                        <img src="<?= $current_user_photo ?: '/social_network/images/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="48" height="48">
+                                        <img src="<?= $current_user_photo ?: IMAGES_URL . '/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="48" height="48">
                                         <div>
                                             <div class="profile-fullname"><?= htmlspecialchars($current_user_fullname) ?></div>
                                             <div class="profile-link">@<?= htmlspecialchars($current_user['linkname'] ?: 'user' . $current_user_id) ?></div>
@@ -127,7 +114,7 @@
                                             </svg>
                                             <span>Настройки</span>
                                         </a></li>
-                                        <li><a href="actions/session/logout.php" class="dropdown-link logout">
+                                        <li><a id="logoutButton" href="" class="dropdown-link logout">
                                             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                                 <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
                                             </svg>
@@ -179,7 +166,7 @@
     <?php endif; ?>
 
     <?php if (!empty($current_user_id)): ?>
-        <script src="js/layout.js"></script>
+        <script src="<?= JS_URL ?>/layout.js" type="module"></script>
     <?php endif; ?>
 
 </body>

@@ -32,18 +32,14 @@
 
 
 
-<!-- <script src="js/messages.js"></script> -->
-
-
-
 <?php
     $content = ob_get_clean();
     $title = 'Сообщения';
     $scripts = [
-        'js/messages.js'
+        'messages.js'
     ];
     $stylesheets = [];
-    require_once '../enums/layout.php';
+    require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;
-    require '../layout.php';
+    require ROOT_PATH . '/layout.php';
 ?>

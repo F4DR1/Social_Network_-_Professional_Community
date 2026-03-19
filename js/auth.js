@@ -1,4 +1,4 @@
-import { login, register } from './api.js';  // Импорт API функций
+import { authLogin, authRegister } from './api.js';
 
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.querySelector(".auth-container");
@@ -80,12 +80,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Показ/скрытие сообщений
-    function setMessage(el, text, type = 'error') {
-        el.textContent = text;
-        if (text && text.trim() !== '') {
-            el.className = `message show ${type}`;
+    function setMessage(message, text, type = 'error') {
+        const textStr = String(text || '');
+        message.textContent = textStr;
+        if (textStr.trim() !== '') {
+            message.className = `message show ${type}`;
         } else {
-            el.className = 'message';
+            message.className = 'message';
         }
     }
 
@@ -124,6 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
             targetForm.style.transform = 'translateX(0)';
 
             // Обновляем заголовок и описание формы
+            
+            document.title = formName === 'login' ? 'Авторизация' : 'Регистрация';
             title.textContent = formName === 'login' ? 'Вход в аккаунт' : 'Создать аккаунт';
             subtitle.textContent = formName === 'login' ? 'Введите данные для входа' : 'Присоединяйтесь к сети';
         }, 200);
@@ -153,18 +156,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-    // === ЛОГИН ===
-    document.getElementById("loginBtn").addEventListener("click", async (e) => {
-        e.preventDefault();
-        clearMessages();
-
+    // Логин
+    async function loginAPI(message, loginStr, passwordStr) {
         const data = {
-            login: document.getElementById("login").value,
-            password: document.getElementById("password").value
+            login: loginStr,
+            password: passwordStr
         };
 
         try {
-            const result = await login(data);
+            const result = await authLogin(data);
 
             if (result.success) {
                 clearMessages();
@@ -174,19 +174,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 setTimeout(() => (window.location.href = container.dataset.returnUrl), 2000);
 
             } else {
-                setMessage(document.getElementById("loginMessage"), result.error || "Ошибка авторизации", 'error');
+                setMessage(message, result.error || "Ошибка авторизации", 'error');
             }
 
         } catch (err) {
-            setMessage(document.getElementById("loginMessage"), err.error, 'error');
+            setMessage(message, err, 'error');
         }
-    });
+    }
 
-    // === РЕГИСТРАЦИЯ ===
-    document.getElementById("registerBtn").addEventListener("click", async (e) => {
-        e.preventDefault();
-        clearMessages();
-
+    // Регистрация
+    async function registerAPI(message) {
         const data = {
             phone: document.getElementById("regLogin").value,
             password: document.getElementById("regPassword").value,
@@ -195,36 +192,38 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-            // Регистрация
-            const registerResult = await register(data);
+            const result = await authRegister(data);
 
-            if (!registerResult.success) {
-                setMessage(document.getElementById("registerMessage"), registerResult.error || "Ошибка регистрации", 'error');
-                return;
-            }
-
-            // Автоматический вход после успешной регистрации
-            const loginData = {
-                login: data.phone,  // Используем телефон как логин
-                password: data.password
-            };
-
-            const loginResult = await login(loginData);
-
-            if (loginResult.success) {
-                // Токен записан в cookie
+            if (result.success) {
                 clearMessages();
-                loginForm.classList.remove("active");
-                registerForm.classList.remove("active");
-                successScreen.classList.add("active");
-                setTimeout(() => (window.location.href = container.dataset.returnUrl), 2000);
+                await loginAPI(message, data.phone, data.password);
 
             } else {
-                setMessage(document.getElementById("registerMessage"), loginResult.message || "Регистрация прошла, но вход не удался", 'error');
+                setMessage(message, result.error || "Ошибка регистрации", 'error');
             }
 
         } catch (err) {
-            setMessage(document.getElementById("registerMessage"), err.message, 'error');
+            setMessage(message, err, 'error');
         }
+    }
+
+
+
+    // === ЛОГИН ===
+    document.getElementById("loginBtn").addEventListener("click", async (e) => {
+        e.preventDefault();
+        clearMessages();
+        const login = document.getElementById("login").value;
+        const password = document.getElementById("password").value;
+        const message = document.getElementById("loginMessage");
+        await loginAPI(message, login, password);
+    });
+
+    // === РЕГИСТРАЦИЯ ===
+    document.getElementById("registerBtn").addEventListener("click", async (e) => {
+        e.preventDefault();
+        clearMessages();
+        const message = document.getElementById("registerMessage");
+        await registerAPI(message);
     });
 });

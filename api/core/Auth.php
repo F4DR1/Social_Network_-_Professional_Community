@@ -1,4 +1,6 @@
 <?php
+    require_once 'Helpers.php';
+
     class Auth {
         private $db;
         private $user = null;
@@ -65,7 +67,7 @@
         }
         
         // Получить текущего пользователя
-        public function user() {
+        public function getCurrentUser() {
             return $this->user;
         }
     }

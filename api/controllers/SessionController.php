@@ -36,7 +36,10 @@
             $currentSession = $this->auth->getCurrentSession();
             
             if ($currentSession) {
-                $this->db->query("DELETE FROM sessions WHERE id = ?", [$currentSession['id']]);
+                $this->db->query(
+                    "DELETE FROM sessions WHERE id = ?",
+                    [$currentSession['id']]
+                );
                 
                 if (Helpers::isWebRequest()) {
                     Helpers::deleteAuthCookie();
@@ -51,9 +54,9 @@
          */
         public function terminateSession($sessionId) {
             $this->auth->check();
-            $currentUser = $this->auth->user();
+            $currentUser = $this->auth->getCurrentUser();
             
-            // Удаляем только сессии текущего пользователя (безопасность!)
+            // Удаляем только сессии текущего пользователя
             $this->db->query(
                 "DELETE FROM sessions WHERE id = ? AND user_id = ?",
                 [$sessionId, $currentUser['id']]
@@ -67,7 +70,7 @@
          */
         public function terminateAllOtherSessions() {
             $this->auth->check();
-            $currentUser = $this->auth->user();
+            $currentUser = $this->auth->getCurrentUser();
             $currentSession = $this->auth->getCurrentSession();
             
             $this->db->query(
@@ -77,6 +80,8 @@
             
             echo json_encode(['success' => true]);
         }
+        
+
         
         private function timeAgo($timestamp) {
             $time = strtotime($timestamp);

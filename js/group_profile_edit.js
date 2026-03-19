@@ -1,3 +1,5 @@
+import { groupsEdit } from './api.js';
+
 document.addEventListener('DOMContentLoaded', function() {
     // Проверяем, есть ли данные
     if (!window.appData) {
@@ -59,29 +61,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // Отправить данные на скрипт
-    async function sendGroupInfoData(action, value) {
-        const url = '../actions/group/info_update.php';
+    async function editGroupData(action, value) {
         const data = {
-            group_id: groupId,
-            user_id: currentUserId,
             action: action,
             value: JSON.stringify(value)
         };
 
         try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(data)
-            });
-            const result = await response.json();
+            const result = await groupsEdit(groupId, data);
 
             if (result.success) {
-                updateGroupPath(value['linkname']);
+                updateGroupPath(result.linkname);
                 updateInfoMessage(action, 'success');
             } else {
-                updateInfoMessage(action, 'error', result.message || 'Ошибка соединения');
-                if (result.error) console.error(result.error);
+                updateInfoMessage(action, 'error', result.error || 'Ошибка соединения');
             }
             
         } catch (err) {
@@ -100,6 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
             name: document.getElementById('groupName').value,
             linkname: groupLinkname.value
         };
-        sendGroupInfoData('Base', baseInfo);
+        editGroupData('base', baseInfo);
     });
 });

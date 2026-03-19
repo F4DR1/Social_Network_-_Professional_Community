@@ -1,4 +1,6 @@
- document.addEventListener('DOMContentLoaded', () => {
+import { authLogout } from './api.js';
+
+document.addEventListener("DOMContentLoaded", function() {
     const profileDropdown = document.querySelector('.profile-dropdown');
     const profileTrigger = document.querySelector('.profile-trigger');
     
@@ -13,4 +15,26 @@
             profileDropdown.removeAttribute('open');
         });
     }
+
+
+
+
+    
+    // Вступление в группу
+    document.getElementById("logoutButton").addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        try {
+            const result = await authLogout();
+
+            if (result.success) {
+                window.location.href = window.APP_CONFIG.BASE_URL;
+            } else {
+                console.log(result.error || "Ошибка выхода из системы");
+            }
+
+        } catch (err) {
+            console.log(err.error);
+        }
+    });
 });

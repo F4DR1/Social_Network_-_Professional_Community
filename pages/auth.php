@@ -1,5 +1,12 @@
 <?php
-    $is_register = $is_register ?? false;
+    require_once __DIR__ . '/../bootstrap.php';
+    require_once ENUMS_PATH . '/auth.php';
+
+    $form = $_GET['form'] ?? '';
+    $return_url = $_GET['return_url'] ?? BASE_URL;
+
+    $is_register = $form === Auth::Register->text() ? true : false;
+    
     ob_start();
 ?>
 
@@ -97,13 +104,13 @@
     $content = ob_get_clean();
     $title = $is_register ? 'Регистрация' : 'Авторизация';
     $scripts = [
-        'js/api.js',
-        'js/auth.js'
+        'api.js',
+        'auth.js'
     ];
     $stylesheets = [
-        'css/auth.css'
+        'auth.css'
     ];
-    require_once 'enums/layout.php';
+    require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Mini;
-    require 'layout.php';
+    require ROOT_PATH . '/layout.php';
 ?>
