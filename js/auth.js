@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(focusActiveForm, 250);
     }
 
+    // Фокус на активную форму
     function focusActiveForm() {
         const currentForm = container.dataset.currentForm;
         if (currentForm === 'login') {
@@ -209,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-    // === ЛОГИН ===
+    // Кнопка логина
     document.getElementById("loginBtn").addEventListener("click", async (e) => {
         e.preventDefault();
         clearMessages();
@@ -219,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
         await loginAPI(message, login, password);
     });
 
-    // === РЕГИСТРАЦИЯ ===
+    // Кнопка регистрации
     document.getElementById("registerBtn").addEventListener("click", async (e) => {
         e.preventDefault();
         clearMessages();

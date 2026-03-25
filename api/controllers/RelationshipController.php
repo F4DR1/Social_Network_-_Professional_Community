@@ -58,14 +58,31 @@
          * GET /relationships/get/{user_id}/{related_user_id} - получить отношение пользователя к другому пользователю
          */
         public function getRelationship($userId, $relatedUserId) {
-            $relationship = $this->db->fetchOne(
-                "SELECT * FROM relationships WHERE user_id = ? AND related_user_id = ?",
+            $relationship = $this->db->fetchOne("
+                    SELECT *
+                    FROM relationships
+                    WHERE user_id = ? AND related_user_id = ?
+                ",
                 [$userId, $relatedUserId]
             );
-            
+            $relatedRelationship = $this->db->fetchOne("
+                    SELECT *
+                    FROM relationships
+                    WHERE user_id = ? AND related_user_id = ?
+                ",
+                [$relatedUserId, $userId]
+            );
+
+            // Пользователи подписаны друг на друга
+            $userIsFollow = !empty($relationship) && !($relationship['is_blocked']);
+            $relatedUserIsFollow = !empty($relatedRelationship) && !($relatedRelationship['is_blocked']);
+
             Helpers::jsonResponse([
                 'success' => true,
-                'relationship' => $relationship ?: null
+                'isFollow' => $userIsFollow,
+                'relatedIsFollow' => $relatedUserIsFollow,
+                'relationship' => $relationship ?: null,
+                'relatedRelationship' => $relatedRelationship ?: null
             ]);
         }
         
@@ -88,8 +105,10 @@
                 $this->auth->check();
                 $currentUser = $this->auth->getCurrentUser();
 
-                $this->db->query(
-                    "DELETE FROM relationships WHERE user_id = ? AND related_user_id = ?",
+                $this->db->query("
+                        DELETE FROM relationships
+                        WHERE user_id = ? AND related_user_id = ?
+                    ",
                     [$currentUser['id'], $data['related_user_id']]
                 );
                 

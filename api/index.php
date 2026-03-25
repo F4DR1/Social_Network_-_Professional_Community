@@ -35,19 +35,19 @@
     // =============== РЕГИСТРИРУЕМ МАРШРУТЫ ===============
     // Какой URL какому контроллеру и методу передать
 
-    // Авторизация (тут auth не нужен, т.к. человек еще не залогинен)
+    // ========== АВТОРИЗАЦИЯ ==========
     $router->add('POST', '/logout', 'AuthController', 'logout', $db, null);
     $router->add('POST', '/login', 'AuthController', 'login', $db, null);
     $router->add('POST', '/register', 'AuthController', 'register', $db, null);
     $router->add('POST', '/auth/check', 'AuthController', 'check', $db, null);
     
-    // Сессии
+    // ========== СЕССИИ ==========
     $router->add('GET', '/sessions', 'SessionController', 'getAllMySessions', $db, $auth);
     $router->add('DELETE', '/sessions/current', 'SessionController', 'terminateCurrentSession', $db, $auth);
     $router->add('DELETE', '/sessions/id', 'SessionController', 'terminateSession', $db, $auth);
     $router->add('DELETE', '/sessions', 'SessionController', 'terminateAllOtherSessions', $db, $auth);
 
-    // Отношения
+    // ========== ОТНОШЕНИЯ ==========
     $router->add('GET', '/relationships/list', 'RelationshipController', 'getList', $db, null);
     $router->add('GET', '/relationships/get/{user_id}/{related_user_id}', 'RelationshipController', 'getRelationship', $db, null);
     $router->add('PUT', '/relationships/subscribe', 'RelationshipController', 'subscribe', $db, $auth);
@@ -55,22 +55,30 @@
     $router->add('PUT', '/relationships/block', 'RelationshipController', 'block', $db, $auth);
     $router->add('PUT', '/relationships/change-list', 'RelationshipController', 'changeList', $db, $auth);
 
-    // Пользователи
+    // ========== ПОЛЬЗОВАТЕЛИ ==========
     $router->add('GET', '/users/{id}', 'UserController', 'getUserById', $db, null);
     $router->add('GET', '/users/by-link/{linkname}', 'UserController', 'getUserByLinkname', $db, null);
     $router->add('PUT', '/users/update', 'UserController', 'updateProfile', $db, $auth);
 
-    // Группы
+    // ========== ГРУППЫ ==========
     $router->add('GET', '/groups/{group_id}', 'GroupController', 'getGroupById', $db, null);
     $router->add('GET', '/groups/by-link/{linkname}', 'GroupController', 'getGroupByLinkname', $db, null);
     $router->add('GET', '/groups/list/{user_id}/{is_admin}', 'GroupController', 'getUserGroups', $db, null);
     $router->add('GET', '/groups/is-admin/{group_id}/{user_id}', 'GroupController', 'getUserIsAdminGroup', $db, null);
     $router->add('POST', '/groups/create', 'GroupController', 'createGroup', $db, $auth);
-    $router->add('POST', '/groups/edit/{group_id}', 'GroupController', 'editGroup', $db, $auth);
+    $router->add('POST', '/groups/edit', 'GroupController', 'editGroup', $db, $auth);
+    $router->add('GET', '/groups/members/{group_id}', 'GroupController', 'members', $db, null);
+    $router->add('GET', '/groups/status/subscribe/{group_id}', 'GroupController', 'statusSubscribe', $db, $auth);
+    $router->add('POST', '/groups/subscribe', 'GroupController', 'subscribe', $db, $auth);
+    $router->add('POST', '/groups/unsubscribe', 'GroupController', 'unsubscribe', $db, $auth);
 
-    // // Посты
-    // $router->add('POST', '/posts', 'PostController', 'create', $db, $auth);
-    // $router->add('GET', '/feed', 'FeedController', 'getFeed', $db, $auth);
+    // ========== ПОСТЫ ==========
+    $router->add('GET', '/posts/feed', 'PostController', 'getAllPostsFeed', $db, $auth);
+    $router->add('GET', '/posts/user/{user_id}', 'PostController', 'getAllPostsByUser', $db, null);
+    $router->add('GET', '/posts/group/{group_id}', 'PostController', 'getAllPostsByGroup', $db, null);
+    $router->add('GET', '/posts/{post_id}', 'PostController', 'getPost', $db, null);
+    $router->add('POST', '/posts/create', 'PostController', 'create', $db, $auth);
+    $router->add('POST', '/posts/delete', 'PostController', 'delete', $db, $auth);
 
     
     // =============== ЗАПУСКАЕМ МАРШРУТИЗАЦИЮ ===============

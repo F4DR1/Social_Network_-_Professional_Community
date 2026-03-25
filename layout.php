@@ -1,7 +1,7 @@
 <?php
     require_once __DIR__ . '/bootstrap.php';
     require_once INCLUDES_PATH . '/init.php';
-    global $client_config, $current_user_id, $current_user;
+    global $clientConfig, $currentUserId, $currentUser;
 
     require_once ENUMS_PATH . '/auth.php';
     require_once ENUMS_PATH . '/layout.php';
@@ -12,19 +12,24 @@
         $layout = Layout::Standart;
     }
 
-    if ($layout === Layout::Standart) {
-        if (!empty($current_user_id) && !empty($current_user)) {
-            $current_user_fullname = $current_user['firstname'] . ' ' . $current_user['lastname'];
-            $current_user_link = $current_user['linkname'] ?? 'user' . $current_user_id ;
-            $current_user_photo = $current_user['photo'] ?? null;
-        }
+    switch ($layout) {
+        case Layout::Standart:
+            if (!empty($currentUserId) && !empty($currentUser)) {
+                $currentUser_fullname = $currentUser['firstname'] . ' ' . $currentUser['lastname'];
+                $currentUser_link = $currentUser['linkname'] ?? 'user' . $currentUserId ;
+                $currentUser_photo = $currentUser['photo'] ?? null;
+            }
+            break;
+        
+        default:
+            break;
     }
 
     // Полная ссылка для return_url
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
     $path = $_SERVER['REQUEST_URI'];
-    $return_url = urlencode($protocol . '://' . $host . $path);
+    $returnUrl = urlencode($protocol . '://' . $host . $path);
 ?>
 
 
@@ -44,8 +49,9 @@
     <link rel="stylesheet" href="<?= CSS_URL ?>/global.css">
 
     <script>
-        window.APP_CONFIG = <?= isset($client_config) ? json_encode($client_config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) : json_encode([]) ?>;
+        window.APP_CONFIG = <?= isset($clientConfig) ? json_encode($clientConfig, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) : json_encode([]) ?>;
     </script>
+    <script src="<?= JS_URL . '/modal.js' ?>" type="module"></script>
     <?php
         // Подгружаем скрипты определённых страниц
         if (isset($scripts) && $scripts > 0) {
@@ -72,11 +78,11 @@
                 </a>
                 <?php if ($layout === Layout::Standart): ?>
                     <div class="header-row">
-                        <?php if (empty($current_user_id)): ?>
+                        <?php if (empty($currentUserId)): ?>
                             <nav class="auth">
                                 <ul>
-                                    <li><a href="<?= Auth::Login->text(); ?>?return_url=<?= $return_url ?>" class="inline">Войти</a></li>
-                                    <li><a href="<?= Auth::Register->text(); ?>?return_url=<?= $return_url ?>" class="inline">Регистрация</a></li>
+                                    <li><a href="<?= Auth::Login->text(); ?>?return_url=<?= $returnUrl ?>" class="inline">Войти</a></li>
+                                    <li><a href="<?= Auth::Register->text(); ?>?return_url=<?= $returnUrl ?>" class="inline">Регистрация</a></li>
                                 </ul>
                             </nav>
 
@@ -84,9 +90,9 @@
                             <nav class="profile-dropdown">
                                 <button class="profile-trigger" aria-label="Меню профиля">
                                     <div class="profile-avatar">
-                                        <img src="<?= $current_user_photo ?: IMAGES_URL . '/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="32" height="32">
+                                        <img src="<?= $currentUser_photo ?: IMAGES_URL . '/empty.webp' ?>" alt="<?= htmlspecialchars($currentUser_fullname) ?>" width="32" height="32">
                                     </div>
-                                    <span class="profile-name"><?= htmlspecialchars($current_user_fullname) ?></span>
+                                    <span class="profile-name"><?= htmlspecialchars($currentUser_fullname) ?></span>
                                     <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                                         <path d="M7 10l5 5 5-5z"/>
                                     </svg>
@@ -94,14 +100,14 @@
                                 
                                 <div class="dropdown-menu">
                                     <div class="profile-info">
-                                        <img src="<?= $current_user_photo ?: IMAGES_URL . '/empty.webp' ?>" alt="<?= htmlspecialchars($current_user_fullname) ?>" width="48" height="48">
+                                        <img src="<?= $currentUser_photo ?: IMAGES_URL . '/empty.webp' ?>" alt="<?= htmlspecialchars($currentUser_fullname) ?>" width="48" height="48">
                                         <div>
-                                            <div class="profile-fullname"><?= htmlspecialchars($current_user_fullname) ?></div>
-                                            <div class="profile-link">@<?= htmlspecialchars($current_user['linkname'] ?: 'user' . $current_user_id) ?></div>
+                                            <div class="profile-fullname"><?= htmlspecialchars($currentUser_fullname) ?></div>
+                                            <div class="profile-link">@<?= htmlspecialchars($currentUser['linkname'] ?: 'user' . $currentUserId) ?></div>
                                         </div>
                                     </div>
                                     <ul class="dropdown-list">
-                                        <li><a href="<?= $current_user_link ?>" class="dropdown-link">
+                                        <li><a href="<?= $currentUser_link ?>" class="dropdown-link">
                                             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                             </svg>
@@ -134,11 +140,11 @@
     <?php endif; ?>
 
     <main>
-        <?php if ($layout === Layout::Standart && !empty($current_user_id)): ?>
+        <?php if ($layout === Layout::Standart && !empty($currentUserId)): ?>
             <div class="navigation-menu">
                 <nav class="navigation">
                     <ul>
-                        <li><a href="<?= $current_user_link ?>">Профиль</a></li>
+                        <li><a href="<?= $currentUser_link ?>">Профиль</a></li>
                         <li><a href="feed">Лента</a></li>
                         <li><a href="messages">Сообщения</a></li>
                         <li><a href="contacts">Контакты</a></li>
@@ -165,7 +171,7 @@
         
     <?php endif; ?>
 
-    <?php if (!empty($current_user_id)): ?>
+    <?php if (!empty($currentUserId)): ?>
         <script src="<?= JS_URL ?>/layout.js" type="module"></script>
     <?php endif; ?>
 

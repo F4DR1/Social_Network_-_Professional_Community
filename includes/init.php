@@ -2,7 +2,7 @@
     require_once __DIR__ . '/../bootstrap.php';
     require_once CONFIG_PATH . '/config.php';
     require_once INCLUDES_PATH . '/session_start.php';
-    global $current_user_id, $current_user;
+    global $currentUserId, $currentUser;
 
 
     /**
@@ -87,7 +87,7 @@
 
 
     
-    // === АВТОРИЗАЦИЯ ===
+    // ========== АВТОРИЗАЦИЯ ==========
     function authCheck() {
         return apiRequest('/auth/check', [
             'method' => 'POST'
@@ -95,15 +95,20 @@
     }
 
     
-    // === ОТНОШЕНИЯ ===
+    // ========== ОТНОШЕНИЯ ==========
     function relationshipsList() {
         return apiRequest("/relationships/list", [
             'method' => 'GET'
         ]);
     }
+    function relationshipsGet($userId, $relatedUserId) {
+        return apiRequest("/relationships/get/$userId/$relatedUserId", [
+            'method' => 'GET',
+        ]);
+    }
 
     
-    // === ПОЛЬЗОВАТЕЛИ ===
+    // ========== ПОЛЬЗОВАТЕЛИ ==========
     function usersGetId($userId) {
         return apiRequest("/users/{$userId}", [
             'method' => 'GET'
@@ -116,7 +121,7 @@
     }
 
 
-    // === ГРУППЫ ===
+    // ========== ГРУППЫ ==========
     function groupsGetId($groupId) {
         return apiRequest("/groups/{$groupId}", [
             'method' => 'GET'
@@ -132,11 +137,16 @@
             'method' => 'GET'
         ]);
     }
+    function groupsStatusSubscribe($groupId) {
+        return apiRequest("/groups/status/subscribe/$groupId", [
+            'method' => 'GET'
+        ]);
+    }
 
 
 
     // Получение данных текущего пользователя
-    $auth_check = authCheck();
-    $current_user_id = $auth_check['success'] ? $auth_check['data']['user_id'] : null;
-    $current_user = $auth_check['success'] ? $auth_check['data']['user'] : null;
+    $authCheck = authCheck();
+    $currentUserId = $authCheck['success'] ? $authCheck['data']['user_id'] : null;
+    $currentUser = $authCheck['success'] ? $authCheck['data']['user'] : null;
 ?>

@@ -16,7 +16,7 @@
     $title = "Такой страницы нет";
     $scripts = [];
     $stylesheets = [
-        '404.css'
+        'pages/404.css'
     ];
     require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Micro;

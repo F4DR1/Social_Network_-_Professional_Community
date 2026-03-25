@@ -1,106 +1,51 @@
+import { groupsMembers, groupsSubscribe, groupsUnsubscribe } from './api.js';
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, есть ли данные
     if (!window.appData) {
         console.error('appData не определен');
         return;
     }
     
     const groupId = window.appData.groupId;
-    const currentUserId = window.appData.currentUserId;
 
     
-    const mainRequestSubscribe = document.getElementById('mainRequestSubscribe');
-    const mainRequestUnsubscribe = document.getElementById('mainRequestUnsubscribe');
-    const secondMessage = document.getElementById('secondMessage');
-
     const membersCount = document.getElementById('membersCount');
     const membersList = document.getElementById('membersList');
 
 
 
-    // Переключение видимости элементов
-    function switchElements(is_subscribe, is_owner) {
-        [mainRequestSubscribe, mainRequestUnsubscribe, secondMessage]
-            .forEach(el => el?.classList.remove('active'));
-
-        
-        if (is_subscribe) {
-            if (!is_owner) {
-                mainRequestUnsubscribe.classList.add('active');
-            }
-            secondMessage.classList.add('active');
-        } else {
-            mainRequestSubscribe.classList.add('active');
-        }
-    }
-
-    // Обновление участников группы
+    // Обновление участников группы в панели
     function updateMembersPanel(members) {
-        membersCount.textContent = members['count'] || 0;
-        
-        // Очищаем старый список
+        if (membersCount) membersCount.textContent = members.length || 0;
+        if (!members || !membersList) return;
+
         membersList.innerHTML = '';
-        
-        // Добавляем всех пользователей
-        if (members.users && members.users.length > 0) {
-            members.users.forEach(user => {
-                const userLink = document.createElement('a');
-                userLink.href = user.linkname || `user${user.id}`;
-                userLink.className = 'member-item';
-                
-                userLink.innerHTML = `
-                    <img src="${user.photo || 'images/empty.webp'}" 
-                        alt="${user.firstname}" 
-                        width="60" height="60">
-                    <p>${user.firstname}</p>
-                `;
-                
-                membersList.appendChild(userLink);
-            });
-        }
+
+        members.forEach(user => {
+            const linkname = user.linkname ?? "user" + user.id;
+            const name = user.firstname;
+            const photo = user.photo ?? `${window.APP_CONFIG.IMAGES}/empty.webp`;
+
+            const link = document.createElement('a');
+            link.href = linkname;
+            link.className = 'member-item';
+            
+            link.innerHTML = `
+                <img src="${photo}" alt="${name}" width="60" height="60" loading="lazy">
+                <p>${name}</p>
+            `;
+            
+            membersList.appendChild(link);
+        });
     }
     
 
 
-    // Получает статус подписки данного пользователя
-    async function getSubscribeStatus() {
-        const url = "../actions/group/get.php";
-        const data = {
-            group_id: groupId,
-            user_id: currentUserId
-        };
-
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(data)
-            });
-            const result = await response.json();
-            if (result.success) {
-                switchElements(result.is_subscribe, result.is_owner);
-            } else {
-                console.log(result.message || "Ошибка соединения");
-            }
-        } catch (err) {
-            console.log("Ошибка сервера");
-        }
-    }
-
     // Получает участников группы
-    async function getMembers() {
-        const url = "../actions/group/get_members.php";
-        const data = {
-            group_id: groupId
-        };
-
+    async function getMembersAPI() {
         try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(data)
-            });
-            const result = await response.json();
+            const result = await groupsMembers(groupId);
+
             if (result.success) {
                 updateMembersPanel(result.members);
             } else {
@@ -108,64 +53,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 membersCount.textContent = '0';
                 membersList.innerHTML = '<p>Ошибка загрузки участников</p>';
             }
+            
         } catch (err) {
-            console.error("Ошибка сервера:", err);
             membersList.innerHTML = '<p>Ошибка соединения</p>';
+            console.log("Ошибка сервера: " . result.error || '');
         }
     }
 
-
-
-
-    // Получаем текущее отношение к группе при загрузке
-    getSubscribeStatus();
-
-    // Получаем участников
-    getMembers();
-
-
-
-
-
-    // Отправить данные на скрипт
-    async function sendGroupSubscribeData(action, value) {
-        const url = "../actions/group/subscribe_update.php";
+    // Отправляет запрос со статусом подписки
+    async function sendSubscribeAPI(isSubscribe) {
         const data = {
-            group_id: groupId,
-            user_id: currentUserId,
-            action: action,
-            value: value
+            groupId: groupId
         };
 
         try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(data)
-            });
-            const result = await response.json();
+            console.log()
+            const result = await (isSubscribe ? groupsSubscribe(data) : groupsUnsubscribe(data));
+
             if (result.success) {
-                getSubscribeStatus();
-                getMembers();
+                location.reload();
             } else {
-                console.log(result.message || "Ошибка соединения");
+                console.error(result.error || "Ошибка соединения");
             }
+            
         } catch (err) {
-            console.log("Ошибка сервера");
+            console.log("Ошибка сервера: " . result.error || '');
         }
     }
+
+
+
+    // Получаем участников
+    getMembersAPI();
 
 
 
     // Вступление в группу
-    document.getElementById("subscribeButton").addEventListener("click", (e) => {
-        e.preventDefault();
-        sendGroupSubscribeData('Subscribe', true);
-    });
+    try {
+        document.getElementById("subscribeButton").addEventListener("click", (e) => {
+            e.preventDefault();
+            sendSubscribeAPI(true);
+        });
+    } catch (error) {}
+    
 
     // Выход из группы
-    document.getElementById("unsubscribeButton").addEventListener("click", (e) => {
-        e.preventDefault();
-        sendGroupSubscribeData('Subscribe', false);
-    });
+    try {
+        document.getElementById("unsubscribeButton").addEventListener("click", (e) => {
+            e.preventDefault();
+            sendSubscribeAPI(false);
+        });
+    } catch (error) {}
 });

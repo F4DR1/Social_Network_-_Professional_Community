@@ -2,7 +2,7 @@
     require_once __DIR__ . '/bootstrap.php';
     require_once INCLUDES_PATH . '/init.php';
     require_once INCLUDES_PATH . '/http_errors.php';
-    global $current_user_id;
+    global $currentUserId;
 
     // Проверяем параметры URL
     $linkname = $_GET['linkname'] ?? '';
@@ -16,9 +16,6 @@
         if ($result['success']) {
             gotoUserProfile($result['data']['user']);
             exit;
-        } else {
-            httpErrorCheck($result['http_code']);
-            exit;
         }
 
         // Группы
@@ -26,15 +23,16 @@
         if ($result['success']) {
             gotoGroupProfile($result['data']['group']);
             exit;
-        } else{
-            httpErrorCheck($result['http_code']);
-            exit;
         }
+
+        httpErrorCheck(404);
+        exit;
     }
 
     // Поиск по ID (site.ru/user123, site.ru/group456)
     if (!empty($type) && !empty($id) && is_numeric($id)) {
         switch ($type) {
+            // Пользователи
             case 'user':
                 $result = usersGetId($id);
                 if ($result['success']) {
@@ -44,6 +42,7 @@
                 }
                 break;
                 
+            // Группы
             case 'group':
                 $result = groupsGetId($id);
                 if ($result['success']) {
@@ -61,7 +60,7 @@
     }
 
     // Остальные случаи
-    if (!empty($current_user_id)) {
+    if (!empty($currentUserId)) {
         include PAGES_PATH . '/feed.php';
         exit;
         
@@ -76,13 +75,13 @@
     
     function gotoUserProfile($user) {
         $_GET['user'] = $user;
-        include 'pages/userProfile.php';
+        include PAGES_PATH . '/user_profile.php';
         exit;
     }
 
     function gotoGroupProfile($group) {
         $_GET['group'] = $group;
-        include 'pages/groupProfile.php';
+        include PAGES_PATH . '/group_profile.php';
         exit;
     }
 ?>

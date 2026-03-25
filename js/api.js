@@ -27,7 +27,7 @@ async function apiRequest(endpoint, options = {}) {
 
 
 
-// === АВТОРИЗАЦИЯ ===
+// ========== АВТОРИЗАЦИЯ ==========
 export async function authLogout() {
     return apiRequest('/logout', {
         method: 'POST'
@@ -52,7 +52,7 @@ export async function authCheck() {
 }
 
 
-// === СЕССИИ ===
+// ========== СЕССИИ ==========
 export async function sessionsGetMy() {
     return apiRequest('/sessions', {
         method: 'GET'
@@ -76,15 +76,10 @@ export async function sessionsTerminateAll() {
 }
 
 
-// === ОТНОШЕНИЯ ===
+// ========== ОТНОШЕНИЯ ==========
 export async function relationshipsList() {
     return apiRequest(`/relationships/list`, {
         method: 'GET'
-    });
-}
-export async function relationshipsGet(userId, relatedUserId) {
-    return apiRequest(`/relationships/get/${userId}/${relatedUserId}`, {
-        method: 'GET',
     });
 }
 export async function relationshipsSubscribe(data) {
@@ -113,7 +108,7 @@ export async function relationshipsChangeList(data) {
 }
 
 
-// === ПРОФИЛЬ ===
+// ========== ПРОФИЛЬ ==========
 // export async function getUserProfile(userId) {
 //     return apiRequest(`/users/${userId}`);
 // }
@@ -126,7 +121,7 @@ export async function relationshipsChangeList(data) {
 // }
 
 
-// === ГРУППЫ ===
+// ========== ГРУППЫ ==========
 export async function groupsListGet(userId, isAdmin) {
     return apiRequest(`/groups/list/${userId}/${isAdmin}`, {
         method: 'GET'
@@ -138,8 +133,60 @@ export async function groupsCreate(data) {
         body: data
     });
 }
-export async function groupsEdit(userId, data) {
-    return apiRequest(`/groups/edit/${userId}`, {
+export async function groupsEdit(data) {
+    return apiRequest(`/groups/edit`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function groupsMembers(groupId) {
+    return apiRequest(`/groups/members/${groupId}`, {
+        method: 'GET'
+    });
+}
+export async function groupsSubscribe(data) {
+    return apiRequest(`/groups/subscribe`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function groupsUnsubscribe(data) {
+    return apiRequest(`/groups/unsubscribe`, {
+        method: 'POST',
+        body: data
+    });
+}
+
+
+// ========== ГРУППЫ ==========
+export async function postsGet(postId) {
+    return apiRequest(`/posts/${postId}`, {
+        method: 'GET'
+    });
+}
+export async function postsGetFeed() {
+    return apiRequest(`/posts/feed`, {
+        method: 'GET'
+    });
+}
+export async function postsGetAllByUser(userId) {
+    return apiRequest(`/posts/user/${userId}`, {
+        method: 'GET'
+    });
+}
+export async function postsGetAllByGroup(groupId) {
+    return apiRequest(`/posts/group/${groupId}`, {
+        method: 'GET'
+    });
+}
+export async function postsCreate(data) {
+    return apiRequest(`/posts/create`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function postsDelete(data) {
+    return apiRequest(`/posts/delete`, {
         method: 'POST',
         body: data
     });

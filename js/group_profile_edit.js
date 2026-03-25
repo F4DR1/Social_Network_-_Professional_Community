@@ -9,46 +9,53 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const groupPath = window.appData.groupPath;
     const groupId = window.appData.groupId;
-    const currentUserId = window.appData.currentUserId;
 
     
-    const baseInfoSuccess = document.getElementById('baseInfoSuccess');
-    const baseInfoError = document.getElementById('baseInfoError');
-    const errorMessage = document.getElementById('errorMessage');
+    const baseInfo = document.getElementById('base-info');
     
-    const groupLinkname = document.getElementById('groupLinkname');
+    const groupLinkname = document.getElementById('group-linkname');
 
 
 
     function updateGroupPath(path) {
-        document.getElementById('groupPath').href = path;
+        document.getElementById('group-path').href = path;
     }
 
-    function updateInfoMessage(action, message_status = null, message = null) {
-        switch (action) {
-            case 'Base':
-                [baseInfoSuccess, baseInfoError]
-                    .forEach(el => el?.classList.remove('active'));
-                
-                switch (message_status) {
-                    case 'error':
-                        errorMessage.textContent = message;
-                        baseInfoError.classList.add('active');
-                        break;
-                    
-                    case 'success':
-                        baseInfoSuccess.classList.add('active');
-                        break;
-                
-                    default:
-                        break;
-                }
-                break;
+    function updateInfoMessage(category = null, message_status = null, message = null) {
+        [baseInfo]
+            .forEach(el => el?.classList.remove('active', 'success', 'error'));
         
+        let infoPanel;
+        switch (category) {
+            case 'base':
+                infoPanel = baseInfo;
+                break;
+                
             default:
-                break;
+                return;
         }
+
+        const infoSVG = infoPanel.getElementsByClassName('info-icon-svg')[0];
+        const infoTitle = infoPanel.getElementsByClassName('info-title')[0];
+        const infoMessage = infoPanel.getElementsByClassName('info-message')[0];
+        switch (message_status) {
+            case 'success':
+                infoPanel.classList.add('success');
+                infoTitle.textContent = 'Изменения сохранены';
+                infoMessage.textContent = 'Основная информация группы сохранена.';
+                break;
         
+            case 'error':
+                infoPanel.classList.add('error');
+                infoTitle.textContent = 'Ошибка при сохранении';
+                infoMessage.textContent = message;
+                break;
+            
+            default:
+                return;
+        }
+
+        infoPanel.classList.add('active');
     }
 
 
@@ -56,41 +63,42 @@ document.addEventListener('DOMContentLoaded', function() {
     updateGroupPath(groupPath);
 
     // Скрываем панели сообщений
-    updateInfoMessage('Base');
+    updateInfoMessage();
 
 
 
     // Отправить данные на скрипт
-    async function editGroupData(action, value) {
+    async function editGroupData(category, value) {
         const data = {
-            action: action,
+            groupId: groupId,
+            category: category,
             value: JSON.stringify(value)
         };
 
         try {
-            const result = await groupsEdit(groupId, data);
+            const result = await groupsEdit(data);
 
             if (result.success) {
                 updateGroupPath(result.linkname);
-                updateInfoMessage(action, 'success');
+                updateInfoMessage(category, 'success');
             } else {
-                updateInfoMessage(action, 'error', result.error || 'Ошибка соединения');
+                updateInfoMessage(category, 'error', result.error || 'Ошибка соединения');
             }
             
         } catch (err) {
-            updateInfoMessage(action, 'error', 'Ошибка сервера');
-            console.error("Ошибка сервера: " . result.error || '');
+            updateInfoMessage(category, 'error', 'Ошибка сервера');
+            console.log("Ошибка сервера: " . result.error || '');
         }
     }
 
 
 
     // Сохранение базовой информации группы
-    document.getElementById("saveBaseInfo").addEventListener("click", (e) => {
+    document.getElementById("save-base-info").addEventListener("click", (e) => {
         e.preventDefault();
         if (groupLinkname.value == '') groupLinkname.value = 'group' + groupId;
         const baseInfo = {
-            name: document.getElementById('groupName').value,
+            name: document.getElementById('group-name').value,
             linkname: groupLinkname.value
         };
         editGroupData('base', baseInfo);

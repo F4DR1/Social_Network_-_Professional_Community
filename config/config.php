@@ -25,8 +25,8 @@
     define('DOMAIN', $DOMAIN);
 
     // Настройки, которые доступны в JavaScript
-    global $client_config;
-    $client_config = [
+    global $clientConfig;
+    $clientConfig = [
         'API' => $API,
         'DOMAIN' => $DOMAIN,
         'BASE_URL' => defined('BASE_URL') ? BASE_URL : '/',

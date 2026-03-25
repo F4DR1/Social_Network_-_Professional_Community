@@ -1,14 +1,16 @@
 <?php
     require_once '../includes/init.php';
-    global $db_frontend, $current_user_id;
+    global $currentUserId;
     
-    if (!isset($current_user_id)) {
+    if (!isset($currentUserId)) {
         header('Location: /');
         exit;
     }
     
     ob_start();
 ?>
+
+
 
 <div class="centered-container">
     <div class="container">
@@ -38,6 +40,8 @@
         <p>Ваша активность за последнее время.</p>
     </div>
 </div>
+
+
 
 <?php
     $content = ob_get_clean();

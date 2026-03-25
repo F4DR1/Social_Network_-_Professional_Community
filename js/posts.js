@@ -1,3 +1,5 @@
+import { postsGetFeed, postsGetAllByUser, postsGetAllByGroup, postsCreate, postsDelete } from './api.js';
+
 document.addEventListener('DOMContentLoaded', function() {
     // Проверяем, есть ли данные
     if (!window.appData) {
@@ -5,27 +7,57 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    const postsType = window.appData.postsType;
     const groupId = window.appData.groupId;
-    const currentUserId = window.appData.currentUserId;
+    const userId = window.appData.userId;
 
     const newPostText = document.getElementById('newPostText');
-
     const postsList = document.getElementById('postsList');
 
 
 
+    // Форматирование даты
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ru-RU');
+    }
 
     // Функция создания HTML поста из данных
     function createPostHTML(post) {
-        const textContent = post.content.text || '';
+        const emptyImage = window.APP_CONFIG.IMAGES + '/empty.webp';
+
+        let authorLinkname = post.author_linkname || `user${post.author_id}`;
+        let authorName = post.author_name || 'Пользователь';
+        let authorPhoto = post.author_photo || emptyImage;
+        let userAuthorLinkname = authorLinkname;
+        let userAuthorName = authorName;
+
+        const isGroupPost = !!post.group_id;
+        if (isGroupPost) {
+            authorLinkname = post.group_linkname || `group${post.group_id}`;
+            authorName = post.group_name || 'Группа';
+            authorPhoto = post.group_photo || emptyImage;
+        }
+        
+        
+        // content парсим из JSON строки
+        const content = typeof post.content === 'string' ? JSON.parse(post.content) : post.content;
+        const textContent = content.text || '';
+        
         const postDate = formatDate(post.created_at);
 
+
+        const groupPostAuthor = isGroupPost ? `
+            <a class="group-post-author" href="${userAuthorLinkname}">
+                От ${userAuthorName}
+            </a>
+        ` : '';
         return `
             <div class="post" data-post-id="${post.id}">
                 <div class="post-head">
-                    <a class="post-author" href="${post.group.linkname || 'group' + post.group.id}">
-                        <img src="${post.group.photo || 'images/empty.webp'}" alt="${post.group.name}" width="40" height="40">
-                        <p>${post.group.name}</p>
+                    <a class="post-author" href="${authorLinkname}">
+                        <img src="${authorPhoto}" alt="${authorName}" width="40" height="40">
+                        <p>${authorName}</p>
                     </a>
                     <div class="post-actions">
                         <div class="action-dropdown">
@@ -52,19 +84,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
 
                 <div class="post-footer">
-                    <a class="group-post-author" href="${post.author.linkname || 'user' + post.author.id}">
-                        От ${post.author.firstname + ' ' + post.author.lastname}
-                    </a>
+                    ${groupPostAuthor}
                     <p class="post-date">${postDate}</p>
                 </div>
             </div>
         `;
     }
     
-    // Форматирование даты
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('ru-RU');  // 01.01.2000
+
+    // Проверка списка постов на пустоту
+    function checkEmptyPosts() {
+        const hasPosts = postsList.children.length > 0 && !postsList.querySelector('.no-posts-message');
+        
+        if (!hasPosts) {
+            postsList.innerHTML = '<p class="no-posts-message">Постов пока нет</p>';
+        }
     }
 
     // Обновить посты на странице
@@ -76,15 +110,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const postHTML = createPostHTML(post);
                 postsList.insertAdjacentHTML('beforeend', postHTML);
             });
-            initPostActions();  // Инициализируем действия для новых постов
-        } else {
-            postsList.innerHTML = '<p>Постов пока нет</p>';
+            initPostActions();
         }
+        
+        checkEmptyPosts();
     }
 
-    // Инициализация действий постов (dropdown + удаление)
+    // Инициализация действий постов
     function initPostActions() {
-        // Dropdown для мобильных
+        // Dropdown
         document.querySelectorAll('.action-dropdown').forEach(dropdown => {
             const trigger = dropdown.querySelector('.action-trigger');
             trigger?.addEventListener('click', (e) => {
@@ -111,32 +145,29 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!confirm('Удалить этот пост навсегда?')) return;
 
 
-        const url = "../actions/posts/delete.php";
         const data = {
-            post_id: postId,
-            group_id: groupId,
-            user_id: currentUserId
+            postId: postId
         };
         
+        if (groupId) {
+            data.groupId = groupId;
+        }
+        
         try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(data)
-            });
-            
-            const result = await response.json();
+            const result = await postsDelete(data);
+
             if (result.success) {
                 postElement.style.transition = 'all 0.3s ease';
                 postElement.style.opacity = '0';
                 postElement.style.transform = 'translateX(-30px)';
-                setTimeout(() => postElement.remove(), 300);
+                postElement.remove();
+                checkEmptyPosts();
             } else {
-                alert('Ошибка удаления: ' + (result.error || 'Неизвестная ошибка'));
+                console.log(result.error || "Ошибка обработки постов");
             }
+
         } catch (err) {
-            console.error('Ошибка удаления:', err);
-            alert('Ошибка сервера');
+            console.error("Ошибка сервера");
         }
     }
     
@@ -152,73 +183,79 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // Получить посты
-    async function getPostsData() {
-        const url = "../actions/posts/get.php";
-        const data = {
-            group_id: groupId
-        };
-
+    async function getPostsAPI() {
         try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(data)
-            });
-            const result = await response.json();
+            let result;
+            switch (postsType) {
+                case 'group':
+                    result = await postsGetAllByGroup(groupId);
+                    break;
+                    
+                case 'user':
+                    result = await postsGetAllByUser(userId);
+                    break;
+                    
+                case 'feed':
+                    result = await postsGetFeed();
+                    break;
+            
+                default:
+                    console.error('Не удалось определить метод загрузки постов');
+                    return;
+            }
+
             if (result.success) {
                 updatePosts(result.posts);
+                return;
             } else {
-                console.log(result.message || "Ошибка соединения");
-                console.error(result.error);
+                console.log(result.error || "Ошибка обработки постов");
             }
-        } catch (err) {
-            console.error("Ошибка сервера: " + err);
-        }
-    }
 
-    // Отправить пост
-    async function sendPostData() {
-        const url = "../actions/posts/post.php";
-        const data = {
-            group_id: groupId,
-            user_id: currentUserId,
-            content: JSON.stringify({
-                text: newPostText.value.trim()
-                // images: [] // для будущего
-            })
-        };
-
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(data)
-            });
-            const result = await response.json();
-            if (result.success) {
-                clearNewPost();
-                getPostsData();
-            } else {
-                console.log('Пост не был отправлен...');
-                console.log(result.message || "Ошибка соединения");
-            }
         } catch (err) {
             console.error("Ошибка сервера");
         }
+        updatePosts([]);
     }
 
+    // Отправить пост
+    async function sendPostAPI() {
+        const data = {
+            content: JSON.stringify({
+                text: newPostText.value.trim()
+            })
+        };
+        
+        if (groupId) {
+            data.groupId = groupId;
+        }
+        
+        try {
+            const result = await postsCreate(data);
+
+            if (result.success) {
+                clearNewPost();
+                getPostsAPI();
+            } else {
+                console.log(result.error || "Ошибка обработки постов");
+            }
+
+        } catch (err) {
+            console.error("Ошибка сервера");
+        }
+        updatePosts([]);
+    }
+
+
     
-
-    // Инициализация
-    clearNewPost();  // Очищаем поля нового поста
-    getPostsData(); // Загружаем посты при старте
+    // Загружаем посты
+    getPostsAPI();
 
 
 
-    // Вступление в группу
+    // Создать пост
     document.getElementById("postNewPost").addEventListener("click", (e) => {
         e.preventDefault();
-        sendPostData();
+        sendPostAPI();
     });
 
     // Авторесайз textarea

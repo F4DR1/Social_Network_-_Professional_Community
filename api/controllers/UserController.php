@@ -12,12 +12,17 @@
         }
         
         /**
-         * GET /users/{id} - получить данные пользователя по id
+         * GET /users/{user_id} - получить данные пользователя по id
          */
-        public function getUserById($id) {
-            $user = $this->db->fetchOne(
-                "SELECT id, linkname, lastname, firstname, photo, phone, email FROM users WHERE id = ?",
-                [$id]
+        public function getUserById($userId) {
+            Helpers::validateUserId($userId);
+
+            $user = $this->db->fetchOne("
+                    SELECT id, linkname, lastname, firstname, photo, phone, email
+                    FROM users
+                    WHERE id = ?
+                ",
+                [$userId]
             );
             
             if (!$user) {
@@ -31,8 +36,11 @@
          * GET /users/{linkname} - получить данные пользователя по linkname
          */
         public function getUserByLinkname($linkname) {
-            $user = $this->db->fetchOne(
-                "SELECT id, linkname, lastname, firstname, photo, phone, email FROM users WHERE linkname = ?",
+            $user = $this->db->fetchOne("
+                    SELECT id, linkname, lastname, firstname, photo, phone, email
+                    FROM users
+                    WHERE linkname = ?
+                ",
                 [$linkname]
             );
             

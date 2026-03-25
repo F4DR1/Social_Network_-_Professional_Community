@@ -3,12 +3,51 @@
 
     class Helpers {
 
+        /**
+         * Проверка на корректный id
+         */
+        private static function validateId($id, $text) {
+            if (empty($id) || !is_numeric($id) || $id <= 0) {
+                self::errorResponse($text, 400);
+            }
+        }
+        
+        /**
+         * Получение домена для cookie
+         */
+        private static function getCookieDomain() {
+            $domain = $_SERVER['HTTP_HOST'] ?? '';
+            $domain = preg_replace('/^www\./', '', $domain);
+            $domain = preg_replace('/:\d+$/', '', $domain);
+            return $domain;
+        }
+        
+        /**
+         * Проверка на локальный сервер
+         */
+        private static function isLocalhost() {
+            $host = $_SERVER['SERVER_NAME'] ?? '';
+            return $host === 'localhost' || strpos($host, '.local') !== false;
+        }
+
     
+
         /**
          * Возвращает список ролей администраторов групп
          */
         public static function getGroupAdminRoles() {
-            return ['owner', 'admin', 'moderator'];
+            $roles = ['owner', 'admin', 'moderator'];
+            return [
+                'roles' => $roles,
+                'text' => implode(',', array_fill(0, count($roles), '?'))
+            ];
+        }
+        
+        /**
+         * Генерация случайного токена
+         */
+        public static function generateToken() {
+            return bin2hex(random_bytes(32));
         }
         
         /**
@@ -98,13 +137,6 @@
         }
         
         /**
-         * Валидация email
-         */
-        public static function validateEmail($email) {
-            return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-        }
-        
-        /**
          * JSON ответ
          */
         public static function jsonResponse($data, $statusCode = 200) {
@@ -123,10 +155,10 @@
         }
         
         /**
-         * Генерация случайного токена
+         * Валидация email
          */
-        public static function generateToken() {
-            return bin2hex(random_bytes(32));
+        public static function validateEmail($email) {
+            return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
         }
         
         /**
@@ -149,21 +181,24 @@
         }
         
         /**
-         * Получение домена для cookie
+         * Проверить id пользователя
          */
-        private static function getCookieDomain() {
-            $domain = $_SERVER['HTTP_HOST'] ?? '';
-            $domain = preg_replace('/^www\./', '', $domain);
-            $domain = preg_replace('/:\d+$/', '', $domain);
-            return $domain;
+        public static function validateUserId($userId) {
+            self::validateId($userId, 'Неверный ID пользователя');
         }
         
         /**
-         * Проверка на локальный сервер
+         * Проверить id группы
          */
-        private static function isLocalhost() {
-            $host = $_SERVER['SERVER_NAME'] ?? '';
-            return $host === 'localhost' || strpos($host, '.local') !== false;
+        public static function validateGroupId($userId) {
+            self::validateId($userId, 'Неверный ID группы');
+        }
+        
+        /**
+         * Проверить id поста
+         */
+        public static function validatePostId($userId) {
+            self::validateId($userId, 'Неверный ID поста');
         }
     }
 ?>

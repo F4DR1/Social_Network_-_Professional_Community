@@ -1,10 +1,12 @@
 <?php
     require_once __DIR__ . '/../bootstrap.php';
     require_once INCLUDES_PATH . '/init.php';
-    global $current_user_id;
-
-    // Списки пользователей
-    $users_list = $db_frontend->fetchAll('SELECT * FROM users');
+    global $currentUserId;
+    
+    $sections = [
+        ['type' => 'searched-users', 'title' => 'Пользователи:'],
+        ['type' => 'searched-groups', 'title' => 'Группы:']
+    ];
 
     ob_start();
 ?>
@@ -15,22 +17,13 @@
     <div class="container">
         <h2>Поиск</h2>
 
-        <h3>Пользователи:</h3>
-        <?php foreach ($users_list as $user): ?>
-            <?php
-                $user_fullname = $user['firstname'] . ' ' . $user['lastname'];
-                $user_photo = $user['photo'];
-                if ($user['id'] !== $current_user_id):
-            ?>
-                <div class="profile-panel">
-                    <img src="<?= isset($user_photo) ? $user_photo : 'images/empty.webp' ?>" alt="<?= htmlspecialchars($user_fullname) ?>" width=80>
-                    <a href="<?= empty($user['linkname']) ? 'user' . $user['id'] : $user['linkname'] ?>" class="fullname-line">
-                        <?= htmlspecialchars($user_fullname) ?>
-                    </a>
-                    <a href="messages?type=user&id=<?= $user['id'] ?>" class="message-line">Написать сообщение</a>
-                </div>
-            <?php endif; ?>
-        <?php endforeach; ?>
+        <?php foreach ($sections as $section): ?>
+            <div class="category" id="<?= $section['type'] ?>">
+                <h3 class="title"><?= $section['title'] ?></h3>
+                <div class="list"></div>
+            </div>
+        <?php endforeach ?>
+
     </div>
 </div>
 
@@ -39,9 +32,15 @@
 <?php
     $content = ob_get_clean();
     $title = 'Поиск';
-    $scripts = [];
+    $scripts = [
+        'category_elements.js',
+        'search.js'
+    ];
     $stylesheets = [
-        'search.css'
+        'pages/search.css',
+        'elements/category.css',
+        'elements/user_card.css',
+        'elements/group_card.css'
     ];
     require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;

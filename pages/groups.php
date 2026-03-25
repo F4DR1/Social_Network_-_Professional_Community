@@ -1,7 +1,16 @@
 <?php
     require_once __DIR__ . '/../bootstrap.php';
     require_once INCLUDES_PATH . '/init.php';
-    global $current_user_id;
+    global $currentUserId;
+
+
+    $subscribeGroups = [];
+    $myGroups = [];
+    
+    $sections = [
+        ['type' => 'my-groups', 'title' => 'Мои группы:'],
+        ['type' => 'all-groups', 'title' => 'Мои подписки:']
+    ];
     
     ob_start();
 ?>
@@ -12,7 +21,12 @@
     <div class="container">
         <h2>Группы</h2>
 
-        <div class="groups" id="groupsList">
+        <?php foreach ($sections as $section): ?>
+            <div class="category" id="<?= $section['type'] ?>">
+                <h3 class="title" data-count=""><?= $section['title'] ?></h3>
+                <div class="list"></div>
+            </div>
+        <?php endforeach ?>
 
         </div>
     </div>
@@ -20,9 +34,10 @@
 
 <div class="right-container">
     <div class="container">
-        <button id="createGroup">Создать группу</button>
+        <button id="create-group-button">Создать группу</button>
     </div>
 </div>
+
 
 <div class="modal" id="modal">
     <div class="modal-content">
@@ -31,14 +46,14 @@
         </div>
         <div class="modal-main">
             <div class="input-field">
-                <input type="text" id="groupName" name="name" required autocomplete="name">
-                <label>Название группы*</label>
+                <input type="text" id="group-name" name="name" required autocomplete="name">
+                <label class="required">Название группы</label>
             </div>
-            <p class="message" id="errorMessage"></p>
+            <p class="message" id="error-message"></p>
         </div>
         <div class="modal-footer">
-            <button class="cancel-btn" id="cancelButton">Отмена</button>
-            <button class="accept-btn" id="acceptButton">Создать группу</button>
+            <button class="cancel-btn" id="cancel-button">Отмена</button>
+            <button class="accept-btn" id="accept-button">Создать группу</button>
         </div>
     </div>
 </div>
@@ -47,7 +62,7 @@
 
 <script>
     window.appData = <?= json_encode([
-        'currentUserId' => $current_user_id
+        'currentUserId' => $currentUserId
     ]) ?>;
 </script>
 
@@ -57,10 +72,14 @@
     $content = ob_get_clean();
     $title = 'Группы';
     $scripts = [
+        'category_elements.js',
         'groups.js'
     ];
     $stylesheets = [
-        'groups.css'
+        'elements/category.css',
+        'elements/group_card.css',
+        'elements/group_create.css',
+        'elements/input_field.css'
     ];
     require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;
