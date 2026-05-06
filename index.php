@@ -2,7 +2,7 @@
     require_once __DIR__ . '/bootstrap.php';
     require_once INCLUDES_PATH . '/init.php';
     require_once INCLUDES_PATH . '/http_errors.php';
-    global $currentUserId;
+    global $currentUser;
 
     // Проверяем параметры URL
     $linkname = $_GET['linkname'] ?? '';
@@ -60,7 +60,7 @@
     }
 
     // Остальные случаи
-    if (!empty($currentUserId)) {
+    if (!empty($currentUser)) {
         include PAGES_PATH . '/feed.php';
         exit;
         

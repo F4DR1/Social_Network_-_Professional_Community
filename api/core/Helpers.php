@@ -5,6 +5,16 @@
     class Helpers {
 
         /**
+         * Возвращает основной домен (без протокола и поддоменов)
+         */
+        public static function getMainDomain() {
+            $host = $_SERVER['HTTP_HOST'] ?? '';
+            // Убираем поддомен api.
+            $host = preg_replace('/^api\./', '', $host);
+            return $host ?: 'localhost';
+        }
+
+        /**
          * Возвращает базовый URL API
          */
         public static function apiBaseUrl() {
@@ -51,10 +61,8 @@
          * Получение домена для cookie
          */
         private static function getCookieDomain() {
-            $domain = $_SERVER['HTTP_HOST'] ?? '';
-            $domain = preg_replace('/^www\./', '', $domain);
-            $domain = preg_replace('/:\d+$/', '', $domain);
-            return $domain;
+            $domain = self::getMainDomain();
+            return ($domain === 'localhost') ? $domain : '.' . $domain;
         }
         
         /**
@@ -134,7 +142,7 @@
                 'domain' => $domain,
                 'secure' => !self::isLocalhost(),
                 'httponly' => true,
-                'samesite' => 'Strict'
+                'samesite' => 'Lax'
             ]);
         }
         

@@ -1,11 +1,22 @@
 <?php
     require __DIR__ . '/vendor/autoload.php';
+    require_once 'core/Helpers.php';
 
-    // Разрешаем запросы с любого сайта (для разработки)
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Credentials: true");
-    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    // Разрешаем запросы только с конкретного домена
+    $allowedOrigin = 'https://' . Helpers::getMainDomain();
+    if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] === $allowedOrigin) {
+        header("Access-Control-Allow-Origin: " . $allowedOrigin);
+        header("Access-Control-Allow-Credentials: true");
+        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    } else {
+        // Разрешаем запросы с любого сайта (для разработки)
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Credentials: true");
+        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+        header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    }
+
 
     // Для preflight запросов OPTIONS
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

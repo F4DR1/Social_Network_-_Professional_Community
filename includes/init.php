@@ -148,5 +148,5 @@
     // Получение данных текущего пользователя
     $authCheck = authCheck();
     $currentUser = $authCheck['success'] ? $authCheck['data']['user'] : null;
-    $currentUserId = $authCheck['success'] ? $currentUser['id'] : null;
+    $currentUserId = !empty($currentUser) ? $currentUser['id'] : null;
 ?>

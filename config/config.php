@@ -5,7 +5,7 @@
     /**
      * Формирует базовый URL API в зависимости от окружения
      */
-    function getApiUrl($domain) {
+    function getApiUrl($mainDomain) {
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
 
@@ -14,11 +14,15 @@
             $base = ltrim($base, '/');
             return $protocol . '://localhost/' . $base . '/api';
         }
-        return $protocol . '://api.' . $domain;
+        return $protocol . '://api.' . $mainDomain;
     }
 
     
-    $DOMAIN = 'мирпрофи.рф';
+    // Автоматически получаем основной домен (без поддомена api.)
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $host = preg_replace('/:\d+$/', '', $host);  // Удаляем порт
+    $DOMAIN = preg_replace('/^api\./', '', $host);  // Убираем 'api.' (если есть, на всякий случай)
+
     $API = getApiUrl($DOMAIN);
 
     define('API', $API);
