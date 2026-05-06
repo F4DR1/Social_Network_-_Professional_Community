@@ -11,78 +11,124 @@
             $this->auth = $auth;
         }
         
+
+
+        /**
+         * Общий обработчик поиска группы
+         */
+        private function getGroup($group) {
+            if (!$group) {
+                Helpers::errorResponse('Группа не найдена', 404);
+            }
+            
+            $group['photo'] = Helpers::fileUrl($group['photo'] ?? null);
+            
+            Helpers::jsonResponse(['success' => true, 'group' => $group]);
+        }
+
+        
+
         /**
          * GET /groups/{group_id} - получить данные группы по id
          */
         public function getGroupById($groupId) {
             Helpers::validateGroupId($groupId);
 
-            $group = $this->db->fetchOne(
-                "SELECT id, linkname, name, photo FROM groups WHERE id = ?",
+            $group = $this->db->fetchOne("
+                    SELECT
+                        g.id,
+                        g.linkname,
+                        g.name,
+                        f.file_path AS photo
+                    FROM
+                        groups g
+                        LEFT JOIN files f ON f.id = g.photo_id
+                    WHERE
+                        g.id = ?
+                ",
                 [$groupId]
             );
-            
-            if (!$group) {
-                Helpers::errorResponse('Группа не найдена', 404);
-            }
-            
-            Helpers::jsonResponse(['success' => true, 'group' => $group]);
+            $this->getGroup($group);
         }
         
         /**
          * GET /groups/{linkname} - получить данные группы по linkname
          */
         public function getGroupByLinkname($linkname) {
-            $group = $this->db->fetchOne(
-                "SELECT id, linkname, name, photo FROM groups WHERE linkname = ?",
+            $group = $this->db->fetchOne("
+                    SELECT
+                        g.id,
+                        g.linkname,
+                        g.name,
+                        f.file_path AS photo
+                    FROM
+                        groups g
+                        LEFT JOIN files f ON f.id = g.photo_id
+                    WHERE
+                        g.linkname = ?
+                ",
                 [$linkname]
             );
-            
-            if (!$group) {
-                Helpers::errorResponse('Группа не найдена', 404);
-            }
-            
-            Helpers::jsonResponse(['success' => true, 'group' => $group]);
+            $this->getGroup($group);
         }
         
         /**
-         * GET /groups/list/{user_id}/{is_admin} - получаем список групп пользователя
+         * GET /groups/list/{user_id} - получаем списки групп пользователя
          */
-        public function getUserGroups($userId, $userIsAdmin) {
+        public function getUserGroups($userId) {
             Helpers::validateUserId($userId);
             
             try {
                 $adminRoles = Helpers::getGroupAdminRoles();
+                $adminRoleNames = $adminRoles['roles'];
 
-                $adminRolesText = $adminRoles['text'];
-                $rolesPlaceholder = $userIsAdmin ? "AND gr.name IN ($adminRolesText)" : "";
-
+                // Один запрос для получения всех групп пользователя с ролями
                 $sql = "
-                    SELECT DISTINCT 
+                    SELECT DISTINCT
                         g.id,
                         g.linkname,
                         g.name,
-                        g.photo,
+                        f.file_path AS photo,
                         gm.role_id,
                         gr.name as role_name,
                         gr.title as role_title
-                    FROM groups g
-                    INNER JOIN group_members gm ON g.id = gm.group_id 
-                    INNER JOIN group_roles gr ON gm.role_id = gr.id
-                    WHERE gm.user_id = ?
-                    $rolesPlaceholder
-                    ORDER BY gm.joined_at DESC
+                    FROM
+                        groups g
+                        INNER JOIN group_members gm ON g.id = gm.group_id
+                        INNER JOIN group_roles gr ON gm.role_id = gr.id
+                        LEFT JOIN files f ON f.id = g.photo_id
+                    WHERE
+                        gm.user_id = ?
+                    ORDER BY
+                        gm.joined_at DESC
                 ";
-
-                $params = [$userId];
-                if ($userIsAdmin) {
-                    $params = array_merge($params, $adminRoles['roles']);
-                }
-
-                $groupsList = $this->db->fetchAll($sql, $params);
                 
-                Helpers::jsonResponse(['success' => true, 'groupsList' => $groupsList]);
-
+                $allGroups = $this->db->fetchAll($sql, [$userId]);
+                
+                $groups = ['all' => [], 'admin' => []];
+                $seenAll = [];
+                $seenAdmin = [];
+                
+                foreach ($allGroups as $group) {
+                    $groupId = $group['id'];
+                    
+                    // Добавляем в общий список, если ещё не добавлена
+                    if (!in_array($groupId, $seenAll)) {
+                        $groups['all'][] = $group;
+                        $seenAll[] = $groupId;
+                    }
+                    
+                    // Проверяем, является ли роль административной (сравниваем по имени)
+                    if (in_array($group['role_name'], $adminRoleNames)) {
+                        if (!in_array($groupId, $seenAdmin)) {
+                            $groups['admin'][] = $group;
+                            $seenAdmin[] = $groupId;
+                        }
+                    }
+                }
+                
+                Helpers::jsonResponse(['success' => true, 'groups' => $groups ?: null]);
+                
             } catch (Exception $e) {
                 Helpers::errorResponse('Не удалось получить список групп', 404);
             }
@@ -97,13 +143,20 @@
 
             
             $adminRoles = Helpers::getGroupAdminRoles();
-            $adminRolesText = $adminRoles['text'];
+            $adminRolesNames = $adminRoles['names'];
             
             $isAdmin = $this->db->fetchOne("
                     SELECT 1
-                    FROM group_members gm
-                    INNER JOIN group_roles gr ON gm.role_id = gr.id
-                    WHERE gm.group_id = ? AND gm.user_id = ? AND gr.name IN ($adminRolesText)
+                    FROM
+                        group_members gm
+                        INNER JOIN
+                            group_roles gr ON gm.role_id = gr.id
+                    WHERE
+                        gm.group_id = ?
+                        AND
+                        gm.user_id = ?
+                        AND
+                        gr.name IN ($adminRolesNames)
                     LIMIT 1
                 ",
                 array_merge([$groupId, $userId], $adminRoles['roles'])
@@ -131,16 +184,23 @@
             try {
                 $this->db->beginTransaction();
 
-                $this->db->query(
-                    "INSERT INTO groups (name, created_at) 
-                    VALUES (?, NOW())",
+                $this->db->query("
+                        INSERT INTO groups (name, created_at) 
+                        VALUES (?, NOW())
+                    ",
                     [$groupName]
                 );
                 
                 $groupId = $this->db->lastInsertId();
 
-                $role = $this->db->fetchOne(
-                    "SELECT id FROM group_roles WHERE name = ?",
+                $role = $this->db->fetchOne("
+                        SELECT
+                            id
+                        FROM
+                            group_roles
+                        WHERE
+                            name = ?
+                    ",
                     ['owner']
                 );
 
@@ -148,9 +208,10 @@
                     throw new Exception('Роль "owner" не найдена');
                 }
 
-                $this->db->query(
-                    "INSERT INTO group_members (group_id, user_id, role_id, joined_at) 
-                    VALUES (?, ?, ?, NOW())",
+                $this->db->query("
+                        INSERT INTO group_members (group_id, user_id, role_id, joined_at) 
+                        VALUES (?, ?, ?, NOW())
+                    ",
                     [$groupId, $currentUser['id'], $role['id']]
                 );
 
@@ -186,12 +247,19 @@
 
             // Проверка админ ли группы
             $adminRoles = Helpers::getGroupAdminRoles();
-            $adminRolesText = $adminRoles['text'];
+            $adminRolesNames = $adminRoles['names'];
             $isAdmin = $this->db->fetchOne("
                     SELECT 1
-                    FROM group_members gm
-                    INNER JOIN group_roles gr ON gm.role_id = gr.id
-                    WHERE gm.group_id = ? AND gm.user_id = ? AND gr.name IN ($adminRolesText)
+                    FROM
+                        group_members gm
+                        INNER JOIN
+                            group_roles gr ON gm.role_id = gr.id
+                    WHERE
+                        gm.group_id = ?
+                        AND
+                        gm.user_id = ?
+                        AND
+                        gr.name IN ($adminRolesNames)
                     LIMIT 1
                 ",
                 array_merge([$groupId, $currentUserId], $adminRoles['roles'])
@@ -217,8 +285,16 @@
                         return;
                     }
 
-                    $exists = $this->db->fetchOne(
-                        "SELECT id FROM groups WHERE linkname = ? AND id != ?",
+                    $exists = $this->db->fetchOne("
+                            SELECT
+                                id
+                            FROM
+                                groups
+                            WHERE
+                                linkname = ?
+                                AND
+                                id != ?
+                        ",
                         [$groupLinkname, $groupId]
                     );
                     if ($exists) {
@@ -226,9 +302,15 @@
                         return;
                     }
 
-                    $this->db->query(
-                        "UPDATE groups SET name = ?, linkname = ? 
-                        WHERE id = ?",
+                    $this->db->query("
+                            UPDATE
+                                groups
+                            SET
+                                name = ?,
+                                linkname = ? 
+                            WHERE
+                                id = ?
+                        ",
                         [$groupName, $groupLinkname, $groupId]
                     );
                     
@@ -253,13 +335,22 @@
                         u.id,
                         u.linkname,
                         u.firstname,
-                        u.photo
-                    FROM group_members gm 
-                    INNER JOIN users u ON gm.user_id = u.id
-                    WHERE gm.group_id = ?
+                        f.file_path AS photo
+                    FROM
+                        group_members gm 
+                        INNER JOIN users u ON gm.user_id = u.id
+                        LEFT JOIN files f ON f.id = u.photo_id
+                    WHERE
+                        gm.group_id = ?
                 ",
                 [$groupId]
             );
+
+            // Преобразуем относительные пути в полные URL
+            foreach ($members as &$member) {
+                $member['photo'] = Helpers::fileUrl($member['photo'] ?? 'images/static/user_empty.webp');
+            }
+            unset($member);
             
             Helpers::jsonResponse(['success' => true, 'members' => $members]);
         }
@@ -277,9 +368,14 @@
                     SELECT
                         gm.user_id IS NOT NULL as isSubscribe,
                         gr.name = ? as isOwner
-                    FROM group_members gm
-                    LEFT JOIN group_roles gr ON gm.role_id = gr.id
-                    WHERE gm.user_id = ? AND gm.group_id = ?
+                    FROM
+                        group_members gm
+                        LEFT JOIN
+                            group_roles gr ON gm.role_id = gr.id
+                    WHERE
+                        gm.user_id = ?
+                        AND
+                        gm.group_id = ?
                     LIMIT 1
                 ",
                 ['owner', $currentUserId, $groupId]
@@ -334,8 +430,13 @@
             
             try {
                 $this->db->query("
-                        DELETE FROM group_members
-                        WHERE user_id = ? AND group_id = ?
+                        DELETE
+                        FROM
+                            group_members
+                        WHERE
+                            user_id = ?
+                            AND
+                            group_id = ?
                     ",
                     [$currentUser['id'], $groupId]
                 );

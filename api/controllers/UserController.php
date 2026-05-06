@@ -11,6 +11,23 @@
             $this->auth = $auth;
         }
         
+
+
+        /**
+         * Общий обработчик поиска пользователя
+         */
+        private function getUser($user) {
+            if (!$user) {
+                Helpers::errorResponse('Пользователь не найден', 404);
+            }
+            
+            $user['photo'] = Helpers::fileUrl($user['photo'] ?? 'images/static/user_empty.webp');
+            
+            Helpers::jsonResponse(['success' => true, 'user' => $user]);
+        }
+
+
+
         /**
          * GET /users/{user_id} - получить данные пользователя по id
          */
@@ -18,18 +35,23 @@
             Helpers::validateUserId($userId);
 
             $user = $this->db->fetchOne("
-                    SELECT id, linkname, lastname, firstname, photo, phone, email
-                    FROM users
-                    WHERE id = ?
+                    SELECT
+                        u.id,
+                        u.linkname,
+                        u.lastname,
+                        u.firstname,
+                        f.file_path AS photo,
+                        u.phone,
+                        u.email
+                    FROM
+                        users u
+                        LEFT JOIN files f ON f.id = u.photo_id
+                    WHERE
+                        u.id = ?
                 ",
                 [$userId]
             );
-            
-            if (!$user) {
-                Helpers::errorResponse('Пользователь не найден', 404);
-            }
-            
-            Helpers::jsonResponse(['success' => true, 'user' => $user]);
+            $this->getUser($user);
         }
         
         /**
@@ -37,22 +59,27 @@
          */
         public function getUserByLinkname($linkname) {
             $user = $this->db->fetchOne("
-                    SELECT id, linkname, lastname, firstname, photo, phone, email
-                    FROM users
-                    WHERE linkname = ?
+                    SELECT
+                        u.id,
+                        u.linkname,
+                        u.lastname,
+                        u.firstname,
+                        f.file_path AS photo,
+                        u.phone,
+                        u.email
+                    FROM
+                        users u
+                        LEFT JOIN files f ON f.id = u.photo_id
+                    WHERE
+                        u.linkname = ?
                 ",
                 [$linkname]
             );
-            
-            if (!$user) {
-                Helpers::errorResponse('Пользователь не найден', 404);
-            }
-            
-            Helpers::jsonResponse(['success' => true, 'user' => $user]);
+            $this->getUser($user);
         }
         
         /**
-         * PUT /users - обновить данные пользователя
+         * PUT /users/update - обновить данные пользователя
          */
         public function updateProfile() {
             $this->auth->check();

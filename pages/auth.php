@@ -77,6 +77,7 @@
                     </div>
                 </div>
                 <div id="registerMessage" class="message"></div>
+                <p>Обратите внимание: сайт ещё разрабатывается, пользовательские файлы могут быть утеряны в любой момент!</p>
                 <button class="submit-btn" id="registerBtn">
                     <span class="btn-text">Зарегистрироваться</span>
                 </button>
@@ -104,7 +105,7 @@
     $content = ob_get_clean();
     $title = $isRegister ? 'Регистрация' : 'Авторизация';
     $scripts = [
-        'auth.js'
+        'pages/auth.js'
     ];
     $stylesheets = [
         'pages/auth.css',

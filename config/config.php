@@ -18,7 +18,7 @@
     }
 
     
-    $DOMAIN = 'sitename.com';
+    $DOMAIN = 'мирпрофи.рф';
     $API = getApiUrl($DOMAIN);
 
     define('API', $API);

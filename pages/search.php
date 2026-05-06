@@ -33,8 +33,8 @@
     $content = ob_get_clean();
     $title = 'Поиск';
     $scripts = [
-        'category_elements.js',
-        'search.js'
+        'elements/category_elements.js',
+        'pages/search.js'
     ];
     $stylesheets = [
         'pages/search.css',

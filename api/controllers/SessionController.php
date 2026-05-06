@@ -10,6 +10,8 @@
             $this->auth = $auth;
         }
         
+
+        
         /**
          * GET /sessions - получить все мои сессии
          */
@@ -21,7 +23,6 @@
             $currentSessionId = $this->auth->getCurrentSession()['id'];
             foreach ($sessions as &$session) {
                 $session['is_current'] = ($session['id'] == $currentSessionId);
-                // Форматируем даты для удобства
                 $session['last_activity_human'] = $this->timeAgo($session['last_activity']);
             }
             
@@ -36,8 +37,13 @@
             $currentSession = $this->auth->getCurrentSession();
             
             if ($currentSession) {
-                $this->db->query(
-                    "DELETE FROM sessions WHERE id = ?",
+                $this->db->query("
+                        DELETE
+                        FROM
+                            sessions
+                        WHERE
+                            id = ?
+                    ",
                     [$currentSession['id']]
                 );
                 
@@ -53,12 +59,20 @@
          * DELETE /sessions/{id} - завершить конкретную сессию
          */
         public function terminateSession($sessionId) {
+            Helpers::validateSessionId($sessionId);
+
             $this->auth->check();
             $currentUser = $this->auth->getCurrentUser();
             
-            // Удаляем только сессии текущего пользователя
-            $this->db->query(
-                "DELETE FROM sessions WHERE id = ? AND user_id = ?",
+            $this->db->query("
+                    DELETE
+                    FROM
+                        sessions
+                    WHERE
+                        id = ?
+                        AND
+                        user_id = ?
+                ",
                 [$sessionId, $currentUser['id']]
             );
             
@@ -73,8 +87,15 @@
             $currentUser = $this->auth->getCurrentUser();
             $currentSession = $this->auth->getCurrentSession();
             
-            $this->db->query(
-                "DELETE FROM sessions WHERE user_id = ? AND id != ?",
+            $this->db->query("
+                    DELETE
+                    FROM
+                        sessions
+                    WHERE
+                        user_id = ?
+                        AND
+                        id != ?
+                ",
                 [$currentUser['id'], $currentSession['id']]
             );
             

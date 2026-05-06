@@ -1,19 +1,20 @@
 // Универсальная функция для всех AJAX запросов
 async function apiRequest(endpoint, options = {}) {
     const url = `${window.APP_CONFIG.API}${endpoint}`;
+    const isFormData = options.body instanceof FormData;
     
     const config = {
         method: options.method || 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
             ...options.headers
         },
         credentials: 'include',  // Cookies для сессий
         ...options
     };
 
-    if (options.body && typeof options.body === 'object') {
-        config.body = JSON.stringify(options.body);
+    if (options.body) {
+        config.body = isFormData ? options.body : JSON.stringify(options.body);
     }
 
     try {
@@ -82,6 +83,11 @@ export async function relationshipsList() {
         method: 'GET'
     });
 }
+export async function relationshipsUsersGet(userId) {
+    return apiRequest(`/relationships/get/users/${userId}`, {
+        method: 'GET'
+    });
+}
 export async function relationshipsSubscribe(data) {
     return apiRequest(`/relationships/subscribe`, {
         method: 'PUT',
@@ -112,7 +118,6 @@ export async function relationshipsChangeList(data) {
 // export async function getUserProfile(userId) {
 //     return apiRequest(`/users/${userId}`);
 // }
-
 // export async function updateUserProfile(userId, data) {
 //     return apiRequest(`/users/${userId}`, { 
 //         method: 'PUT', 
@@ -121,9 +126,59 @@ export async function relationshipsChangeList(data) {
 // }
 
 
+// ========== НАВЫКИ ПОЛЬЗОВАТЕЛЯ ==========
+export async function skillLevelsGet() {
+    return apiRequest(`/skills/levels/get`, {
+        method: 'GET'
+    });
+}
+export async function skillsGet(data) {
+    return apiRequest(`/skills/get`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function userSkillsGet(userId, data) {
+    return apiRequest(`/users/user-skills/get/${userId}`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function userSkillsAdd(data) {
+    return apiRequest(`/users/user-skills/add`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function userSkillsEdit(data) {
+    return apiRequest(`/users/user-skills/edit`, {
+        method: 'PUT',
+        body: data
+    });
+}
+export async function userSkillsDelete(data) {
+    return apiRequest(`/users/user-skills/delete`, {
+        method: 'DELETE',
+        body: data
+    });
+}
+export async function userSkillEndorsementAdd(data) {
+    return apiRequest(`/users/user-skills/endorsement/add`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function userSkillEndorsementDelete(data) {
+    return apiRequest(`/users/user-skills/endorsement/delete`, {
+        method: 'DELETE',
+        body: data
+    });
+}
+
+
 // ========== ГРУППЫ ==========
-export async function groupsListGet(userId, isAdmin) {
-    return apiRequest(`/groups/list/${userId}/${isAdmin}`, {
+export async function groupsListGet(userId) {
+    return apiRequest(`/groups/list/${userId}`, {
         method: 'GET'
     });
 }
@@ -158,13 +213,8 @@ export async function groupsUnsubscribe(data) {
 }
 
 
-// ========== ГРУППЫ ==========
-export async function postsGet(postId) {
-    return apiRequest(`/posts/${postId}`, {
-        method: 'GET'
-    });
-}
-export async function postsGetFeed() {
+// ========== ПОСТЫ ==========
+export async function postsGetByFeed() {
     return apiRequest(`/posts/feed`, {
         method: 'GET'
     });
@@ -179,15 +229,40 @@ export async function postsGetAllByGroup(groupId) {
         method: 'GET'
     });
 }
-export async function postsCreate(data) {
-    return apiRequest(`/posts/create`, {
+export async function postGet(postId) {
+    return apiRequest(`/post/get/${postId}`, {
+        method: 'GET'
+    });
+}
+export async function postPublicate(data) {
+    return apiRequest(`/post/publicate`, {
         method: 'POST',
         body: data
     });
 }
-export async function postsDelete(data) {
-    return apiRequest(`/posts/delete`, {
+export async function postDelete(data) {
+    return apiRequest(`/post/delete`, {
         method: 'POST',
         body: data
+    });
+}
+
+
+// ========== КОНТЕНТ ==========
+export async function contentArticleGet(articleId) {
+    return apiRequest(`/content/article/get/${articleId}`, {
+        method: 'GET'
+    });
+}
+export async function contentArticleCreate(data) {
+    return apiRequest(`/content/article/create`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function fileUpload(formData) {
+    return apiRequest(`/file/upload`, {
+        method: 'POST',
+        body: formData
     });
 }

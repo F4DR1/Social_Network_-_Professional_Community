@@ -1,7 +1,8 @@
 <?php
     require_once __DIR__ . '/bootstrap.php';
     require_once INCLUDES_PATH . '/init.php';
-    global $clientConfig, $currentUserId, $currentUser;
+    require_once INCLUDES_PATH . '/page_path.php';
+    global $clientConfig, $currentUser;
 
     require_once ENUMS_PATH . '/auth.php';
     require_once ENUMS_PATH . '/layout.php';
@@ -11,24 +12,10 @@
     if (empty($layout)) {
         $layout = Layout::Standart;
     }
-
-    switch ($layout) {
-        case Layout::Standart:
-            if (!empty($currentUserId) && !empty($currentUser)) {
-                $currentUser_fullname = $currentUser['firstname'] . ' ' . $currentUser['lastname'];
-                $currentUser_link = $currentUser['linkname'] ?? 'user' . $currentUserId ;
-                $currentUser_photo = $currentUser['photo'] ?? null;
-            }
-            break;
-        
-        default:
-            break;
-    }
+    
+    $profileLink = '';
 
     // Полная ссылка для return_url
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'];
-    $path = $_SERVER['REQUEST_URI'];
     $returnUrl = urlencode($protocol . '://' . $host . $path);
 ?>
 
@@ -40,23 +27,25 @@
     <meta charset="UTF-8">
     <title>
         <?php
-            $base_title = 'NNN';
+            $base_title = 'МирПрофи';
             echo $title ?? $base_title;
         ?>
     </title>
 
     <link rel="icon" href="<?= IMAGES_URL ?>/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="<?= CSS_URL ?>/global.css">
+    <link rel="stylesheet" href="<?= CSS_URL ?>/global.css?v=<?= time() ?>">
 
     <script>
         window.APP_CONFIG = <?= isset($clientConfig) ? json_encode($clientConfig, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) : json_encode([]) ?>;
     </script>
-    <script src="<?= JS_URL . '/modal.js' ?>" type="module"></script>
+    <script src="<?= JS_URL ?>/layout.js?v=<?= time() ?>" type="module"></script>
+    <script src="<?= JS_URL ?>/modal.js?v=<?= time() ?>" type="module"></script>
     <?php
         // Подгружаем скрипты определённых страниц
         if (isset($scripts) && $scripts > 0) {
             foreach ($scripts as $script) {
-                echo "<script src=\"" . JS_URL ."/$script\" type=\"module\"></script>";
+                $time = time();
+                echo "<script src=\"" . JS_URL ."/$script?v=$time\" type=\"module\"></script>";
             }
         }
 
@@ -73,12 +62,12 @@
         <header>
             <div class="header-container">
                 <a href="/" class="logo-row">
-                    <img src="<?= IMAGES_URL ?>/logo.png" alt="Логотип NNN" class="logo">
-                    <h1>NNN</h1>
+                    <img src="<?= API ?>/images/static/logo.png" alt="Логотип <?= htmlspecialchars($base_title) ?>" class="logo">
+                    <h1><?= htmlspecialchars($base_title) ?></h1>
                 </a>
                 <?php if ($layout === Layout::Standart): ?>
                     <div class="header-row">
-                        <?php if (empty($currentUserId)): ?>
+                        <?php if (empty($currentUser)): ?>
                             <nav class="auth">
                                 <ul>
                                     <li><a href="<?= Auth::Login->text(); ?>?return_url=<?= $returnUrl ?>" class="inline">Войти</a></li>
@@ -87,12 +76,19 @@
                             </nav>
 
                         <?php else: ?>
+                            <?php
+                                // Получаем данные пользователя
+                                $currentUserFullName = $currentUser['firstname'] . ' ' . $currentUser['lastname'];
+                                $currentUserPhoto = $currentUser['photo'] ?? null;
+
+                                $profileLink = $currentUser['linkname'] ?? 'user' . $currentUser['id'];
+                            ?>
                             <nav class="profile-dropdown">
                                 <button class="profile-trigger" aria-label="Меню профиля">
                                     <div class="profile-avatar">
-                                        <img src="<?= $currentUser_photo ?: IMAGES_URL . '/empty.webp' ?>" alt="<?= htmlspecialchars($currentUser_fullname) ?>" width="32" height="32">
+                                        <img src="<?= $currentUserPhoto ?>" alt="<?= htmlspecialchars($currentUserFullName) ?>" width="32" height="32">
                                     </div>
-                                    <span class="profile-name"><?= htmlspecialchars($currentUser_fullname) ?></span>
+                                    <span class="profile-name"><?= htmlspecialchars($currentUserFullName) ?></span>
                                     <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                                         <path d="M7 10l5 5 5-5z"/>
                                     </svg>
@@ -100,14 +96,14 @@
                                 
                                 <div class="dropdown-menu">
                                     <div class="profile-info">
-                                        <img src="<?= $currentUser_photo ?: IMAGES_URL . '/empty.webp' ?>" alt="<?= htmlspecialchars($currentUser_fullname) ?>" width="48" height="48">
+                                        <img src="<?= $currentUserPhoto ?>" alt="<?= htmlspecialchars($currentUserFullName) ?>" width="48" height="48">
                                         <div>
-                                            <div class="profile-fullname"><?= htmlspecialchars($currentUser_fullname) ?></div>
-                                            <div class="profile-link">@<?= htmlspecialchars($currentUser['linkname'] ?: 'user' . $currentUserId) ?></div>
+                                            <div class="profile-fullname"><?= htmlspecialchars($currentUserFullName) ?></div>
+                                            <div class="profile-link">@<?= htmlspecialchars($profileLink) ?></div>
                                         </div>
                                     </div>
                                     <ul class="dropdown-list">
-                                        <li><a href="<?= $currentUser_link ?>" class="dropdown-link">
+                                        <li><a href="<?= $profileLink ?>" class="dropdown-link">
                                             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                             </svg>
@@ -140,16 +136,21 @@
     <?php endif; ?>
 
     <main>
-        <?php if ($layout === Layout::Standart && !empty($currentUserId)): ?>
+        <?php if ($layout === Layout::Standart): ?>
             <div class="navigation-menu">
                 <nav class="navigation">
                     <ul>
-                        <li><a href="<?= $currentUser_link ?>">Профиль</a></li>
-                        <li><a href="feed">Лента</a></li>
-                        <li><a href="messages">Сообщения</a></li>
-                        <li><a href="contacts">Контакты</a></li>
-                        <li><a href="groups">Группы</a></li>
-                        <li><a href="search">Поиск</a></li>
+                        <?php if (empty($currentUser)): ?>
+                            <li><a href="<?= Auth::Login->text() ?>">Войти</a></li>
+                            <li><a href="<?= Auth::Register->text() ?>">Регистрация</a></li>
+                        <?php else: ?>
+                            <li><a href="<?= $profileLink ?>">Профиль</a></li>
+                            <li><a href="feed">Лента</a></li>
+                            <li><a href="messages">Сообщения</a></li>
+                            <li><a href="contacts">Контакты</a></li>
+                            <li><a href="groups">Группы</a></li>
+                            <li><a href="search">Поиск</a></li>
+                        <?php endif; ?>
                     </ul>
                 </nav>
             </div>
@@ -165,14 +166,10 @@
     </main>
 
     <?php if ($layout !== Layout::Micro): ?>
-        <footer>
-            &copy; NNN.
+        <footer class="global">
+            &copy; <?= htmlspecialchars($base_title) ?>
         </footer>
         
-    <?php endif; ?>
-
-    <?php if (!empty($currentUserId)): ?>
-        <script src="<?= JS_URL ?>/layout.js" type="module"></script>
     <?php endif; ?>
 
 </body>

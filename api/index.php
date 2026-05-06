@@ -1,4 +1,6 @@
 <?php
+    require __DIR__ . '/vendor/autoload.php';
+
     // Разрешаем запросы с любого сайта (для разработки)
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Credentials: true");
@@ -49,7 +51,8 @@
 
     // ========== ОТНОШЕНИЯ ==========
     $router->add('GET', '/relationships/list', 'RelationshipController', 'getList', $db, null);
-    $router->add('GET', '/relationships/get/{user_id}/{related_user_id}', 'RelationshipController', 'getRelationship', $db, null);
+    $router->add('GET', '/relationships/get/users/{user_id}', 'RelationshipController', 'getRelationshipUsers', $db, null);
+    $router->add('GET', '/relationships/get/{user_id}/{related_user_id}', 'RelationshipController', 'getRelationshipWithUser', $db, null);
     $router->add('PUT', '/relationships/subscribe', 'RelationshipController', 'subscribe', $db, $auth);
     $router->add('DELETE', '/relationships/unsubscribe', 'RelationshipController', 'unsubscribe', $db, $auth);
     $router->add('PUT', '/relationships/block', 'RelationshipController', 'block', $db, $auth);
@@ -59,11 +62,21 @@
     $router->add('GET', '/users/{id}', 'UserController', 'getUserById', $db, null);
     $router->add('GET', '/users/by-link/{linkname}', 'UserController', 'getUserByLinkname', $db, null);
     $router->add('PUT', '/users/update', 'UserController', 'updateProfile', $db, $auth);
+    
+    // ========== НАВЫКИ ПОЛЬЗОВАТЕЛЕЙ ==========
+    $router->add('GET', '/skills/levels/get', 'UserSkillController', 'getSkillLevels', $db, $auth);
+    $router->add('POST', '/skills/get', 'UserSkillController', 'getSkills', $db, $auth);
+    $router->add('POST', '/users/user-skills/get/{user_id}', 'UserSkillController', 'getUserSkills', $db, null);
+    $router->add('POST', '/users/user-skills/add', 'UserSkillController', 'addUserSkill', $db, $auth);
+    $router->add('PUT', '/users/user-skills/edit', 'UserSkillController', 'editUserSkill', $db, $auth);
+    $router->add('DELETE', '/users/user-skills/delete', 'UserSkillController', 'deleteUserSkill', $db, $auth);
+    $router->add('POST', '/users/user-skills/endorsement/add', 'UserSkillController', 'addEndorsementUserSkill', $db, $auth);
+    $router->add('DELETE', '/users/user-skills/endorsement/delete', 'UserSkillController', 'deleteEndorsementUserSkill', $db, $auth);
 
     // ========== ГРУППЫ ==========
     $router->add('GET', '/groups/{group_id}', 'GroupController', 'getGroupById', $db, null);
     $router->add('GET', '/groups/by-link/{linkname}', 'GroupController', 'getGroupByLinkname', $db, null);
-    $router->add('GET', '/groups/list/{user_id}/{is_admin}', 'GroupController', 'getUserGroups', $db, null);
+    $router->add('GET', '/groups/list/{user_id}', 'GroupController', 'getUserGroups', $db, null);
     $router->add('GET', '/groups/is-admin/{group_id}/{user_id}', 'GroupController', 'getUserIsAdminGroup', $db, null);
     $router->add('POST', '/groups/create', 'GroupController', 'createGroup', $db, $auth);
     $router->add('POST', '/groups/edit', 'GroupController', 'editGroup', $db, $auth);
@@ -73,12 +86,17 @@
     $router->add('POST', '/groups/unsubscribe', 'GroupController', 'unsubscribe', $db, $auth);
 
     // ========== ПОСТЫ ==========
-    $router->add('GET', '/posts/feed', 'PostController', 'getAllPostsFeed', $db, $auth);
-    $router->add('GET', '/posts/user/{user_id}', 'PostController', 'getAllPostsByUser', $db, null);
-    $router->add('GET', '/posts/group/{group_id}', 'PostController', 'getAllPostsByGroup', $db, null);
-    $router->add('GET', '/posts/{post_id}', 'PostController', 'getPost', $db, null);
-    $router->add('POST', '/posts/create', 'PostController', 'create', $db, $auth);
-    $router->add('POST', '/posts/delete', 'PostController', 'delete', $db, $auth);
+    $router->add('GET', '/posts/feed', 'PostController', 'getAllByFeed', $db, $auth);
+    $router->add('GET', '/posts/user/{user_id}', 'PostController', 'getAllByUser', $db, null);
+    $router->add('GET', '/posts/group/{group_id}', 'PostController', 'getAllByGroup', $db, null);
+    $router->add('GET', '/post/get/{post_id}', 'PostController', 'get', $db, null);
+    $router->add('POST', '/post/publicate', 'PostController', 'publicate', $db, $auth);
+    $router->add('POST', '/post/delete', 'PostController', 'delete', $db, $auth);
+
+    // ========== КОНТЕНТ ==========
+    $router->add('GET', '/content/article/get/{article_id}', 'ContentController', 'articleGet', $db, null);
+    $router->add('POST', '/content/article/create', 'ContentController', 'articleCreate', $db, $auth);
+    $router->add('POST', '/file/upload', 'ContentController', 'fileUpload', $db, $auth);
 
     
     // =============== ЗАПУСКАЕМ МАРШРУТИЗАЦИЮ ===============

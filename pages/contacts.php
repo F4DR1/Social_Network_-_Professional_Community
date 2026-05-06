@@ -116,8 +116,8 @@
     $content = ob_get_clean();
     $title = 'Контакты';
     $scripts = [
-        'category_elements.js',
-        'contacts.js'
+        'elements/category_elements.js',
+        'pages/contacts.js'
     ];
     $stylesheets = [
         'elements/category.css',

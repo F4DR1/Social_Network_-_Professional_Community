@@ -1,0 +1,63 @@
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+    width: auto;
+}
+
+.dropdown-trigger {
+    background: #f0f2f5;
+    border: 1px solid #ccd0d5;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.dropdown-arrow {
+    transition: transform 0.2s;
+}
+
+.custom-dropdown.open .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    list-style: none;
+    padding: 4px 0;
+    min-width: 150px;
+    z-index: 10000; /* повысил, чтобы гарантированно быть поверх других элементов */
+    display: none;
+}
+
+/* Убедимся, что при наличии класса open меню показывается */
+.custom-dropdown.open .dropdown-menu {
+    display: block !important; /* временно для проверки, если не работает - убери !important после отладки */
+}
+
+.dropdown-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.1s;
+    white-space: nowrap;
+}
+
+.dropdown-menu li:hover {
+    background: #f0f2f5;
+}
+
+.dropdown-menu li.selected {
+    background: #e4e6eb;
+    font-weight: bold;
+}

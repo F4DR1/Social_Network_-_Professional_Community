@@ -19,12 +19,17 @@
                 Helpers::errorResponse('Токен не найден', 401);
             }
             
-            // Проверяем сессию в БД (используем логику из Auth.php)
-            $session = $this->db->fetchOne(
-                "SELECT s.*, u.id, u.linkname, u.phone, u.firstname, u.lastname, u.photo 
-                FROM sessions s 
-                JOIN users u ON s.user_id = u.id 
-                WHERE s.token = ? AND s.last_activity > DATE_SUB(NOW(), INTERVAL 30 DAY)",
+            // Проверяем сессию в БД
+            $session = $this->db->fetchOne("
+                    SELECT
+                        *
+                    FROM
+                        sessions
+                    WHERE
+                        token = ?
+                        AND
+                        last_activity > DATE_SUB(NOW(), INTERVAL 30 DAY)
+                ",
                 [$token]
             );
             
@@ -33,23 +38,41 @@
             }
             
             // Обновляем last_activity
-            $this->db->query(
-                "UPDATE sessions SET last_activity = NOW() WHERE token = ?",
+            $this->db->query("
+                    UPDATE
+                        sessions
+                    SET
+                        last_activity = NOW()
+                    WHERE
+                        token = ?
+                ",
                 [$token]
             );
+
+
+
+            // Получаем данные пользователя
+            $user = $this->db->fetchOne("
+                    SELECT
+                        u.id,
+                        u.linkname,
+                        u.phone,
+                        u.firstname,
+                        u.lastname,
+                        f.file_path AS photo
+                    FROM
+                        sessions s
+                        JOIN users u ON s.user_id = u.id
+                        LEFT JOIN files f ON f.id = u.photo_id
+                    WHERE
+                        s.token = ?
+                ",
+                [$token]
+            );
+
+            $user['photo'] = Helpers::fileUrl($user['photo'] ?? 'images/static/user_empty.webp');
             
-            Helpers::jsonResponse([
-                'success' => true,
-                'user_id' => $session['user_id'],
-                'user' => [
-                    'id' => $session['id'],
-                    'linkname' => $session['linkname'],
-                    'phone' => $session['phone'],
-                    'firstname' => $session['firstname'],
-                    'lastname' => $session['lastname'],
-                    'photo' => $session['photo']
-                ]
-            ]);
+            Helpers::jsonResponse(['success' => true, 'user' => $user]);
         }
         
         /**
@@ -76,8 +99,14 @@
             }
 
             // Проверка уникальности телефона
-            $exists = $this->db->fetchOne(
-                "SELECT id FROM users WHERE phone = ?",
+            $exists = $this->db->fetchOne("
+                    SELECT
+                        id
+                    FROM
+                        users
+                    WHERE
+                        phone = ?
+                ",
                 [$cleanPhone]
             );
             if ($exists) {
@@ -87,9 +116,10 @@
             // Создание пользователя
             $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
             
-            $this->db->query(
-                "INSERT INTO users (phone, password_hash, lastname, firstname, created_at) 
-                VALUES (?, ?, ?, ?, NOW())",
+            $this->db->query("
+                    INSERT INTO users (phone, password_hash, lastname, firstname, created_at) 
+                    VALUES (?, ?, ?, ?, NOW())
+                ",
                 [$cleanPhone, $passwordHash, $data['lastname'], $data['firstname']]
             );
             
@@ -159,7 +189,15 @@
             $token = Helpers::extractToken();
             
             if ($token) {
-                $this->db->query("DELETE FROM sessions WHERE token = ?", [$token]);
+                $this->db->query("
+                        DELETE
+                        FROM
+                            sessions
+                        WHERE
+                            token = ?
+                    ",
+                    [$token]
+                );
                 
                 if (Helpers::isWebRequest()) {
                     Helpers::deleteAuthCookie();
@@ -176,14 +214,26 @@
          */
         private function findUserByLogin($login) {
             if (Helpers::validateEmail($login)) {
-                return $this->db->fetchOne(
-                    "SELECT * FROM users WHERE email = ?",
+                return $this->db->fetchOne("
+                        SELECT
+                            *
+                        FROM
+                            users
+                        WHERE
+                            email = ?
+                    ",
                     [$login]
                 );
             } else {
                 $cleanPhone = Helpers::formatPhone($login);
-                return $this->db->fetchOne(
-                    "SELECT * FROM users WHERE phone = ?",
+                return $this->db->fetchOne("
+                        SELECT
+                            *
+                        FROM
+                            users
+                        WHERE
+                            phone = ?
+                    ",
                     [$cleanPhone]
                 );
             }

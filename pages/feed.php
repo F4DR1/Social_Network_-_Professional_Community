@@ -25,7 +25,7 @@
     $content = ob_get_clean();
     $title = 'Лента новостей';
     $scripts = [
-        'posts.js'
+        'elements/posts.js'
     ];
     $stylesheets = [
         'elements/post_create.css',

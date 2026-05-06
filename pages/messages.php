@@ -33,7 +33,7 @@
     $content = ob_get_clean();
     $title = 'Сообщения';
     $scripts = [
-        'messages.js'
+        'pages/messages.js'
     ];
     $stylesheets = [
         'pages/messages.css'

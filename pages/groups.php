@@ -8,8 +8,8 @@
     $myGroups = [];
     
     $sections = [
-        ['type' => 'my-groups', 'title' => 'Мои группы:'],
-        ['type' => 'all-groups', 'title' => 'Мои подписки:']
+        ['type' => 'myGroups', 'title' => 'Мои группы:'],
+        ['type' => 'allGroups', 'title' => 'Мои подписки:']
     ];
     
     ob_start();
@@ -34,27 +34,7 @@
 
 <div class="right-container">
     <div class="container">
-        <button id="create-group-button">Создать группу</button>
-    </div>
-</div>
-
-
-<div class="modal" id="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Создание группы</h2>
-        </div>
-        <div class="modal-main">
-            <div class="input-field">
-                <input type="text" id="group-name" name="name" required autocomplete="name">
-                <label class="required">Название группы</label>
-            </div>
-            <p class="message" id="error-message"></p>
-        </div>
-        <div class="modal-footer">
-            <button class="cancel-btn" id="cancel-button">Отмена</button>
-            <button class="accept-btn" id="accept-button">Создать группу</button>
-        </div>
+        <button id="openCreateGroupPanel">Создать группу</button>
     </div>
 </div>
 
@@ -72,8 +52,8 @@
     $content = ob_get_clean();
     $title = 'Группы';
     $scripts = [
-        'category_elements.js',
-        'groups.js'
+        'elements/category_elements.js',
+        'pages/groups.js'
     ];
     $stylesheets = [
         'elements/category.css',

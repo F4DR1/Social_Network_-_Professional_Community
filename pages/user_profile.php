@@ -2,8 +2,13 @@
     require_once __DIR__ . '/../bootstrap.php';
     require_once INCLUDES_PATH . '/init.php';
     require_once INCLUDES_PATH . '/elements.php';
+    require_once INCLUDES_PATH . '/page_path.php';
     global $currentUserId;
 
+    $panel = $_GET['p'] ?? '';
+
+    $user = $_GET['user'];
+    
 
     // Отформатированные данные пользователя
     $user_fullname = $user['firstname'] . ' ' . $user['lastname'];
@@ -182,23 +187,53 @@
 
             <?php endif; ?>
         </div>
+
+        <div>
+
+        </div>
     </div>
 </div>
 
 <div class="centered-container">
-    <?php if ($user['id'] === $currentUserId): ?>
-        <?= postCreationField(); ?>
-    <?php endif; ?>
+    <div class="container">
+        <ul class="panels-navigation">
+            <li class="posts-panel-btn panel-btn"><a href="<?= htmlspecialchars($path) ?>">Посты</a></li>
+            <li class="skills-panel-btn panel-btn"><a href="<?= htmlspecialchars($path . '?p=skills') ?>">Навыки</a></li>
+        </ul>
+    </div>
 
-    <?= postsPanel(); ?>
+    <?php switch ($panel):
+        case 'skills': ?>
+
+            <section class="container skills-panel">
+                <h2>Навыки</h2>
+                <?php if ($user['id'] === $currentUserId): ?>
+                    <button id="openEditUserSkillsButton" class="button user-skills-btn">Настроить</button>
+                <?php endif; ?>
+
+                <div id="skillsList" class="skills-list"></div>
+            </section>
+
+        <?php break;
+        
+        default: ?>
+
+            <?php if ($user['id'] === $currentUserId): ?>
+                <?= postCreationField(); ?>
+            <?php endif; ?>
+            <?= postsPanel(); ?>
+
+        <?php break; ?>
+    <?php endswitch; ?>
 </div>
 
 
 <script>
     window.appData = <?= json_encode([
         'currentUserId' => $currentUserId,
-        'postsType' => 'user',
-        'userId' => $user['id']
+        'userId' => $user['id'],
+        'panel' => $panel,
+        'postsType' => 'user'
     ]) ?>;
 </script>
 
@@ -208,15 +243,35 @@
     $content = ob_get_clean();
     $title = $user_fullname;
     $scripts = [
-        'user_profile.js',
-        'profile_dropdown.js',
-        'posts.js'
+        'pages/user_profile.js',
+        'elements/profile_dropdown.js'
     ];
     $stylesheets = [
-        'pages/user_profile.css',
-        'elements/post_create.css',
-        'elements/post.css'
+        'pages/user_profile.css'
     ];
+    
+    switch ($panel) {
+        case 'skills':
+            array_push($scripts,
+                'elements/custom_dropdown.js'
+            );
+            array_push($stylesheets,
+                'elements/custom_dropdown.css'
+            );
+            break;
+        
+        default:
+            array_push($scripts,
+                'elements/files_upload.js',
+                'elements/posts.js'
+            );
+            array_push($stylesheets,
+                'elements/post_create.css',
+                'elements/post.css'
+            );
+            break;
+    }
+
     require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;
     require ROOT_PATH . '/layout.php';

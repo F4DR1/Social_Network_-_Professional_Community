@@ -1,0 +1,14 @@
+{
+    "name": "mir-profi/api",
+    "description": "API социальной сети",
+    "require": {
+        "php": ">=8.0",
+        "league/commonmark": "^2.4"
+    },
+    "autoload": {
+        "classmap": [
+            "controllers/",
+            "core/"
+        ]
+    }
+}

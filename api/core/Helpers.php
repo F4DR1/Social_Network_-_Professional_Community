@@ -1,7 +1,42 @@
 <?php
+    use League\CommonMark\CommonMarkConverter;
     require_once 'DeviceDetector.php';
 
     class Helpers {
+
+        /**
+         * Возвращает базовый URL API
+         */
+        public static function apiBaseUrl() {
+            if ($_SERVER['HTTP_HOST'] === 'localhost') {
+                return 'http://localhost/social_network/api';
+            }
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            return $protocol . '://' . $_SERVER['HTTP_HOST'];
+        }
+
+        /**
+         * Формирует полный путь для файлов
+         */
+        public static function fileUrl($relativePath) {
+            if (empty($relativePath)) return null;
+            return self::apiBaseUrl() . '/' . ltrim($relativePath, '/');
+        }
+
+
+
+        /**
+         * Конвертирует markdown в html
+         */
+        public static function markdownToHtml(string $markdown): string {
+            $converter = new CommonMarkConverter([
+                'html_input' => 'escape',  // Запрещает вставку чистого HTML
+                'allow_unsafe_links' => false,
+            ]);
+            return $converter->convert($markdown)->getContent();
+        }
+
+
 
         /**
          * Проверка на корректный id
@@ -39,7 +74,7 @@
             $roles = ['owner', 'admin', 'moderator'];
             return [
                 'roles' => $roles,
-                'text' => implode(',', array_fill(0, count($roles), '?'))
+                'names' => implode(',', array_fill(0, count($roles), '?'))
             ];
         }
         
@@ -181,6 +216,13 @@
         }
         
         /**
+         * Проверить id сессии
+         */
+        public static function validateSessionId($sessionId) {
+            self::validateId($sessionId, 'Неверный ID сессии');
+        }
+        
+        /**
          * Проверить id пользователя
          */
         public static function validateUserId($userId) {
@@ -199,6 +241,20 @@
          */
         public static function validatePostId($userId) {
             self::validateId($userId, 'Неверный ID поста');
+        }
+        
+        /**
+         * Проверить id скилла
+         */
+        public static function validateSkillId($skillId) {
+            self::validateId($skillId, 'Неверный ID навыка');
+        }
+        
+        /**
+         * Проверить id уровня скилла
+         */
+        public static function validateSkillLevelId($skillLevelId) {
+            self::validateId($skillLevelId, 'Неверный ID уровня навыка');
         }
     }
 ?>
