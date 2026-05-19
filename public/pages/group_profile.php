@@ -34,7 +34,7 @@
     switch ($action) {
         case 'edit':
             // Не пускаем на страницу редактирования группы если не админ
-            if (!$isAdmin) header('Location: ' . $path);
+            if (!$isAdmin) header('Location: ' . PATH);
             break;
         
         default:
@@ -54,7 +54,7 @@
             <div class="container">
                 <h2>Основная информация</h2>
 
-                <div id="base-info" class="info-panel">
+                <div id="baseInfo" class="info-panel">
                     <svg class="info-icon" viewBox="0 0 64 64">
                         <!-- SVG: Зелёная галочка в круге | Красный крест в круге -->
                         <path class="info-icon-svg" />
@@ -66,24 +66,24 @@
                 <div class="form-fields">
                     <div class="input-field">
                         <span>Название:</span>
-                        <input type="text" id="group-name" value="<?= htmlspecialchars($groupName) ?>" name="name" required autocomplete="name">
+                        <input type="text" id="groupName" value="<?= htmlspecialchars($groupName) ?>" name="name" required autocomplete="name">
                     </div>
                     <div class="input-field typed">
                         <span>Адрес:</span>
-                        <span class="included"><?= htmlspecialchars($protocol . '://' . $host . '/') ?></span>
-                        <input type="text" id="group-linkname" value="<?= htmlspecialchars($groupLinkname) ?>" name="name" required autocomplete="name">
+                        <span class="included"><?= htmlspecialchars(PROTOCOL . '://' . HOST . '/') ?></span>
+                        <input type="text" id="groupLinkname" value="<?= htmlspecialchars($groupLinkname) ?>" name="name" required autocomplete="name">
                         <span class="hint">Номер группы — <u><?= htmlspecialchars($groupNumber) ?></u>.</span>
                     </div>
                 </div>
 
-                <button class="standart-btn" id="save-base-info">Сохранить</button>
+                <button class="standart-btn" id="saveBaseInfo">Сохранить</button>
             </div>
         </div>
 
         <div class="right-container">
             <div class="container">
-                <a class="btn" id="groupPath">
-                    <img src="<?= $groupPhoto ?? 'images/empty.webp' ?>" alt="<?= htmlspecialchars($groupName) ?>" width=60>
+                <a href="<?= PATH ?>" class="btn" id="groupPath">
+                    <img src="<?= $groupPhoto ?>" alt="<?= htmlspecialchars($groupName) ?>" width=60>
                     <h1><?= htmlspecialchars($groupName) ?></h1>
                     <p>вернуться к странице</p>
                 </a>
@@ -103,7 +103,7 @@
     default: ?>
         <div class="main-container">
             <div class="container">
-                <img src="<?= $groupPhoto ?? 'images/empty.webp' ?>" alt="<?= htmlspecialchars($groupName) ?>" width=200>
+                <img src="<?= $groupPhoto ?>" alt="<?= htmlspecialchars($groupName) ?>" width=200>
                 <h1><?= htmlspecialchars($groupName) ?></h1>
                 
                 <div class="profile-actions-panel">
@@ -176,7 +176,7 @@
         <div class="right-container">
             <?php if ($isSubscribe && $isAdmin): ?>
                 <div class="container">
-                    <a href="<?= htmlspecialchars($path . '?act=edit') ?>" class="btn">Управление</a>
+                    <a href="<?= htmlspecialchars(PATH . '?act=edit') ?>" class="btn">Управление</a>
                 </div>
             <?php endif; ?>
 

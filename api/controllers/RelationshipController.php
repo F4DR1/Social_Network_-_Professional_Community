@@ -48,8 +48,12 @@
          * GET /relationships/list - получить данные список всех доступных взаимоотношений
          */
         public function getList() {
-            $list = $this->db->fetchAll(
-                "SELECT * FROM relationship_lists",
+            $list = $this->db->fetchAll("
+                    SELECT
+                        *
+                    FROM
+                        relationship_lists
+                ",
                 []
             );
             
@@ -88,7 +92,7 @@
                                 r2.is_blocked = 0
                             THEN 'mutual'
                             
-                            -- Outgoing: МОЯ запись есть, ЧЖУЖОЙ нет
+                            -- Outgoing: МОЯ запись есть, ЧУЖОЙ нет
                             WHEN
                                 r1.id IS NOT NULL
                                 AND

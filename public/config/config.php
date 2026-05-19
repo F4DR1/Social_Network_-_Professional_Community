@@ -1,32 +1,35 @@
 <?php
     require_once __DIR__ . '/../bootstrap.php';
+    require_once INCLUDES_PATH . '/page_path.php';
 
     
     /**
      * Формирует базовый URL API в зависимости от окружения
      */
     function getApiUrl($mainDomain) {
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
-
-        if ($host === 'localhost' || $host === '127.0.0.1') {
+        if (HOST === 'localhost' || HOST === '127.0.0.1') {
             $base = rtrim(BASE_URL, '/');
             $base = ltrim($base, '/');
-            return $protocol . '://localhost/' . $base . '/api';
+            if (basename($base) === 'public') {
+                $base = dirname($base, 1);
+                $base = $base === '.' ? '' : $base . '/';
+            }
+            return PROTOCOL . '://localhost/' . $base . 'api';
         }
-        return $protocol . '://api.' . $mainDomain;
+        return PROTOCOL . '://api.' . $mainDomain;
     }
+
 
     
     // Автоматически получаем основной домен (без поддомена api.)
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $host = preg_replace('/:\d+$/', '', $host);  // Удаляем порт
+    $host = preg_replace('/:\d+$/', '', HOST);  // Удаляем порт
     $DOMAIN = preg_replace('/^api\./', '', $host);  // Убираем 'api.' (если есть, на всякий случай)
 
     $API = getApiUrl($DOMAIN);
 
     define('API', $API);
     define('DOMAIN', $DOMAIN);
+    
 
     // Настройки, которые доступны в JavaScript
     global $clientConfig;

@@ -117,7 +117,7 @@
             $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
             
             $this->db->query("
-                    INSERT INTO users (phone, password_hash, lastname, firstname, created_at) 
+                    INSERT INTO users (phone, password_hash, lastname, firstname, registered_at) 
                     VALUES (?, ?, ?, ?, NOW())
                 ",
                 [$cleanPhone, $passwordHash, $data['lastname'], $data['firstname']]

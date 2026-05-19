@@ -11,14 +11,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const groupId = window.appData.groupId;
 
     
-    const baseInfo = document.getElementById('base-info');
+    const baseInfo = document.getElementById('baseInfo');
     
-    const groupLinkname = document.getElementById('group-linkname');
+    const groupLinkname = document.getElementById('groupLinkname');
 
 
 
     function updateGroupPath(path) {
-        document.getElementById('group-path').href = path;
+        document.getElementById('groupPath').href = path;
     }
 
     function updateInfoMessage(category = null, message_status = null, message = null) {
@@ -94,11 +94,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // Сохранение базовой информации группы
-    document.getElementById("save-base-info").addEventListener("click", (e) => {
+    document.getElementById("saveBaseInfo").addEventListener("click", (e) => {
         e.preventDefault();
         if (groupLinkname.value == '') groupLinkname.value = 'group' + groupId;
         const baseInfo = {
-            name: document.getElementById('group-name').value,
+            name: document.getElementById('groupName').value,
             linkname: groupLinkname.value
         };
         editGroupData('base', baseInfo);

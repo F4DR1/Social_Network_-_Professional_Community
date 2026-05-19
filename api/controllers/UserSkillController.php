@@ -209,7 +209,7 @@
 
             
             $this->db->query("
-                    INSERT INTO user_skills (user_id, skill_id, level_id, created_at)
+                    INSERT INTO user_skills (user_id, skill_id, level_id, added_at)
                     VALUES (?, ?, ?, NOW())
                 ",
                 [$currentUserId, $skillId, $skillLevelId]

@@ -21,7 +21,7 @@
                 Helpers::errorResponse('Группа не найдена', 404);
             }
             
-            $group['photo'] = Helpers::fileUrl($group['photo'] ?? null);
+            $group['photo'] = Helpers::fileUrl($group['photo'] ?? 'images/static/group_empty.webp');
             
             Helpers::jsonResponse(['success' => true, 'group' => $group]);
         }
@@ -41,7 +41,7 @@
                         g.name,
                         f.file_path AS photo
                     FROM
-                        groups g
+                        `groups` g
                         LEFT JOIN files f ON f.id = g.photo_id
                     WHERE
                         g.id = ?
@@ -62,7 +62,7 @@
                         g.name,
                         f.file_path AS photo
                     FROM
-                        groups g
+                        `groups` g
                         LEFT JOIN files f ON f.id = g.photo_id
                     WHERE
                         g.linkname = ?
@@ -93,7 +93,7 @@
                         gr.name as role_name,
                         gr.title as role_title
                     FROM
-                        groups g
+                        `groups` g
                         INNER JOIN group_members gm ON g.id = gm.group_id
                         INNER JOIN group_roles gr ON gm.role_id = gr.id
                         LEFT JOIN files f ON f.id = g.photo_id
@@ -185,7 +185,7 @@
                 $this->db->beginTransaction();
 
                 $this->db->query("
-                        INSERT INTO groups (name, created_at) 
+                        INSERT INTO `groups` (name, created_at) 
                         VALUES (?, NOW())
                     ",
                     [$groupName]
@@ -289,7 +289,7 @@
                             SELECT
                                 id
                             FROM
-                                groups
+                                `groups`
                             WHERE
                                 linkname = ?
                                 AND
@@ -304,7 +304,7 @@
 
                     $this->db->query("
                             UPDATE
-                                groups
+                                `groups`
                             SET
                                 name = ?,
                                 linkname = ? 

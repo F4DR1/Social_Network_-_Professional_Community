@@ -134,7 +134,7 @@
                     FROM
                         posts p
                         INNER JOIN group_posts gp ON p.id = gp.post_id
-                        INNER JOIN groups g ON gp.group_id = g.id
+                        INNER JOIN `groups` g ON gp.group_id = g.id
                         INNER JOIN users u ON p.author_id = u.id
                         LEFT JOIN files fu ON fu.id = u.photo_id
                         LEFT JOIN files fg ON fg.id = g.photo_id

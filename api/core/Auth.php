@@ -18,24 +18,44 @@
             
             if ($token) {
                 // Ищем сессию с таким токеном
-                $session = $this->db->fetchOne(
-                    "SELECT * FROM sessions 
-                    WHERE token = ?",
+                $session = $this->db->fetchOne("
+                        SELECT
+                            *
+                        FROM
+                            sessions 
+                        WHERE
+                            token = ?
+                    ",
                     [$token]
                 );
 
                 if ($session) {
                     // Получаем данные пользователя отдельно
-                    $user = $this->db->fetchOne(
-                        "SELECT id, phone, email, firstname, lastname, created_at 
-                        FROM users WHERE id = ?",
+                    $user = $this->db->fetchOne("
+                            SELECT
+                                id,
+                                phone,
+                                email,
+                                firstname,
+                                lastname,
+                                registered_at 
+                            FROM
+                                users
+                            WHERE id = ?
+                        ",
                         [$session['user_id']]
                     );
                     
                     if ($user) {
                         // Обновляем время последней активности
-                        $this->db->query(
-                            "UPDATE sessions SET last_activity = NOW() WHERE id = ?",
+                        $this->db->query("
+                            UPDATE
+                                sessions
+                            SET
+                                last_activity = NOW()
+                            WHERE
+                                id = ?
+                            ",
                             [$session['id']]
                         );
                         
@@ -57,11 +77,21 @@
             if (!$this->user) return [];
             
             // Получаем все сессии текущего пользователя
-            return $this->db->fetchAll(
-                "SELECT id, device_name, device_type, ip_address, last_activity, created_at 
-                FROM sessions 
-                WHERE user_id = ? 
-                ORDER BY last_activity DESC",
+            return $this->db->fetchAll("
+                    SELECT
+                        id,
+                        device_name,
+                        device_type,
+                        ip_address,
+                        last_activity,
+                        created_at 
+                    FROM
+                        sessions 
+                    WHERE
+                        user_id = ? 
+                    ORDER BY
+                        last_activity DESC
+                ",
                 [$this->user['id']]
             );
         }

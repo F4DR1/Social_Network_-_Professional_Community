@@ -33,7 +33,7 @@
 
 <div class="main-container">
     <div class="container">
-        <img src="<?= $user_photo ?? 'images/empty.webp' ?>" alt="<?= htmlspecialchars($user_fullname) ?>" width=200>
+        <img src="<?= $user_photo ?>" alt="<?= htmlspecialchars($user_fullname) ?>" width=200>
         <h1><?= htmlspecialchars($user_fullname) ?></h1>
 
         <div class="profile-actions-panel">
@@ -47,7 +47,7 @@
                         </div>
 
                     <?php elseif ($currentIsFollow): ?>
-                        <div id="main-request-following" class="active">
+                        <div id="mainRequestFollowing" class="active">
                             <div class="action-dropdown">
                                 <button class="standart-btn action-trigger">
                                     <span>Вы подписаны</span>
@@ -69,7 +69,7 @@
                         </div>
 
                     <?php elseif ($relatedIsFollow): ?>
-                        <div id="main-request-follower" class="active">
+                        <div id="mainRequestFollower" class="active">
                             <div class="action-dropdown">
                                 <button class="standart-btn action-trigger">
                                     <span>Подписан на вас</span>
@@ -91,7 +91,7 @@
                         </div>
 
                     <?php else: ?>
-                        <div id="main-request" class="active">
+                        <div id="mainRequest" class="active">
                             <button class="standart-btn" id="followButton">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -106,7 +106,7 @@
 
                 <div class="base-actions">
                     <?php if (!$currentIsFollow || !$relatedIsFollow): ?>
-                        <div id="base-action-message" class="active">
+                        <div id="baseActionMessage" class="active">
                             <a href="messages?type=user&id=<?= $user['id'] ?>" class="small-btn">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                     <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
@@ -119,7 +119,7 @@
 
                 <div class="contact-actions">
                     <?php if ($currentIsFollow && $relatedIsFollow): ?>
-                        <div id="contact-action" class="active">
+                        <div id="contactAction" class="active">
                             <div class="action-dropdown">
                                 <button class="action-trigger has-lists">
                                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -197,8 +197,8 @@
 <div class="centered-container">
     <div class="container">
         <ul class="panels-navigation">
-            <li class="posts-panel-btn panel-btn"><a href="<?= htmlspecialchars($path) ?>">Посты</a></li>
-            <li class="skills-panel-btn panel-btn"><a href="<?= htmlspecialchars($path . '?p=skills') ?>">Навыки</a></li>
+            <li class="posts-panel-btn panel-btn"><a href="<?= htmlspecialchars(PATH) ?>">Посты</a></li>
+            <li class="skills-panel-btn panel-btn"><a href="<?= htmlspecialchars(PATH . '?p=skills') ?>">Навыки</a></li>
         </ul>
     </div>
 

@@ -16,7 +16,7 @@
     $profileLink = '';
 
     // Полная ссылка для return_url
-    $returnUrl = urlencode($protocol . '://' . $host . $path);
+    $returnUrl = urlencode(PROTOCOL . '://' . HOST . PATH);
 ?>
 
 
