@@ -36,8 +36,9 @@
                                 id,
                                 phone,
                                 email,
-                                firstname,
                                 lastname,
+                                firstname,
+                                CONCAT(firstname, ' ', lastname) AS fullname,
                                 registered_at 
                             FROM
                                 users

@@ -57,8 +57,9 @@
                         u.id,
                         u.linkname,
                         u.phone,
-                        u.firstname,
                         u.lastname,
+                        u.firstname,
+                        CONCAT(u.firstname, ' ', u.lastname) AS fullname,
                         f.file_path AS photo
                     FROM
                         sessions s
@@ -70,7 +71,7 @@
                 [$token]
             );
 
-            $user['photo'] = Helpers::fileUrl($user['photo'] ?? 'images/static/user_empty.webp');
+            $user['photo'] = Helpers::fileUrl($user['photo'] ?? Helpers::imagePlaceholder('user'));
             
             Helpers::jsonResponse(['success' => true, 'user' => $user]);
         }

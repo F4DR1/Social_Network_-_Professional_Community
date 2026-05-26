@@ -11,6 +11,34 @@
         }
         
 
+
+        /**
+         * GET /validate_token - верифицировать токен и получить id пользователя
+         */
+        public function validateToken() {
+            // Отклоняем несанкционированные запросы проверки токена пользователя
+            if (!Helpers::isInternalRequest()) Helpers::errorResponse('No access to token verification', 403);
+
+            $data = json_decode(file_get_contents('php://input'), true);
+            $token = $data['token'] ?? '';
+            
+            $session = $this->db->fetchOne("
+                    SELECT
+                        user_id
+                    FROM
+                        sessions
+                    WHERE
+                        token = ?
+                ",
+                [$token]
+            );
+
+            if (empty($session)) Helpers::errorResponse('Session not found', 404);
+
+            $user_id = (int) $session['user_id'];
+            
+            Helpers::jsonResponse(['success' => true, 'user_id' => $user_id]);
+        }
         
         /**
          * GET /sessions - получить все мои сессии

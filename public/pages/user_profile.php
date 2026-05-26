@@ -11,7 +11,7 @@
     
 
     // Отформатированные данные пользователя
-    $user_fullname = $user['firstname'] . ' ' . $user['lastname'];
+    $user_fullname = $user['fullname'];
     $user_photo = $user['photo'];
 
 

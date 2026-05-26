@@ -8,6 +8,9 @@
     require_once ENUMS_PATH . '/layout.php';
 
 
+    $userToken = !empty($currentUser) ? $_COOKIE['auth_token'] : null;
+
+
     // Шаблон по умолчанию
     if (empty($layout)) {
         $layout = Layout::Standart;
@@ -35,11 +38,27 @@
     <link rel="icon" href="<?= IMAGES_URL ?>/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="<?= CSS_URL ?>/global.css?v=<?= time() ?>">
 
+
     <script>
         window.APP_CONFIG = <?= isset($clientConfig) ? json_encode($clientConfig, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) : json_encode([]) ?>;
     </script>
+
+
+    <script src="<?= JS_URL ?>/socket_manager.js?v=<?= time() ?>"></script>
+    <script>
+        // Создаём глобальный экземпляр сокета
+        window.socket = new SocketManager();
+
+        // При переходе на другую страницу соединение корректно закрывается
+        window.addEventListener('beforeunload', () => {
+            if (window.socket) {
+                window.socket.close();
+            }
+        });
+    </script>
     <script src="<?= JS_URL ?>/layout.js?v=<?= time() ?>" type="module"></script>
     <script src="<?= JS_URL ?>/modal.js?v=<?= time() ?>" type="module"></script>
+
     <?php
         // Подгружаем скрипты определённых страниц
         if (isset($scripts) && $scripts > 0) {
@@ -56,6 +75,11 @@
             }
         }
     ?>
+    <script>
+        // Подключаемся к WebSocket
+        window.socket.connect('<?= htmlspecialchars($userToken) ?>');
+        document.dispatchEvent(new Event('socketReady'));  // Оповещаем всех, что сокет готов
+    </script>
 </head>
 <body class="layout-<?= strtolower($layout->name) ?>">
     <?php if ($layout !== Layout::Micro): ?>
@@ -76,9 +100,18 @@
                             </nav>
 
                         <?php else: ?>
+                            <div class="notifications-dropdown">
+                                <button class="notifications-trigger" aria-label="Уведомления">
+                                    🔔
+                                    <span class="counter notifications-counter" id="notificationsCounter"></span>
+                                </button>
+                                <div class="dropdown-notifications" id="notifications">
+                                </div>
+                            </div>
+                            
                             <?php
                                 // Получаем данные пользователя
-                                $currentUserFullName = $currentUser['firstname'] . ' ' . $currentUser['lastname'];
+                                $currentUserFullName = $currentUser['fullname'];
                                 $currentUserPhoto = $currentUser['photo'] ?? null;
 
                                 $profileLink = $currentUser['linkname'] ?? 'user' . $currentUser['id'];
@@ -146,7 +179,7 @@
                         <?php else: ?>
                             <li><a href="<?= $profileLink ?>">Профиль</a></li>
                             <li><a href="feed">Лента</a></li>
-                            <li><a href="messages">Сообщения</a></li>
+                            <li><a href="msg">Мессенджер<span class="counter messages-counter" id="messagesCounter"></span></a></li>
                             <li><a href="contacts">Контакты</a></li>
                             <li><a href="groups">Группы</a></li>
                             <li><a href="search">Поиск</a></li>

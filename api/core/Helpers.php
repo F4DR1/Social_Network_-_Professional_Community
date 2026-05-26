@@ -5,6 +5,15 @@
     class Helpers {
 
         /**
+         * Проверяет межсерверный ли запрос
+         */
+        public static function isInternalRequest(): bool {
+            $headers = getallheaders();
+            $apiKey = $headers['X-Api-Key'] ?? '';
+            return $apiKey === env('INTERNAL_API_KEY');
+        }
+
+        /**
          * Возвращает основной домен (без протокола и поддоменов)
          */
         public static function getMainDomain() {
@@ -31,6 +40,23 @@
         public static function fileUrl($relativePath) {
             if (empty($relativePath)) return null;
             return self::apiBaseUrl() . '/' . ltrim($relativePath, '/');
+        }
+
+        /**
+         * Формирует заглушки для изображений
+         */
+        public static function imagePlaceholder($type) {
+            switch ($type) {
+                case 'user':
+                    return 'images/static/user_empty.webp';
+                    
+                case 'group':
+                    return 'images/static/group_empty.webp';
+                
+                default:
+                    // Общая заглушка на изображение
+                    return 'images/static/user_empty.webp';
+            }
         }
 
 
@@ -242,6 +268,20 @@
          */
         public static function validateGroupId($userId) {
             self::validateId($userId, 'Неверный ID группы');
+        }
+        
+        /**
+         * Проверить id чата
+         */
+        public static function validateChatId($chatId) {
+            self::validateId($chatId, 'Неверный ID чата');
+        }
+        
+        /**
+         * Проверить id сообщения
+         */
+        public static function validateMessageId($messageId) {
+            self::validateId($messageId, 'Неверный ID сообщения');
         }
         
         /**

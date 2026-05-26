@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // ПЕРЕДЕЛАТЬ ПОД ОБЩИЙ ОБРАБОТЧИК ВЫПАДАЮЩИХ МЕНЮ custom_dropdown!!!
+    
     const actionTriggers = document.querySelectorAll('.profile-actions .action-trigger');
     
     actionTriggers.forEach(trigger => {

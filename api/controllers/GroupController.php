@@ -10,6 +10,29 @@
             $this->db = $db;
             $this->auth = $auth;
         }
+
+
+        
+        /**
+         * Проверяет является ли пользователь участником группы
+         */
+        public static function checkIsMember($db, $groupId, $currentUserId) {
+            // Проверка членства в чате
+            $isMember = $db->fetchOne("
+                    SELECT 1
+                    FROM
+                        group_members
+                    WHERE
+                        group_id = ?
+                        AND
+                        user_id = ?
+                ",
+                [$groupId, $currentUserId]
+            );
+            if (!$isMember) {
+                Helpers::errorResponse('Вы не являетесь участником этой группы', 403);
+            }
+        }
         
 
 
@@ -21,7 +44,7 @@
                 Helpers::errorResponse('Группа не найдена', 404);
             }
             
-            $group['photo'] = Helpers::fileUrl($group['photo'] ?? 'images/static/group_empty.webp');
+            $group['photo'] = Helpers::fileUrl($group['photo'] ?? Helpers::imagePlaceholder('group'));
             
             Helpers::jsonResponse(['success' => true, 'group' => $group]);
         }
@@ -348,7 +371,7 @@
 
             // Преобразуем относительные пути в полные URL
             foreach ($members as &$member) {
-                $member['photo'] = Helpers::fileUrl($member['photo'] ?? 'images/static/user_empty.webp');
+                $member['photo'] = Helpers::fileUrl($member['photo'] ?? Helpers::imagePlaceholder('user'));
             }
             unset($member);
             
