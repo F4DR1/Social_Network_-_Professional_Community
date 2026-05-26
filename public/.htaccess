@@ -6,7 +6,8 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 
 # 1. СПЕЦИФИЧНЫЕ страницы (приоритет!)
-RewriteRule ^(feed|messages|contacts|groups)$ pages/$1.php [L,QSA]
+RewriteRule ^(feed|contacts|groups)$ pages/$1.php [L,QSA]
+RewriteRule ^msg$ pages/messenger.php [L,QSA]
 
 RewriteRule ^search$ pages/search.php?act=$1 [L,QSA]
 RewriteRule ^settings$ pages/settings.php?act=$1 [L,QSA]

@@ -7,18 +7,25 @@ namespace Composer\Autoload;
 class ComposerStaticInit2ac6f4e8b1e718ba605eeeb708bbd68f
 {
     public static $files = array (
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
+        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
     );
 
     public static $prefixLengthsPsr4 = array (
         'S' =>
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
+            'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Symfony\\Polyfill\\Ctype\\' => 23,
         ),
         'P' =>
         array (
+            'Psr\\Http\\Message\\' => 17,
             'Psr\\EventDispatcher\\' => 20,
+            'Predis\\' => 7,
+            'PhpOption\\' => 10,
         ),
         'N' =>
         array (
@@ -29,8 +36,13 @@ class ComposerStaticInit2ac6f4e8b1e718ba605eeeb708bbd68f
             'League\\Config\\' => 14,
             'League\\CommonMark\\' => 18,
         ),
+        'G' =>
+        array (
+            'GrahamCampbell\\ResultType\\' => 26,
+        ),
         'D' =>
         array (
+            'Dotenv\\' => 7,
             'Dflydev\\DotAccessData\\' => 22,
         ),
     );
@@ -40,9 +52,29 @@ class ComposerStaticInit2ac6f4e8b1e718ba605eeeb708bbd68f
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
         ),
+        'Symfony\\Polyfill\\Mbstring\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Symfony\\Polyfill\\Ctype\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
+        ),
+        'Psr\\Http\\Message\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
         'Psr\\EventDispatcher\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/event-dispatcher/src',
+        ),
+        'Predis\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/predis/predis/src',
+        ),
+        'PhpOption\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
         ),
         'Nette\\' =>
         array (
@@ -57,6 +89,14 @@ class ComposerStaticInit2ac6f4e8b1e718ba605eeeb708bbd68f
         array (
             0 => __DIR__ . '/..' . '/league/commonmark/src',
         ),
+        'GrahamCampbell\\ResultType\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
+        ),
+        'Dotenv\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
+        ),
         'Dflydev\\DotAccessData\\' =>
         array (
             0 => __DIR__ . '/..' . '/dflydev/dot-access-data/src',
@@ -67,12 +107,15 @@ class ComposerStaticInit2ac6f4e8b1e718ba605eeeb708bbd68f
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Auth' => __DIR__ . '/../..' . '/core/Auth.php',
         'AuthController' => __DIR__ . '/../..' . '/controllers/AuthController.php',
+        'ChatController' => __DIR__ . '/../..' . '/controllers/ChatController.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'ContentController' => __DIR__ . '/../..' . '/controllers/ContentController.php',
+        'Core\\Redis' => __DIR__ . '/../..' . '/core/Redis.php',
         'Database' => __DIR__ . '/../..' . '/core/Database.php',
         'DeviceDetector' => __DIR__ . '/../..' . '/core/DeviceDetector.php',
         'GroupController' => __DIR__ . '/../..' . '/controllers/GroupController.php',
         'Helpers' => __DIR__ . '/../..' . '/core/Helpers.php',
+        'MessageController' => __DIR__ . '/../..' . '/controllers/MessageController.php',
         'Nette\\ArgumentOutOfRangeException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
         'Nette\\DeprecatedException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
         'Nette\\DirectoryNotFoundException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
@@ -135,6 +178,8 @@ class ComposerStaticInit2ac6f4e8b1e718ba605eeeb708bbd68f
         'Nette\\Utils\\Type' => __DIR__ . '/..' . '/nette/utils/src/Utils/Type.php',
         'Nette\\Utils\\UnknownImageFileException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
         'Nette\\Utils\\Validators' => __DIR__ . '/..' . '/nette/utils/src/Utils/Validators.php',
+        'NotificationController' => __DIR__ . '/../..' . '/controllers/NotificationController.php',
+        'Notifications' => __DIR__ . '/../..' . '/core/Notifications.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
         'PostController' => __DIR__ . '/../..' . '/controllers/PostController.php',
         'RelationshipController' => __DIR__ . '/../..' . '/controllers/RelationshipController.php',

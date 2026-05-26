@@ -46,7 +46,7 @@
                 [$articleId]
             );
             
-            $article['coverMediaUrl'] = Helpers::fileUrl($article['coverMediaUrl'] ?? null);
+            $article['coverMediaUrl'] = Helpers::fileUrl($article['coverMediaUrl'] ?? Helpers::imagePlaceholder('cover_article'));
             
             Helpers::jsonResponse(['success' => true, 'article' => $article]);
         }

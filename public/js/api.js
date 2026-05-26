@@ -77,6 +77,69 @@ export async function sessionsTerminateAll() {
 }
 
 
+// ========== УВЕДОМЛЕНИЯ ==========
+export async function notificationsGetUnreadCount() {
+    return apiRequest(`/notifications/get/unread-count`, {
+        method: 'GET'
+    });
+}
+export async function notificationsGet() {
+    return apiRequest(`/notifications/get`, {
+        method: 'GET'
+    });
+}
+
+
+// ========== СООБЩЕНИЯ ==========
+export async function messagesGet(data) {
+    return apiRequest(`/messages/get`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function messagesMarkRead(data) {
+    return apiRequest(`/messages/mark-read`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function messagesSend(data) {
+    return apiRequest(`/messages/send`, {
+        method: 'POST',
+        body: data
+    });
+}
+
+
+// ========== ЧАТЫ ==========
+export async function chatsGetIdByUser(userId) {
+    return apiRequest(`/chats/get/id/user/${userId}`, {
+        method: 'GET'
+    });
+}
+export async function chatsGetIdByGroup(groupId) {
+    return apiRequest(`/chats/get/id/group/${groupId}`, {
+        method: 'GET'
+    });
+}
+export async function chatsGetUnreadCount() {
+    return apiRequest(`/chats/get/unread-count`, {
+        method: 'GET'
+    });
+}
+export async function chatsGetInfo(data) {
+    return apiRequest(`/chats/get/info`, {
+        method: 'POST',
+        body: data
+    });
+}
+export async function chatsGet() {
+    return apiRequest(`/chats/get`, {
+        method: 'GET'
+    });
+}
+
+
 // ========== ОТНОШЕНИЯ ==========
 export async function relationshipsList() {
     return apiRequest(`/relationships/list`, {
@@ -115,9 +178,11 @@ export async function relationshipsChangeList(data) {
 
 
 // ========== ПРОФИЛЬ ==========
-// export async function getUserProfile(userId) {
-//     return apiRequest(`/users/${userId}`);
-// }
+export async function usersGetById(userId) {
+    return apiRequest(`/users/${userId}`, {
+        method: 'GET'
+    });
+}
 // export async function updateUserProfile(userId, data) {
 //     return apiRequest(`/users/${userId}`, { 
 //         method: 'PUT', 

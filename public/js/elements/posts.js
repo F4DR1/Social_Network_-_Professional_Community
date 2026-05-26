@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="modal-main new-post">
                 <div class="input-field">
-                    <textarea min="1" max="500" type="text" id="${postTextId}" required placeholder="Напишите что-нибудь..."></textarea>
+                    <textarea min="1" max="2048" type="text" id="${postTextId}" required placeholder="Напишите что-нибудь..."></textarea>
                 </div>
             </div>
             <div class="modal-footer" id="${modalFooterId}">
@@ -168,10 +168,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div id="${filesPreviewPanelId}"></div>
                 </div>
                 <div class="input-field">
-                    <textarea min="1" max="500" type="text" id="${titleTextId}" required placeholder="Введите название статьи..."></textarea>
+                    <textarea min="1" max="255" type="text" id="${titleTextId}" required placeholder="Введите название статьи..."></textarea>
                 </div>
                 <div class="input-field">
-                    <textarea min="1" max="500" type="text" id="${articleTextId}" required placeholder="Напишите что-нибудь..."></textarea>
+                    <textarea min="1" max="4096" type="text" id="${articleTextId}" required placeholder="Напишите что-нибудь..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -460,8 +460,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
         } catch (err) {
-            console.error('Ошибка при загрузке постов:', err);
-            // console.error('Ошибка сервера');
+            // console.error('Ошибка при загрузке постов:', err);
+            console.error('Ошибка сервера');
         }
         updatePostsLists([]);
     }

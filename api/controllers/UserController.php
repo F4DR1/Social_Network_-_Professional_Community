@@ -21,7 +21,7 @@
                 Helpers::errorResponse('Пользователь не найден', 404);
             }
             
-            $user['photo'] = Helpers::fileUrl($user['photo'] ?? 'images/static/user_empty.webp');
+            $user['photo'] = Helpers::fileUrl($user['photo'] ?? Helpers::imagePlaceholder('user'));
             
             Helpers::jsonResponse(['success' => true, 'user' => $user]);
         }
@@ -40,6 +40,7 @@
                         u.linkname,
                         u.lastname,
                         u.firstname,
+                        CONCAT(u.firstname, ' ', u.lastname) AS fullname,
                         f.file_path AS photo,
                         u.phone,
                         u.email
@@ -64,6 +65,7 @@
                         u.linkname,
                         u.lastname,
                         u.firstname,
+                        CONCAT(u.firstname, ' ', u.lastname) AS fullname,
                         f.file_path AS photo,
                         u.phone,
                         u.email

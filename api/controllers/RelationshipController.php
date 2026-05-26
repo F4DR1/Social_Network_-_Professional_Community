@@ -1,5 +1,7 @@
 <?php
     require_once 'core/Helpers.php';
+    require_once 'core/Notifications.php';
+    use Core\Redis;
 
     class RelationshipController {
         private $db;
@@ -20,7 +22,6 @@
             Helpers::validateUserId($relatedUserId);
 
             try {
-                $this->auth->check();
                 $currentUser = $this->auth->getCurrentUser();
                 
                 $fields = array_keys($data);
@@ -36,6 +37,32 @@
                 $params = array_merge([$currentUser['id'], $relatedUserId], array_values($data));
                 
                 $this->db->query($sql, $params);
+
+            } catch (Exception $e) {
+                Helpers::errorResponse('Ошибка отношений', 409);
+            }
+        }
+
+        /**
+         * Универсальный метод для delete операций
+         */
+        private function deleteRelation($relatedUserId) {
+            Helpers::validateUserId($relatedUserId);
+
+            try {
+                $currentUser = $this->auth->getCurrentUser();
+                
+                $this->db->query("
+                        DELETE
+                        FROM
+                            relationships
+                        WHERE
+                            user_id = ?
+                            AND
+                            related_user_id = ?
+                    ",
+                    [$currentUser['id'], $relatedUserId]
+                );
 
             } catch (Exception $e) {
                 Helpers::errorResponse('Ошибка отношений', 409);
@@ -196,8 +223,38 @@
          * PUT /relationships/subscribe - создать отношение текущего пользователя к другому пользователю
          */
         public function subscribe() {
+            $this->auth->check();
+            $currentUserId = $this->auth->getCurrentUser()['id'];
+
             $data = json_decode(file_get_contents('php://input'), true);
-            $this->upsertRelation($data['related_user_id'], ['is_blocked' => false]);
+            $relatedUserId = $data['related_user_id'] ?? null;
+
+            Helpers::validateUserId($relatedUserId);
+
+
+            $this->upsertRelation($relatedUserId, ['is_blocked' => false]);
+
+
+            // Уведомляем пользователя о подписке на него
+            $relatedUserIsFollower = (bool) $this->db->fetchOne("
+                    SELECT 1
+                    FROM
+                        relationships
+                    WHERE
+                        user_id = ?
+                        AND
+                        related_user_id = ?
+                ",
+                [$relatedUserId, $currentUserId]
+            );
+            $data = [
+                'actor_id' => $currentUserId,
+                'message' => $relatedUserIsFollower ? 'подписался на вас в ответ.' : 'подписался на вас.'
+            ];
+            $notificationId = Notifications::saveNotificationToDB($this->db, $relatedUserId, 'new_subscriber', json_encode($data));
+            Redis::newNotification($relatedUserId, $notificationId);
+
+
             Helpers::jsonResponse(['success' => true]);
         }
         
@@ -207,35 +264,25 @@
         public function unsubscribe() {
             $this->auth->check();
             $data = json_decode(file_get_contents('php://input'), true);
-            try {
-                $this->auth->check();
-                $currentUser = $this->auth->getCurrentUser();
 
-                $this->db->query("
-                        DELETE
-                        FROM
-                            relationships
-                        WHERE
-                            user_id = ?
-                            AND
-                            related_user_id = ?
-                    ",
-                    [$currentUser['id'], $data['related_user_id']]
-                );
-                
-                Helpers::jsonResponse(['success' => true]);
-
-            } catch (Exception $e) {
-                Helpers::errorResponse('Ошибка отношений', 409);
-            }
+            $this->deleteRelation($data['related_user_id']);
+            Helpers::jsonResponse(['success' => true]);
         }
 
         /**
          * PUT /relationships/block - создать отношение текущего пользователя к другому пользователю со значением is_blocked
          */
         public function block() {
+            $this->auth->check();
+
             $data = json_decode(file_get_contents('php://input'), true);
-            $this->upsertRelation($data['related_user_id'], ['is_blocked' => $data['is_blocked']]);
+            $isBlocked = $data['is_blocked'] ?? false;
+            
+            if ($isBlocked)
+                $this->upsertRelation($data['related_user_id'], ['is_blocked' => $isBlocked]);
+            else
+                $this->deleteRelation($data['related_user_id']);
+
             Helpers::jsonResponse(['success' => true]);
         }
 
@@ -243,8 +290,18 @@
          * PUT /relationships/change-list - создать отношение текущего пользователя к другому пользователю со значением relationship_list_id
          */
         public function changeList() {
+            $this->auth->check();
+
             $data = json_decode(file_get_contents('php://input'), true);
-            $this->upsertRelation($data['related_user_id'], ['relationship_list_id' => $data['list_id']]);
+            $listId = $data['list_id'] ?? null;
+
+            // if (!empty($listId))
+            // {
+            //     $this->upsertRelation($data['related_user_id'], ['relationship_list_id' => $listId]);
+            //     Helpers::jsonResponse(['success' => true]);
+            // } else {
+            //     Helpers::errorResponse('Ошибка отношений', 409);
+            // }
             Helpers::jsonResponse(['success' => true]);
         }
     }

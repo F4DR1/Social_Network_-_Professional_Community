@@ -1,7 +1,17 @@
 <?php
     require __DIR__ . '/vendor/autoload.php';
+    
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+    
+    function env($key, $default = null) {
+        return $_ENV[$key] ?? $default;
+    }
+    
+
     require_once 'core/Helpers.php';
 
+    
     // Разрешаем запросы только с конкретного домена
     $allowedOrigin = 'https://' . Helpers::getMainDomain();
     if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] === $allowedOrigin) {
@@ -55,10 +65,27 @@
     $router->add('POST', '/auth/check', 'AuthController', 'check', $db, null);
     
     // ========== СЕССИИ ==========
+    $router->add('POST', '/validate_token', 'SessionController', 'validateToken', $db, null);
     $router->add('GET', '/sessions', 'SessionController', 'getAllMySessions', $db, $auth);
     $router->add('DELETE', '/sessions/current', 'SessionController', 'terminateCurrentSession', $db, $auth);
     $router->add('DELETE', '/sessions/id', 'SessionController', 'terminateSession', $db, $auth);
     $router->add('DELETE', '/sessions', 'SessionController', 'terminateAllOtherSessions', $db, $auth);
+    
+    // ========== УВЕДОМЛЕНИЯ ==========
+    $router->add('GET', '/notifications/get/unread-count', 'NotificationController', 'getUnreadCount', $db, $auth);
+    
+    // ========== СООБЩЕНИЯ ==========
+    $router->add('POST', '/messages/get', 'MessageController', 'get', $db, $auth);
+    $router->add('POST', '/messages/mark-read', 'MessageController', 'markRead', $db, $auth);
+    $router->add('POST', '/messages/send', 'MessageController', 'send', $db, $auth);
+    
+    // ========== ЧАТЫ ==========
+    $router->add('GET', '/chats/get/id/user/{user_id}', 'ChatController', 'getIdByUser', $db, $auth);
+    $router->add('GET', '/chats/get/id/group/{user_id}', 'ChatController', 'getIdByGroup', $db, $auth);
+    $router->add('GET', '/chats/get/unread-count', 'ChatController', 'getUnreadCount', $db, $auth);
+    $router->add('POST', '/chats/get/info', 'ChatController', 'getInfo', $db, $auth);
+    $router->add('GET', '/chats/get', 'ChatController', 'get', $db, $auth);
+    $router->add('GET', '/chats/members/get/{chat_id}/ids', 'ChatController', 'getMembersIds', $db, $auth);
 
     // ========== ОТНОШЕНИЯ ==========
     $router->add('GET', '/relationships/list', 'RelationshipController', 'getList', $db, null);

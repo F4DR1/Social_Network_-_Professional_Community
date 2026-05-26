@@ -1,0 +1,4 @@
+# Python 3.7+
+aiohttp==3.7.*
+redis==4.2.*
+websockets==9.0.*
