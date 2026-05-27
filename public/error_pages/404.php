@@ -13,7 +13,7 @@
 
 <?php
     $content = ob_get_clean();
-    $title = "Такой страницы нет";
+    $title = 'Такой страницы нет';
     $scripts = [];
     $stylesheets = [
         'pages/404.css'

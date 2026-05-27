@@ -8,6 +8,124 @@
         public function __construct($db, $auth = null) {
             $this->db = $db;
         }
+        
+
+        
+        /**
+         * Поиск пользователя по логину (email или телефон)
+         */
+        public static function findUserByLogin($db, $login) {
+            if (Helpers::validateEmail($login)) {
+                return $db->fetchOne("
+                        SELECT
+                            id,
+                            password_hash
+                        FROM
+                            users
+                        WHERE
+                            email = ?
+                    ",
+                    [$login]
+                );
+            } else {
+                $cleanPhone = Helpers::formatPhone($login);
+                return $db->fetchOne("
+                        SELECT
+                            id,
+                            password_hash
+                        FROM
+                            users
+                        WHERE
+                            phone = ?
+                    ",
+                    [$cleanPhone]
+                );
+            }
+        }
+        
+        /**
+         * Авторизуем пользователя
+         */
+        public static function authorizeUser($db, $userId, $login) {
+            // Создание сессии
+            $token = Helpers::generateToken();
+            $deviceInfo = DeviceDetector::getDeviceInfo();
+            
+            $db->query("
+                    INSERT INTO sessions (user_id, token, device_name, device_type, ip_address, last_activity, created_at) 
+                    VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+                ",
+                [
+                    $userId,
+                    $token,
+                    $deviceInfo['name'],
+                    $deviceInfo['type'],
+                    DeviceDetector::getClientIP()
+                ]
+            );
+
+            $sessionId = $db->lastInsertId();
+
+        
+            // Ответ в зависимости от типа клиента
+            if (Helpers::isWebRequest()) {
+                Helpers::setAuthCookie($token);
+                Helpers::jsonResponse([
+                    'success' => true,
+                    'user_id' => $userId,
+                    'session_id' => $sessionId
+                ]);
+            } else {
+                Helpers::jsonResponse([
+                    'success' => true,
+                    'user_id' => $userId,
+                    'token' => $token,
+                    'session_id' => $sessionId
+                ]);
+            }
+        }
+        
+        /**
+         * Валидация данных
+         */
+        public static function validateData($db, $phone, $password, $lastname, $firstname) {
+            // Валидация обязательных полей
+            if (empty($phone) || empty($password) || empty($lastname) || empty($firstname)) {
+                Helpers::errorResponse('Телефон, пароль и имя обязательны');
+            }
+
+
+            // Проверка сложности пароля
+            $passwordCheck = Helpers::validatePassword($password);
+            if ($passwordCheck !== true) {
+                Helpers::errorResponse($passwordCheck);
+            }
+
+            // Форматируем телефон
+            $cleanPhone = Helpers::formatPhone($phone);
+            if (strlen($cleanPhone) <= 0) {
+                Helpers::errorResponse('Неверный формат телефона');
+            }
+
+            // Проверка уникальности телефона
+            $exists = $db->fetchOne("
+                    SELECT
+                        id
+                    FROM
+                        users
+                    WHERE
+                        phone = ?
+                ",
+                [$cleanPhone]
+            );
+            if ($exists) {
+                Helpers::errorResponse('Пользователь с таким номером телефона уже зарегистрирован');
+            }
+        }
+
+
+
+
 
         /**
          * POST /auth/check - проверка токена и возврат данных пользователя
@@ -81,42 +199,23 @@
          */
         public function register() {
             $data = json_decode(file_get_contents('php://input'), true);
+
+            $phone = $data['phone'] ?? null;
+            $password = $data['password'] ?? null;
+            $lastname = $data['lastname'] ?? null;
+            $firstname = $data['firstname'] ?? null;
             
             // Валидация обязательных полей
-            if (empty($data['phone']) || empty($data['password']) || empty($data['lastname']) || empty($data['firstname'])) {
-                Helpers::errorResponse('Телефон, пароль и имя обязательны');
-            }
+            self::validateData($this->db, $phone, $password, $lastname, $firstname);
 
-            // Проверка сложности пароля
-            $passwordCheck = Helpers::validatePassword($data['password']);
-            if ($passwordCheck !== true) {
-                Helpers::errorResponse($passwordCheck);
-            }
-
-            // Форматируем телефон
-            $cleanPhone = Helpers::formatPhone($data['phone']);
-            if (strlen($cleanPhone) <= 0) {
-                Helpers::errorResponse('Неверный формат телефона');
-            }
-
-            // Проверка уникальности телефона
-            $exists = $this->db->fetchOne("
-                    SELECT
-                        id
-                    FROM
-                        users
-                    WHERE
-                        phone = ?
-                ",
-                [$cleanPhone]
-            );
-            if ($exists) {
-                Helpers::errorResponse('Пользователь с таким номером телефона уже зарегистрирован');
-            }
+            
+            // Телефон
+            $cleanPhone = Helpers::formatPhone($phone);
+            
+            // Хэш пароля
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
             
             // Создание пользователя
-            $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
-            
             $this->db->query("
                     INSERT INTO users (phone, password_hash, lastname, firstname, registered_at) 
                     VALUES (?, ?, ?, ?, NOW())
@@ -124,10 +223,24 @@
                 [$cleanPhone, $passwordHash, $data['lastname'], $data['firstname']]
             );
             
-            Helpers::jsonResponse([
-                'success' => true,
-                'user_id' => $this->db->lastInsertId()
-            ]);
+            Helpers::jsonResponse(['success' => true, 'user_id' => $this->db->lastInsertId()]);
+        }
+        
+        /**
+         * POST /register/validate
+         */
+        public function registerValidate() {
+            $data = json_decode(file_get_contents('php://input'), true);
+
+            $phone = $data['phone'] ?? null;
+            $password = $data['password'] ?? null;
+            $lastname = $data['lastname'] ?? null;
+            $firstname = $data['firstname'] ?? null;
+            
+            // Валидация обязательных полей
+            self::validateData($this->db, $phone, $password, $lastname, $firstname);
+            
+            Helpers::jsonResponse(['success' => true]);
         }
         
         /**
@@ -135,52 +248,24 @@
          */
         public function login() {
             $data = json_decode(file_get_contents('php://input'), true);
+
+            $login = $data['login'] ?? null;
+            $password = $data['password'] ?? null;
             
-            if (empty($data['login']) || empty($data['password'])) {
-                Helpers::errorResponse('Логин и пароль обязательны');
+            if (empty($login) || empty($password)) {
+                Helpers::errorResponse('Логин и пароль обязательны', 400);
             }
 
+
             // Поиск пользователя
-            $user = $this->findUserByLogin($data['login']);
+            $user = $this->findUserByLogin($this->db, $login);
             
-            if (!$user || !password_verify($data['password'], $user['password_hash'])) {
+            if (!$user || !password_verify($password, $user['password_hash'])) {
                 Helpers::errorResponse('Неверный логин или пароль', 401);
             }
 
-            // Создание сессии
-            $token = Helpers::generateToken();
-            $deviceInfo = DeviceDetector::getDeviceInfo();
-            
-            $this->db->query(
-                "INSERT INTO sessions (user_id, token, device_name, device_type, ip_address, last_activity, created_at) 
-                VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
-                [
-                    $user['id'],
-                    $token,
-                    $deviceInfo['name'],
-                    $deviceInfo['type'],
-                    DeviceDetector::getClientIP()
-                ]
-            );
-
-            $sessionId = $this->db->lastInsertId();
-        
-            // Ответ в зависимости от типа клиента
-            if (Helpers::isWebRequest()) {
-                Helpers::setAuthCookie($token);
-                Helpers::jsonResponse([
-                    'success' => true,
-                    'user_id' => $user['id'],
-                    'session_id' => $sessionId
-                ]);
-            } else {
-                Helpers::jsonResponse([
-                    'success' => true,
-                    'user_id' => $user['id'],
-                    'token' => $token,
-                    'session_id' => $sessionId
-                ]);
-            }
+            // Авторизация
+            self::authorizeUser($this->db, $user['id'], $login);
         }
         
         /**
@@ -206,38 +291,6 @@
             }
             
             Helpers::jsonResponse(['success' => true]);
-        }
-        
-
-        
-        /**
-         * Поиск пользователя по логину (email или телефон)
-         */
-        private function findUserByLogin($login) {
-            if (Helpers::validateEmail($login)) {
-                return $this->db->fetchOne("
-                        SELECT
-                            *
-                        FROM
-                            users
-                        WHERE
-                            email = ?
-                    ",
-                    [$login]
-                );
-            } else {
-                $cleanPhone = Helpers::formatPhone($login);
-                return $this->db->fetchOne("
-                        SELECT
-                            *
-                        FROM
-                            users
-                        WHERE
-                            phone = ?
-                    ",
-                    [$cleanPhone]
-                );
-            }
         }
     }
 ?>

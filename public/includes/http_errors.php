@@ -5,7 +5,11 @@
     function httpErrorCheck($httpCode) {
         switch ($httpCode) {
             case 404:
-                include PAGES_PATH . '/404.php';
+                include ERROR_PAGES_PATH . '/404.php';
+                break;
+
+            case 403:
+                include ERROR_PAGES_PATH . '/403.php';
                 break;
             
             default:

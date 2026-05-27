@@ -46,6 +46,12 @@ export async function authRegister(data) {
         body: data
     });
 }
+export async function authRegisterDataValidate(data) {
+    return apiRequest('/register/validate', {
+        method: 'POST',
+        body: data
+    });
+}
 export async function authCheck() {
     return apiRequest('/auth/check', {
         method: 'POST'
@@ -73,6 +79,21 @@ export async function sessionsTerminate(data) {
 export async function sessionsTerminateAll() {
     return apiRequest('/sessions', {
         method: 'DELETE'
+    });
+}
+
+
+// ========== КОДЫ ==========
+export async function codesSend(data) {
+    return apiRequest('/codes/send', {
+        method: 'POST',
+        body: data
+    });
+}
+export async function codesConfirm(data) {
+    return apiRequest('/codes/confirm', {
+        method: 'POST',
+        body: data
     });
 }
 

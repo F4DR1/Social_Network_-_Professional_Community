@@ -1,5 +1,6 @@
 <?php
-    require_once '../includes/init.php';
+    require_once __DIR__ . '/../bootstrap.php';
+    require_once INCLUDES_PATH . '/init.php';
     global $currentUserId;
     
     if (!isset($currentUserId)) {

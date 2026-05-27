@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!messageInput || !sendMessageBtn) return;
 
         const hasText = messageInput.value.trim().length > 0;
-        sendMessageBtn.classList.toggle('active', hasText);
+        // sendMessageBtn.classList.toggle('active', hasText);
         sendMessageBtn.disabled = !hasText;
     }
 

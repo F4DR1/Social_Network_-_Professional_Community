@@ -44,18 +44,6 @@
     </script>
 
 
-    <script src="<?= JS_URL ?>/socket_manager.js?v=<?= time() ?>"></script>
-    <script>
-        // Создаём глобальный экземпляр сокета
-        window.socket = new SocketManager();
-
-        // При переходе на другую страницу соединение корректно закрывается
-        window.addEventListener('beforeunload', () => {
-            if (window.socket) {
-                window.socket.close();
-            }
-        });
-    </script>
     <script src="<?= JS_URL ?>/layout.js?v=<?= time() ?>" type="module"></script>
     <script src="<?= JS_URL ?>/modal.js?v=<?= time() ?>" type="module"></script>
 
@@ -75,11 +63,24 @@
             }
         }
     ?>
-    <script>
-        // Подключаемся к WebSocket
-        window.socket.connect('<?= htmlspecialchars($userToken) ?>');
-        document.dispatchEvent(new Event('socketReady'));  // Оповещаем всех, что сокет готов
-    </script>
+    <?php if ($layout === Layout::Standart): ?>
+        <script src="<?= JS_URL ?>/socket_manager.js?v=<?= time() ?>"></script>
+        <script>
+            // Создаём глобальный экземпляр сокета
+            window.socket = new SocketManager();
+
+            // При переходе на другую страницу соединение корректно закрывается
+            window.addEventListener('beforeunload', () => {
+                if (window.socket) {
+                    window.socket.close();
+                }
+            });
+            
+            // Подключаемся к WebSocket
+            window.socket.connect('<?= htmlspecialchars($userToken) ?>');
+            document.dispatchEvent(new Event('socketReady'));  // Оповещаем всех, что сокет готов
+        </script>
+    <?php endif; ?>
 </head>
 <body class="layout-<?= strtolower($layout->name) ?>">
     <?php if ($layout !== Layout::Micro): ?>
@@ -202,7 +203,6 @@
         <footer class="global">
             &copy; <?= htmlspecialchars($base_title) ?>
         </footer>
-        
     <?php endif; ?>
 
 </body>

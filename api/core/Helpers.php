@@ -12,6 +12,14 @@
             $apiKey = $headers['X-Api-Key'] ?? '';
             return $apiKey === env('INTERNAL_API_KEY');
         }
+        
+        /**
+         * Проверка на локальный сервер
+         */
+        public static function isLocalhost() {
+            $host = $_SERVER['SERVER_NAME'] ?? '';
+            return $host === 'localhost' || strpos($host, '.local') !== false;
+        }
 
         /**
          * Возвращает основной домен (без протокола и поддоменов)
@@ -89,14 +97,6 @@
         private static function getCookieDomain() {
             $domain = self::getMainDomain();
             return ($domain === 'localhost') ? $domain : '.' . $domain;
-        }
-        
-        /**
-         * Проверка на локальный сервер
-         */
-        private static function isLocalhost() {
-            $host = $_SERVER['SERVER_NAME'] ?? '';
-            return $host === 'localhost' || strpos($host, '.local') !== false;
         }
 
     
@@ -203,6 +203,57 @@
             }
             
             return $cleaned;
+        }
+
+        /**
+         * Маскирует email: оставляет первый и последний символ локальной части,
+         * а также домен целиком. Пример: "example@mail.com" → "e***e@mail.com"
+         */
+        public static function maskEmail(string $email): string {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return 'некорректный email';
+            }
+
+            [$local, $domain] = explode('@', $email, 2);
+            $len = mb_strlen($local);
+
+            if ($len <= 2) {
+                // Если локальная часть из 1-2 символов, показываем только первую букву
+                $maskedLocal = mb_substr($local, 0, 1) . '***';
+            } else {
+                $first = mb_substr($local, 0, 1);
+                $last = mb_substr($local, -1);
+                $maskedLocal = $first . str_repeat('*', max($len - 2, 1)) . $last;
+            }
+
+            return $maskedLocal . '@' . $domain;
+        }
+
+        /**
+         * Маскирует номер телефона: показывает код страны, оператора и последние 2 цифры.
+         * Ожидает номер в формате, который возвращает Helpers::formatPhone()
+         * (например, "79161234567" или "+79161234567").
+         * Пример: "+79161234567" → "+7 (916) ***-**-67"
+         */
+        public static function maskPhone(string $phone): string {
+            // Убираем все нецифровые символы для единообразия
+            $digits = preg_replace('/\D/', '', $phone);
+            $len = strlen($digits);
+
+            if ($len < 7) {
+                // Слишком короткий номер – маскируем почти всё
+                return preg_replace('/\d/', '*', $phone);
+            }
+
+            // Предполагаем российскую нумерацию: 1 цифра кода страны, 3 – код оператора, 7 – номер
+            $countryCode = substr($digits, 0, 1);   // 7
+            $operator = substr($digits, 1, 3);      // 916
+            $number = substr($digits, 4);           // 1234567
+            $lastTwo = substr($number, -2);         // 67
+
+            $maskedNumber = '***-**-' . $lastTwo;
+
+            return "+{$countryCode} ({$operator}) {$maskedNumber}";
         }
         
         /**

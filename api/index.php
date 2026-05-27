@@ -62,6 +62,7 @@
     $router->add('POST', '/logout', 'AuthController', 'logout', $db, null);
     $router->add('POST', '/login', 'AuthController', 'login', $db, null);
     $router->add('POST', '/register', 'AuthController', 'register', $db, null);
+    $router->add('POST', '/register/validate', 'AuthController', 'registerValidate', $db, null);
     $router->add('POST', '/auth/check', 'AuthController', 'check', $db, null);
     
     // ========== СЕССИИ ==========
@@ -70,6 +71,10 @@
     $router->add('DELETE', '/sessions/current', 'SessionController', 'terminateCurrentSession', $db, $auth);
     $router->add('DELETE', '/sessions/id', 'SessionController', 'terminateSession', $db, $auth);
     $router->add('DELETE', '/sessions', 'SessionController', 'terminateAllOtherSessions', $db, $auth);
+    
+    // ========== КОДЫ ==========
+    $router->add('POST', '/codes/send', 'CodeController', 'sendCode', $db, null);
+    $router->add('POST', '/codes/confirm', 'CodeController', 'confirmCode', $db, null);
     
     // ========== УВЕДОМЛЕНИЯ ==========
     $router->add('GET', '/notifications/get/unread-count', 'NotificationController', 'getUnreadCount', $db, $auth);
