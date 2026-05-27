@@ -19,6 +19,7 @@
     // Константы для файловой системы (для PHP-инклюдов)
     define('INCLUDES_PATH', ROOT_PATH . '/includes');
     define('CONFIG_PATH', ROOT_PATH . '/config');
+    define('ERROR_PAGES_PATH', ROOT_PATH . '/error_pages');
     define('PAGES_PATH', ROOT_PATH . '/pages');
     define('ENUMS_PATH', ROOT_PATH . '/enums');
 

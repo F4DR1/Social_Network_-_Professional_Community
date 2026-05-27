@@ -1,18 +1,64 @@
-import { authLogin, authRegister } from '../api.js';
+import {
+    authLogin, authRegister, authRegisterDataValidate,
+    codesSend, codesConfirm
+} from '../api.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-    const container = document.querySelector(".auth-container");
-    const loginTab = document.querySelector('[data-form="login"]');
-    const registerTab = document.querySelector('[data-form="register"]');
+    const authContainer = document.getElementById('authContainer');
 
-    const title = document.getElementById("authTitle");
-    const subtitle = document.getElementById("authSubtitle");
-    const loginForm = document.getElementById("loginForm");
-    const registerForm = document.getElementById("registerForm");
-    const successScreen = document.getElementById("successMessage");
+    // Элементы контейнера
+    const authTitle = document.getElementById('authTitle');
+    const authSubtitle = document.getElementById('authSubtitle');
+    const authTabs = document.getElementById('authTabs');
+    const loginTab = document.getElementById('loginTab');
+    const registerTab = document.getElementById('registerTab');
+
+    const loginForm = document.getElementById('loginForm');
+    const loginMessage = document.getElementById('loginMessage');
+
+    const registerForm = document.getElementById('registerForm');
+    const registerMessage = document.getElementById('registerMessage');
+
+    const recoveryForm = document.getElementById('recoveryForm');
+    const recoveryMessage = document.getElementById('recoveryMessage');
+
+    const codeForm = document.getElementById('codeForm');
+    const codeMessage = document.getElementById('codeMessage');
+
+    const successScreen = document.getElementById('successMessage');
+    
+    const resendCodeTimer = document.getElementById('resendCodeTimer');
+    const resendCodeLine = document.getElementById('resendCodeLine');
+    const resendCodeBtn = document.getElementById('resendCodeBtn');
+    
+
+
+    // Элементы логина
+    const loginLogin = document.getElementById('loginLogin');
+    const loginPassword = document.getElementById('loginPassword');
+
+    // Элементы регистрации
+    const registerLogin = document.getElementById('registerLogin');
+    const registerPassword = document.getElementById('registerPassword');
+    const registerFirstname = document.getElementById('registerFirstname');
+    const registerLastname = document.getElementById('registerLastname');
+    
+    // Элементы восстановления
+    const recoveryLogin = document.getElementById('recoveryLogin');
+    
+    // Элементы кода
+    const codeInput = document.getElementById('codeInput');
+
+
+    
+    let sentCodePurpose = null;
+    let codeSentMessage = '';
 
 
 
+
+
+    // -------------------- ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ --------------------
     // Обработка Enter
     function setupEnterKeySubmit() {
         // Функция для получения активной формы
@@ -79,6 +125,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Фокус на активную форму
+    function focusActiveForm() {
+        switch (authContainer.dataset.currentForm) {
+            case 'login':
+                if (loginLogin) loginLogin.focus();
+                break;
+
+            case 'register':
+                if (registerLogin) registerLogin.focus();
+                break;
+
+            case 'recovery':
+                if (recoveryLogin) recoveryLogin.focus();
+                break;
+        
+            default:
+                break;
+        }
+    }
+
     // Показ/скрытие сообщений
     function setMessage(message, text, type = 'error') {
         const textStr = String(text || '');
@@ -90,78 +156,155 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Очистка сообщений на форме
     function clearMessages() {
-        document.querySelectorAll('.message').forEach(msg => {
+        authContainer.querySelectorAll('.message').forEach(msg => {
             msg.textContent = '';
             msg.className = 'message';
         });
     }
 
-    // Переключатель форм
+    // Таймер повторной отправки кода
+    function startResendTimer(seconds = 60) {
+        if (!resendCodeTimer || !resendCodeLine) return;
+    
+        // Показываем таймер, скрываем кнопку для повторной отправки
+        resendCodeTimer.classList.add('active');
+        resendCodeLine.classList.remove('active');
+        resendCodeBtn.disabled = true;
+        
+        let remaining = seconds;
+        
+        // Функция форматирования времени
+        const formatTime = (sec) => {
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        };
+        
+        // Сразу обновляем текст
+        resendCodeTimer.textContent = `Повторно отправить код можно через ${formatTime(remaining)}`;
+        
+        const intervalId = setInterval(() => {
+            remaining--;
+            if (remaining > 0) {
+                resendCodeTimer.textContent = `Повторно отправить код можно через ${formatTime(remaining)}`;
+            } else {
+                clearInterval(intervalId);
+                resendCodeTimer.classList.remove('active');
+                resendCodeLine.classList.add('active');
+                resendCodeBtn.disabled = false;
+            }
+        }, 1000);
+    }
+
+
+
+
+
+    // -------------------- ВИЗУАЛЬНАЯ ОБРАБОТКА --------------------
     function switchForm(formName) {
         // Сначала скрываем текущую форму
-        const currentActive = document.querySelector('.auth-form.active');
+        const currentActive = authContainer.querySelector('.auth-form.active');
         if (currentActive) {
             currentActive.style.opacity = '0';
-            currentActive.style.transform = formName === 'login' ? 'translateX(20px)' : 'translateX(-20px)';
             currentActive.classList.remove('active');
         }
 
+        // Очищаем поля сообщений
         clearMessages();
+
+
+        let targetForm;
+        let formTitle = '';
+        let formSubtitle = '';
+        switch (formName) {
+            case 'register-code':
+            case 'recovery-code':
+                authTabs.classList.toggle('active', false);
+                
+                if (currentActive) currentActive.style.transform = 'translate(20px, 0)';
+                
+                // Обновляем табы
+                loginTab.classList.toggle('active', false);
+                registerTab.classList.toggle('active', false);
+
+                targetForm = codeForm;
+                formTitle = 'Введите код подтверждения';
+                formSubtitle = codeSentMessage;
+                break;
+
+            case 'recovery':
+                sentCodePurpose = null;
+                codeSentMessage = '';
+
+                document.title = 'Восстановление доступа';
+                authTabs.classList.toggle('active', false);
+                
+                if (currentActive) currentActive.style.transform = 'translate(20px, 0)';
+                
+                // Обновляем табы
+                loginTab.classList.toggle('active', false);
+                registerTab.classList.toggle('active', false);
+
+                targetForm = recoveryForm;
+                formTitle = 'Восстановление доступа';
+                formSubtitle = 'Введите данные для восстановления';
+                break;
+
+            case 'login':
+            case 'register':
+                sentCodePurpose = null;
+                codeSentMessage = '';
+
+                const isLogin = formName === 'login';
+
+                document.title = isLogin ? 'Авторизация' : 'Регистрация';
+                authTabs.classList.toggle('active', true);
+                
+                if (currentActive) currentActive.style.transform = isLogin ? 'translate(20px, 0)' : 'translate(-20px, 0)';
+                
+                // Обновляем табы
+                loginTab.classList.toggle('active', isLogin);
+                registerTab.classList.toggle('active', !isLogin);
+
+                targetForm = isLogin ? loginForm : registerForm;
+                formTitle = isLogin ? 'Вход в аккаунт' : 'Создать аккаунт';
+                formSubtitle = isLogin ? 'Введите данные для входа' : 'Присоединяйтесь к сети';
+                break;
         
-        // Обновляем табы
-        loginTab.classList.toggle("active", formName === "login");
-        registerTab.classList.toggle("active", formName === "register");
-        container.dataset.currentForm = formName;
+            default:
+                break;
+        }
 
         
         // Задержка для плавного перехода
         setTimeout(() => {
-            const targetForm = formName === 'login' ? loginForm : registerForm;
-            
+            // Обновляем заголовок и описание формы
+            authTitle.textContent = formTitle;
+            authSubtitle.textContent = formSubtitle;
+
             // Показываем новую форму
             targetForm.classList.add('active');
             targetForm.style.opacity = '1';
-            targetForm.style.transform = 'translateX(0)';
-
-            // Обновляем заголовок и описание формы
-            
-            document.title = formName === 'login' ? 'Авторизация' : 'Регистрация';
-            title.textContent = formName === 'login' ? 'Вход в аккаунт' : 'Создать аккаунт';
-            subtitle.textContent = formName === 'login' ? 'Введите данные для входа' : 'Присоединяйтесь к сети';
+            targetForm.style.transform = 'translate(0, 0)';
         }, 200);
+
 
         // Фокус на нужное поле
         setTimeout(focusActiveForm, 250);
     }
 
-    // Фокус на активную форму
-    function focusActiveForm() {
-        const currentForm = container.dataset.currentForm;
-        if (currentForm === 'login') {
-            const loginInput = document.getElementById('login');
-            if (loginInput) loginInput.focus();
-        } else if (currentForm === 'register') {
-            const regLoginInput = document.getElementById('regLogin');
-            if (regLoginInput) regLoginInput.focus();
-        }
-    }
 
 
+    
 
-    // Инициализация
-    loginTab.addEventListener("click", () => switchForm("login"));
-    registerTab.addEventListener("click", () => switchForm("register"));
-    switchForm(container.dataset.currentForm);
-    setupEnterKeySubmit();
-
-
-
-    // Логин
-    async function loginAPI(message, loginStr, passwordStr) {
+    // -------------------- API --------------------
+    // Авторизация
+    async function loginAPI(message, login = null, password = null) {
         const data = {
-            login: loginStr,
-            password: passwordStr
+            login: login?? loginLogin.value,
+            password: password ?? loginPassword.value
         };
 
         try {
@@ -169,13 +312,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (result.success) {
                 clearMessages();
-                loginForm.classList.remove("active");
-                registerForm.classList.remove("active");
-                successScreen.classList.add("active");
-                setTimeout(() => (window.location.href = container.dataset.returnUrl), 2000);
+                loginForm.classList.remove('active');
+                registerForm.classList.remove('active');
+                recoveryForm.classList.remove('active');
+                codeForm.classList.remove('active');
+                successScreen.classList.add('active');
+                setTimeout(() => (window.location.href = authContainer.dataset.returnUrl), 2000);
 
             } else {
-                setMessage(message, result.error || "Ошибка авторизации", 'error');
+                setMessage(message, result.error || 'Ошибка авторизации', 'error');
             }
 
         } catch (err) {
@@ -186,10 +331,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Регистрация
     async function registerAPI(message) {
         const data = {
-            phone: document.getElementById("regLogin").value,
-            password: document.getElementById("regPassword").value,
-            firstname: document.getElementById("regFirstname").value,
-            lastname: document.getElementById("regLastname").value
+            phone: registerLogin.value,
+            password: registerPassword.value,
+            firstname: registerFirstname.value,
+            lastname: registerLastname.value
         };
 
         try {
@@ -200,7 +345,117 @@ document.addEventListener("DOMContentLoaded", () => {
                 await loginAPI(message, data.phone, data.password);
 
             } else {
-                setMessage(message, result.error || "Ошибка регистрации", 'error');
+                setMessage(message, result.error || 'Ошибка регистрации', 'error');
+            }
+
+        } catch (err) {
+            setMessage(message, err, 'error');
+        }
+    }
+
+    // Отправить код
+    async function sendCodeAPI(message) {
+        const currentForm = authContainer.dataset.currentForm;
+
+        const data = {};
+        
+        let newForm = '';
+        switch (currentForm) {
+            case 'recovery':
+                newForm = 'recovery-code';
+                data.purpose = 'recovery_verification';
+                data.login = recoveryLogin.value;
+                break;
+            
+            case 'register':
+                newForm = 'register-code';
+                data.purpose = 'register_verification';
+                data.login = registerLogin.value;
+                break;
+        
+            default:
+                return;
+        }
+
+        try {
+            const result = await codesSend(data);
+
+            if (result.success) {
+                startResendTimer();
+                console.log(result.code);  // Временный вывод кода на фронтенде
+                // Переключаем форму на ввод кода
+                codeSentMessage = result.message;
+                sentCodePurpose = data.purpose;
+                switchForm(newForm);
+
+            } else {
+                setMessage(message, result.error || 'Ошибка регистрации', 'error');
+            }
+
+        } catch (err) {
+            setMessage(message, err, 'error');
+        }
+    }
+
+    // Проверить код
+    async function confirmCodeAPI(message) {
+        const data = {
+            purpose: sentCodePurpose,
+            code: codeInput.value
+        };
+        if (sentCodePurpose == 'recovery_verification') data.login = recoveryLogin.value;
+        else if (sentCodePurpose == 'register_verification') data.login = registerLogin.value;
+
+        try {
+            const result = await codesConfirm(data);
+
+            if (result.success) {
+                switch (sentCodePurpose) {
+                    case 'register_verification':
+                        setMessage(codeMessage, result.message, 'success');
+                        registerAPI(registerMessage);
+                        break;
+                        
+                    case 'recovery_verification':
+                        clearMessages();
+                        loginForm.classList.remove('active');
+                        registerForm.classList.remove('active');
+                        recoveryForm.classList.remove('active');
+                        codeForm.classList.remove('active');
+                        successScreen.classList.add('active');
+                        setTimeout(() => (window.location.href = authContainer.dataset.returnUrl), 2000);
+                        break;
+                
+                    default:
+                        return;
+                }
+            } else {
+                setMessage(message, result.error || 'Ошибка регистрации', 'error');
+            }
+
+        } catch (err) {
+            setMessage(message, err, 'error');
+        }
+    }
+
+    // Проверить доступность данных для регистрации
+    async function validateRegisterDataAPI(message) {
+        const data = {
+            phone: registerLogin.value,
+            password: registerPassword.value,
+            firstname: registerFirstname.value,
+            lastname: registerLastname.value
+        };
+
+        try {
+            const result = await authRegisterDataValidate(data);
+
+            if (result.success) {
+                clearMessages();
+                sendCodeAPI(registerMessage);
+
+            } else {
+                setMessage(message, result.error || 'Ошибка регистрации', 'error');
             }
 
         } catch (err) {
@@ -209,22 +464,106 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    
 
-    // Кнопка логина
-    document.getElementById("loginBtn").addEventListener("click", async (e) => {
+    
+    // -------------------- МЕТОДЫ --------------------
+    // Обработка клика по вкладкам
+    function tabClickHandler(formName) {
+        if (formName != 'login' && formName != 'register' && formName != 'recovery') return;
+
+        const oldFormName = authContainer.dataset.currentForm;
+        authContainer.dataset.currentForm = formName;
+
+        // Устанавливаем новый адрес (без поддержки истории)
+        const currentPath = window.location.pathname;
+        const segments = currentPath.split('/');
+        segments[segments.length - 1] = formName;
+        const newPath = segments.join('/');
+        window.history.replaceState({}, '', newPath);
+
+        // Переключаем формы
+        switchForm(formName);
+    }
+
+
+
+
+
+    // -------------------- СТАРТОВАЯ ОБРАБОТКА --------------------
+    // Добавляем событие клика по вкладке
+    loginTab.addEventListener('click', () => tabClickHandler('login'));
+    registerTab.addEventListener('click', () => tabClickHandler('register'));
+
+    // Устанавливаем стартовую вкладку
+    tabClickHandler(authContainer.dataset.currentForm);
+
+    // Обработка клавиши Enter на вкладках
+    setupEnterKeySubmit();
+
+
+
+
+
+    // -------------------- КНОПКИ ПЕРЕХОДА К ФОРМАМ --------------------
+    // Кнопка возврата к форме восстановления
+    document.getElementById('codeBackBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
-        clearMessages();
-        const login = document.getElementById("login").value;
-        const password = document.getElementById("password").value;
-        const message = document.getElementById("loginMessage");
-        await loginAPI(message, login, password);
+        tabClickHandler('recovery');
+    });
+
+    // Кнопка возврата к форме входа
+    document.getElementById('recoveryBackBtn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        tabClickHandler('login');
+    });
+
+    // Кнопка перехода к форме восстановления
+    document.getElementById('showRecoveryFormBtn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        tabClickHandler('recovery');
     });
 
     // Кнопка регистрации
-    document.getElementById("registerBtn").addEventListener("click", async (e) => {
+    document.getElementById('registerBtn')?.addEventListener('click', async (e) => {
         e.preventDefault();
+        // Отправить код пользователю
         clearMessages();
-        const message = document.getElementById("registerMessage");
-        await registerAPI(message);
+        validateRegisterDataAPI(registerMessage);
+    });
+
+    
+
+    // -------------------- КНОПКИ API ДЕЙСТВИЙ --------------------
+    // Кнопка отправки подтверждения кода
+    document.getElementById('confirmCodeBtn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        // Отправить код на проверку
+        clearMessages();
+        confirmCodeAPI(codeMessage);
+    });
+
+    // Кнопка повторной отправки кода
+    resendCodeBtn?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        // Отправить код пользователю
+        clearMessages();
+        sendCodeAPI(codeMessage);
+    });
+
+    // Кнопка отправки кода и перехода к форме кода
+    document.getElementById('sendRecoveryCodeBtn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        // Отправить код пользователю
+        clearMessages();
+        sendCodeAPI(recoveryMessage);
+    });
+
+    // Кнопка авторизации
+    document.getElementById('loginBtn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        // Авторизовываем
+        clearMessages();
+        await loginAPI(loginMessage);
     });
 });

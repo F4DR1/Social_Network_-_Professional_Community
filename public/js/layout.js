@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
 
     // Выход из системы
-    document.getElementById('logoutButton').addEventListener('click', async (e) => {
+    document.getElementById('logoutButton')?.addEventListener('click', async (e) => {
         e.preventDefault();
 
         try {
