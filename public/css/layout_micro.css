@@ -1,0 +1,306 @@
+/* ============================================================
+   МирПрофи — micro_layout.css
+   Ультра-минимальный layout: только контент, без шапки и подвала.
+   Используется для модальных окон, iframe-вставок, OAuth-потоков.
+   Dark minimalist · Accent #695BF8
+   Единый фон #131308
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── CSS-переменные ── */
+:root {
+  --accent:          #695BF8;
+  --accent-dim:      #8879fa;
+  --accent-ghost:    rgba(105, 91, 248, 0.12);
+  --accent-glow:     rgba(105, 91, 248, 0.35);
+
+  /* Новая осветлённая палитра */
+  --bg:              #1c1c13;
+  --bg-2:            #202016;
+  --bg-3:            #242419;
+  --bg-4:            #29291d;
+  --bg-5:            #2e2e21;
+
+  --border:          rgba(255,255,255,0.09);
+  --border-hover:    rgba(255,255,255,0.16);
+
+  --text:            #eaeaf2;
+  --text-2:          #9a9ab4;
+  --text-3:          #62627a;
+
+  --radius:          14px;
+  --radius-sm:       8px;
+  --radius-lg:       20px;
+
+  --transition:      0.18s ease;
+
+  --font-sans:       'Manrope', sans-serif;
+  --font-mono:       'DM Mono', monospace;
+}
+
+/* ── Сброс ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; }
+
+body.layout-micro {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+  padding: 16px;
+}
+
+a { color: var(--accent-dim); text-decoration: none; transition: color var(--transition); }
+a:hover { color: var(--accent); }
+ul { list-style: none; }
+img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--bg-5); border-radius: 999px; }
+
+/* ════════════════════════════════════════════════════════════
+   MAIN — центрированный блок
+   ════════════════════════════════════════════════════════════ */
+main {
+  width: 100%;
+  max-width: 440px;
+}
+
+.page-content {
+  width: 100%;
+}
+
+/* ════════════════════════════════════════════════════════════
+   КОНТЕЙНЕР MICRO (карточка-форма)
+   ════════════════════════════════════════════════════════════ */
+.micro-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 24px 64px rgba(0,0,0,0.6),
+    0 0 80px rgba(105,91,248,0.05);
+  animation: micro-appear 0.3s ease both;
+}
+
+@keyframes micro-appear {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Заголовок карточки */
+.micro-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.micro-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+}
+
+.micro-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.micro-header p {
+  font-size: 0.875rem;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+/* Акцентная полоса сверху карточки */
+.micro-card::before {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  border-radius: 999px;
+  margin-bottom: 28px;
+  opacity: 0.6;
+}
+
+/* ════════════════════════════════════════════════════════════
+   УТИЛИТЫ — поля, кнопки, разделители
+   ════════════════════════════════════════════════════════════ */
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field-label span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.01em;
+}
+
+.input {
+  width: 100%;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-size: 0.9rem;
+  font-family: var(--font-sans);
+  color: var(--text);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.input::placeholder { color: var(--text-3); }
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ghost);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-sans);
+  transition: all var(--transition);
+  width: 100%;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 18px var(--accent-glow);
+}
+.btn-primary:hover {
+  background: var(--accent-dim);
+  box-shadow: 0 6px 24px var(--accent-glow);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  background: var(--bg-4);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--bg-5); }
+
+.btn-inline { width: auto; }
+
+.divider-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  color: var(--text-3);
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+}
+.divider-text::before,
+.divider-text::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 18px 0;
+}
+
+.micro-hint {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-3);
+  margin-top: 20px;
+  line-height: 1.5;
+}
+.micro-hint a {
+  color: var(--accent-dim);
+  font-weight: 500;
+}
+.micro-hint a:hover { color: var(--accent); }
+
+.alert {
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 16px;
+  line-height: 1.45;
+}
+.alert-error   { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.18); color: #fca5a5; }
+.alert-success { background: rgba(74,222,128,0.07); border: 1px solid rgba(74,222,128,0.15); color: #86efac; }
+.alert-info    { background: var(--accent-ghost); border: 1px solid rgba(105,91,248,0.22); color: var(--accent-dim); }
+
+.loader {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--bg-5);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Декоративный фоновый градиент ── */
+body.layout-micro::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(105,91,248,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+main { position: relative; z-index: 1; }
+
+/* ════════════════════════════════════════════════════════════
+   АДАПТИВ
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  body.layout-micro { padding: 12px; align-items: flex-start; padding-top: 32px; }
+
+  .micro-card { padding: 24px 20px; border-radius: var(--radius); }
+}

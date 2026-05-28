@@ -1,406 +1,785 @@
-/* ============================================
-   PROFILE PAGE - ACTIONS PANEL
-============================================= */
-
-/* 🔥 Основная панель действий */
+/* ============================================================
+   МирПрофи — user_profile.css
+   Страница профиля пользователя
+   ============================================================ */
+ 
+/* ════════════════════════════════════════════════════════════
+   MAIN-CONTAINER — шапка профиля
+   ════════════════════════════════════════════════════════════ */
+.main-container > .container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 28px;
+  position: relative;
+  /* НЕ overflow: hidden — иначе дропдауны в profile-actions-panel обрезаются */
+  overflow: visible;
+}
+ 
+/* Декоративная полоса-акцент сверху карточки профиля */
+.main-container > .container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-dim), transparent);
+  border-radius: var(--radius) var(--radius) 0 0;
+  /* pointer-events off, чтобы не мешал кликам */
+  pointer-events: none;
+}
+ 
+/* Аватар */
+.main-container > .container > img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--bg-4);
+  box-shadow: 0 0 0 2px var(--accent-ghost), 0 8px 24px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.main-container > .container > img:hover {
+  box-shadow: 0 0 0 3px var(--accent-ghost), 0 8px 32px rgba(105,91,248,0.2);
+  transform: scale(1.02);
+}
+ 
+/* Имя пользователя */
+.main-container > .container > h1,
+.main-container > .container > h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--text);
+  line-height: 1.2;
+}
+ 
+/* ════════════════════════════════════════════════════════════
+   PROFILE-ACTIONS-PANEL
+   ════════════════════════════════════════════════════════════ */
 .profile-actions-panel {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 2rem 0;
-    flex-wrap: wrap;
-    position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  /* Обязательно visible — дочерние дропдауны выходят за пределы */
+  overflow: visible;
+  position: relative;
+  z-index: 10;
 }
-
-/* 🔥 КОНТЕЙНЕРЫ ГРУПП */
-.profile-actions-panel .main-action {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
+ 
+/* Главная кнопка */
+.main-action {
+  display: flex;
+  /* Тоже visible, чтобы дропдаун вышел наружу */
+  overflow: visible;
+  position: relative;
 }
-
-.profile-actions-panel .base-actions,
-.profile-actions-panel .contact-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+ 
+/* Дополнительные маленькие кнопки */
+.base-actions {
+  display: flex;
+  gap: 6px;
 }
-
-/* 🔥 ОСНОВНЫЕ КНОПКИ */
-.profile-actions-panel .standart-btn {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    min-height: 48px;
-    min-width: 160px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    border: none;
-    border-radius: 12px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+ 
+/* Меню "ещё" */
+.contact-actions {
+  display: flex;
+  gap: 6px;
+  overflow: visible;
+  position: relative;
 }
-
-/* Градиент для основных кнопок */
-.profile-actions-panel .standart-btn {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: white;
-    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+ 
+/* ── Кнопки ── */
+/* Стандартная кнопка */
+.standart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.925rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  box-shadow: 0 2px 14px var(--accent-glow);
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
-
-.profile-actions-panel .standart-btn:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.5);
+.standart-btn:hover {
+  background: var(--accent-dim);
+  box-shadow: 0 4px 20px var(--accent-glow);
+  transform: translateY(-1px);
 }
-
-.profile-actions-panel .standart-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 12px 0 rgba(59, 130, 246, 0.3);
+.standart-btn:active { transform: translateY(0); }
+ 
+.standart-btn svg {
+  fill: rgba(255,255,255,0.85);
+  flex-shrink: 0;
 }
-
-/* 🔥 МАЛЕНЬКИЕ КНОПКИ */
-.profile-actions-panel .small-btn {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    background: #f8fafc;
-    color: #64748b;
-    cursor: pointer;
-    transition: all 0.2s ease;
+ 
+/* Маленькая иконочная кнопка */
+.small-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 12px;
+  background: var(--bg-3);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  white-space: nowrap;
 }
-
-.profile-actions-panel .small-btn:hover {
-    background: #f1f5f9;
-    border-color: #3b82f6;
-    color: #3b82f6;
-    transform: scale(1.05);
+.small-btn:hover {
+  background: var(--bg-4);
+  border-color: var(--border-hover);
+  color: var(--text);
 }
-
-/* 🔥 DROPDOWN МЕНЮ */
-.profile-actions-panel .action-dropdown {
-    position: relative;
-    display: inline-block;
+.small-btn svg {
+  fill: var(--text-3);
+  flex-shrink: 0;
+  transition: fill var(--transition);
 }
-
-.profile-actions-panel .action-trigger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    min-height: 48px;
-    min-width: 160px;
-    background: #f8fafc;
-    color: #374151;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.25s ease;
+.small-btn:hover svg { fill: var(--text-2); }
+ 
+/* Универсальная кнопка .button */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: var(--bg-3);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
-
-.profile-actions-panel .action-trigger.has-lists {
-    min-width: 52px;
-    padding: 0.75rem;
+.button:hover {
+  background: var(--bg-4);
+  border-color: var(--border-hover);
+  color: var(--text);
 }
-
-.profile-actions-panel .action-trigger:hover {
-    background: #f1f5f9;
-    border-color: #3b82f6;
-    color: #1e40af;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+ 
+/* ════════════════════════════════════════════════════════════
+   PROFILE-ACTIONS DROPDOWN
+   Отдельный дизайн для дропдаунов внутри .profile-actions-panel.
+   Намеренно отличается от .custom-dropdown из custom_dropdown.css.
+   ════════════════════════════════════════════════════════════ */
+ 
+/* Обёртка — всегда visible, чтобы меню выходило за пределы карточки */
+.profile-actions-panel .custom-dropdown {
+  position: relative;
+  display: inline-flex;
+  overflow: visible;
 }
-
-/* 🔥 СПИСОК ДРОПДАУНА */
-.profile-actions-panel .dropdown-list {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    min-width: 260px;
-    background: white;
-    border-radius: 16px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.12),
-        0 8px 16px rgba(0, 0, 0, 0.08);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-12px);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 10000;
-    list-style: none;
-    padding: 8px 0;
-    margin: 0;
+ 
+/* Триггер в главной кнопке (большой) */
+.profile-actions-panel .main-action .custom-dropdown .dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.925rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition);
+  white-space: nowrap;
+  user-select: none;
 }
-
-.profile-actions-panel .action-dropdown:hover .dropdown-list {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+.profile-actions-panel .main-action .custom-dropdown .dropdown-trigger:hover {
+  background: var(--bg-4);
+  border-color: var(--border-hover);
 }
-
-/* 🔥 КНОПКИ В ДРОПДАУНЕ */
-.profile-actions-panel .dropdown-button {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    width: 100%;
-    padding: 0.75rem 1.25rem;
-    background: none;
-    border: none;
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: #374151;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: left;
+.profile-actions-panel .main-action .custom-dropdown.open .dropdown-trigger {
+  background: var(--bg-4);
+  border-color: var(--border-hover);
+  box-shadow: 0 0 0 3px var(--accent-ghost);
 }
-
-.profile-actions-panel .dropdown-button:hover {
-    background: #f8fafc;
-    color: #1f2937;
-    transform: translateX(4px);
+ 
+/* Триггер в contact-actions (иконочный) */
+.profile-actions-panel .contact-actions .custom-dropdown .dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition);
 }
-
-/* 🔥 ПОДСПИСОК "СПИСКИ" - ИСПРАВЛЕННЫЙ */
+.profile-actions-panel .contact-actions .custom-dropdown .dropdown-trigger:hover {
+  background: var(--bg-4);
+  border-color: var(--border-hover);
+}
+.profile-actions-panel .contact-actions .custom-dropdown.open .dropdown-trigger {
+  background: var(--bg-4);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ghost);
+}
+.profile-actions-panel .contact-actions .custom-dropdown .dropdown-trigger svg {
+  fill: var(--text-3);
+  transition: fill var(--transition);
+}
+.profile-actions-panel .contact-actions .custom-dropdown.open .dropdown-trigger svg,
+.profile-actions-panel .contact-actions .custom-dropdown .dropdown-trigger:hover svg {
+  fill: var(--text-2);
+}
+ 
+/* Стрелка */
+.profile-actions-panel .custom-dropdown .dropdown-arrow {
+  fill: var(--text-3);
+  flex-shrink: 0;
+  transition: transform var(--transition), fill var(--transition);
+  pointer-events: none;
+}
+.profile-actions-panel .custom-dropdown.open .dropdown-arrow {
+  transform: rotate(180deg);
+  fill: var(--text-2);
+}
+ 
+/* ── Выпадающее меню — ключевые правила ──
+   z-index выше всего на странице; position: absolute
+   относительно ближайшего position: relative предка (.custom-dropdown).
+   Предки до <body> НЕ должны иметь overflow: hidden/clip/scroll —
+   см. containers.css и правки выше.
+*/
+.profile-actions-panel .custom-dropdown .dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  list-style: none;
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  /* Поднимаем над всем контентом страницы */
+  z-index: 1000;
+  /* Анимация */
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+  pointer-events: none;
+  transform-origin: top left;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.profile-actions-panel .custom-dropdown.open .dropdown-menu {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+ 
+/* Для contact-actions меню открывается вправо от иконки (или влево если нет места) */
+.profile-actions-panel .contact-actions .custom-dropdown .dropdown-menu {
+  left: auto;
+  right: 0;
+  transform-origin: top right;
+}
+ 
+/* Пункт меню */
+.profile-actions-panel .custom-dropdown .dropdown-menu li {
+  list-style: none;
+}
+ 
+/* Кнопка внутри пункта меню */
+.profile-actions-panel .custom-dropdown .dropdown-menu .dropdown-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  text-align: left;
+  white-space: nowrap;
+}
+.profile-actions-panel .custom-dropdown .dropdown-menu .dropdown-button:hover {
+  background: var(--bg-4);
+  color: var(--text);
+}
+.profile-actions-panel .custom-dropdown .dropdown-menu .dropdown-button svg {
+  fill: var(--text-3);
+  flex-shrink: 0;
+  transition: fill var(--transition);
+}
+.profile-actions-panel .custom-dropdown .dropdown-menu .dropdown-button:hover svg {
+  fill: var(--text-2);
+}
+ 
+/* Разделитель между пунктами (если нужен) */
+.profile-actions-panel .custom-dropdown .dropdown-menu li + li {
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
+  padding-top: 2px;
+}
+ 
+/* Вложенный дропдаун (Изменить список) */
 .profile-actions-panel .lists-wrapper {
-    position: relative;
+  position: relative;
 }
-
-.profile-actions-panel .lists-dropdown {
-    position: absolute;
-    left: 0;
-    top: 100%;
-    min-width: 200px;
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: all 0.2s ease;
-    z-index: 10001;
-    list-style: none;
-    padding: 8px 0;
-    margin: 0;
+.profile-actions-panel .lists-wrapper > .custom-dropdown {
+  width: 100%;
 }
-
-/* Открываем подсписок при наведении на элемент "Изменить список" */
-.profile-actions-panel .lists-wrapper:hover .lists-dropdown {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+.profile-actions-panel .lists-wrapper .lists-toggle {
+  width: 100%;
+  justify-content: space-between;
 }
-
-/* 🔥 СКРЫТЫЕ ЭЛЕМЕНТЫ ПО УМОЛЧАНИЮ - ИСПРАВЛЕННЫЕ */
-#main-message,
-#main-request,
-#main-request-following,
-#main-request-follower,
-#base-action-message,
-#contact-action {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    position: absolute !important;
+.profile-actions-panel .lists-wrapper .lists-toggle .dropdown-arrow {
+  margin-left: auto;
 }
-
-/* 🔥 АКТИВНЫЕ ЭЛЕМЕНТЫ - ИСПРАВЛЕННЫЕ */
-#main-message.active,
-#main-request.active,
-#main-request-following.active,
-#main-request-follower.active,
-#contact-action.active {
-    display: block !important;
-    width: auto !important;
-    height: auto !important;
-    min-width: 160px !important;
-    min-height: 48px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    position: relative !important;
+.profile-actions-panel .lists-wrapper.open .dropdown-arrow {
+  transform: rotate(-90deg);
 }
-
-#base-action-message.active {
-    display: flex !important;
-    width: auto !important;
-    height: auto !important;
-    min-width: 48px !important;
-    min-height: 48px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    position: relative !important;
+ 
+/* Меню вложенного дропдауна — открывается вбок */
+.profile-actions-panel .lists-wrapper .dropdown-menu {
+  left: calc(100% + 6px);
+  right: auto;
+  top: 0;
+  transform-origin: top left;
 }
-
-/* ============================================
-   АДАПТИВНОСТЬ
-============================================= */
-
-@media (max-width: 768px) {
-    .profile-actions-panel {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1rem;
-        margin: 1.5rem 0;
-    }
-
-    .profile-actions-panel .main-action {
-        flex-direction: column;
-        width: 100%;
-        gap: 1rem;
-    }
-
-    .profile-actions-panel .standart-btn,
-    .profile-actions-panel .action-trigger {
-        min-width: 100%;
-        justify-content: center;
-    }
-
-    /* 🔥 МОБИЛЬНЫЕ ДРОПДАУНЫ */
-    .profile-actions-panel .dropdown-list {
-        position: static;
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-        box-shadow: none;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        margin-top: 0.75rem;
-        z-index: auto;
-        display: none;
-        min-width: 100%;
-        max-width: 100%;
-    }
-
-    .profile-actions-panel .action-dropdown.active .dropdown-list {
-        display: block !important;
-    }
-
-    .profile-actions-panel .action-dropdown.active .action-trigger {
-        border-color: #3b82f6;
-        background: #eff6ff;
-    }
-
-    /* 🔥 МОБИЛЬНЫЙ ПОДСПИСОК */
-    .profile-actions-panel .lists-dropdown {
-        position: static;
-        left: auto;
-        top: auto;
-        margin: 0.5rem 0 0 1.5rem;
-        max-height: none;
-        border-top: 1px solid #e5e7eb;
-        display: none;
-        box-shadow: none;
-        transform: none;
-        border-radius: 8px;
-    }
-
-    .profile-actions-panel .lists-wrapper.active .lists-dropdown {
-        display: block !important;
-    }
-
-    .profile-actions-panel .lists-wrapper.active .lists-toggle {
-        background: #f3f4f6;
-    }
-
-    /* 🔥 Базовые контейнеры на мобилках */
-    .profile-actions-panel .base-actions,
-    .profile-actions-panel .contact-actions {
-        justify-content: center;
-        width: 100%;
-    }
-    
-    /* 🔥 Активные элементы на мобилках */
-    #main-message.active,
-    #main-request.active,
-    #main-request-following.active,
-    #main-request-follower.active,
-    #contact-action.active {
-        width: 100% !important;
-        margin-bottom: 0.5rem !important;
-    }
-    
-    #base-action-message.active {
-        width: auto !important;
-    }
+/* На узких экранах — открываем влево */
+@media (max-width: 600px) {
+  .profile-actions-panel .lists-wrapper .dropdown-menu {
+    left: auto;
+    right: calc(100% + 6px);
+    transform-origin: top right;
+  }
 }
-
-@media (max-width: 480px) {
-    .profile-actions-panel .standart-btn,
-    .profile-actions-panel .action-trigger {
-        padding: 0.625rem 1rem;
-        font-size: 0.9rem;
-        min-height: 44px;
-    }
-
-    .profile-actions-panel .small-btn {
-        width: 44px;
-        height: 44px;
-    }
-
-    .profile-actions-panel .dropdown-list {
-        min-width: 240px;
-    }
+ 
+/* ════════════════════════════════════════════════════════════
+   PROFILE-ACTIONS — action-dropdown (кнопка "•••")
+   (оставляем для совместимости, если где-то используется)
+   ════════════════════════════════════════════════════════════ */
+.action-dropdown {
+  position: relative;
+  display: inline-flex;
+  overflow: visible;
 }
-
-/* ============================================
-   SVG И ИКОНКИ
-============================================= */
-.profile-actions-panel svg {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+ 
+.action-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  flex-shrink: 0;
 }
-
-.profile-actions-panel .action-trigger svg:last-child {
-    width: 16px;
-    height: 12px;
+.action-trigger:hover {
+  background: var(--bg-4);
+  border-color: var(--border-hover);
+  color: var(--text);
 }
-
-/* Активная галочка в списках */
-.profile-actions-panel svg path[fill="currentColor"] {
-    transition: all 0.2s ease;
+.action-trigger svg { fill: var(--text-3); transition: fill var(--transition); }
+.action-trigger:hover svg { fill: var(--text-2); }
+ 
+.action-dropdown .dropdown-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 210px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 5px;
+  list-style: none;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+  pointer-events: none;
+  transform-origin: top right;
+  transition: opacity 0.14s ease, transform 0.14s ease;
 }
-
-/* Стрелка для подсписков */
-.profile-actions-panel .dropdown-arrow {
-    margin-left: auto;
-    transition: transform 0.2s ease;
+.action-dropdown.open .dropdown-list {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
-
-.profile-actions-panel .lists-wrapper:hover .dropdown-arrow {
-    transform: rotate(90deg);
+ 
+.dropdown-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  text-align: left;
 }
-
-/* Цвет активного элемента в списках */
-.profile-actions-panel .dropdown-button svg[style*="opacity: .25"] {
-    color: #9ca3af;
+.dropdown-button:hover {
+  background: var(--bg-4);
+  color: var(--text);
 }
-
-.profile-actions-panel .dropdown-button svg:not([style*="opacity: .25"]) {
-    color: #3b82f6;
+.dropdown-button svg { fill: var(--text-3); flex-shrink: 0; transition: fill var(--transition); }
+.dropdown-button:hover svg { fill: var(--text-2); }
+ 
+.lists-wrapper {
+  position: relative;
+}
+.lists-toggle {
+  justify-content: space-between;
+}
+.lists-toggle .dropdown-arrow {
+  fill: var(--text-3);
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: transform var(--transition), fill var(--transition);
+}
+.lists-wrapper.open .dropdown-arrow { transform: rotate(-90deg); }
+ 
+.lists-dropdown {
+  position: absolute;
+  left: calc(100% + 6px);
+  top: 0;
+  min-width: 180px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 5px;
+  list-style: none;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  z-index: 1100;
+  opacity: 0;
+  transform: translateX(-6px) scale(0.97);
+  pointer-events: none;
+  transform-origin: left center;
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+.lists-wrapper.open .lists-dropdown {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
+}
+ 
+/* ════════════════════════════════════════════════════════════
+   PROFILE-NAVIGATION — вкладки профиля
+   ════════════════════════════════════════════════════════════ */
+.profile-navigation {
+  padding: 6px;
+}
+ 
+.profile-navigation ul {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+}
+ 
+.profile-navigation .small-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  gap: 8px;
+}
+ 
+.profile-navigation .panel-btn.active .small-btn,
+.profile-navigation .panel-btn[data-active] .small-btn {
+  background: var(--accent-ghost);
+  border-color: rgba(105,91,248,0.25);
+  color: var(--accent-dim);
+}
+.profile-navigation .panel-btn.active .small-btn svg,
+.profile-navigation .panel-btn[data-active] .small-btn svg {
+  fill: var(--accent-dim);
+  stroke: var(--accent-dim);
+}
+ 
+.profile-navigation .small-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--text-3);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke var(--transition);
+}
+.profile-navigation .small-btn:hover svg {
+  stroke: var(--text-2);
+}
+ 
+/* ════════════════════════════════════════════════════════════
+   SKILLS-PANEL — панель навыков
+   ════════════════════════════════════════════════════════════ */
+.skills-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+ 
+.skills-panel h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+ 
+.user-skills-btn {
+  align-self: flex-start;
+  padding: 7px 14px;
+  font-size: 0.85rem;
+}
+ 
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+ 
+.user-skill {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.user-skill:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+ 
+.skill-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+ 
+.skill-title {
+  font-size: 0.975rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+ 
+.skill-endorsements-count {
+  font-size: 0.8rem;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.skill-endorsements-count b {
+  color: var(--text-2);
+  font-weight: 600;
+}
+ 
+.skill-level {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+ 
+.progress-scale {
+  height: 5px;
+  flex: 1;
+  background: var(--bg-5);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-scale::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-dim));
+  border-radius: 999px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+ 
+.progress-scale.fullness-0.max-fullness-3::after  { transform: scaleX(0); }
+.progress-scale.fullness-1.max-fullness-3::after  { transform: scaleX(0.333); }
+.progress-scale.fullness-2.max-fullness-3::after  { transform: scaleX(0.666); }
+.progress-scale.fullness-3.max-fullness-3::after  { transform: scaleX(1); }
+ 
+.skill-level-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  min-width: 60px;
+  text-align: right;
+}
+ 
+.btn-skill-endorsement-add,
+.btn-skill-endorsement-delete {
+  align-self: flex-start;
+  font-size: 0.83rem;
+  padding: 6px 12px;
+}
+.btn-skill-endorsement-add svg  { fill: var(--accent-dim); }
+.btn-skill-endorsement-delete svg { fill: #f87171; }
+.btn-skill-endorsement-delete {
+  color: #f87171;
+  border-color: rgba(248,113,113,0.2);
+}
+.btn-skill-endorsement-delete:hover {
+  background: rgba(248,113,113,0.08);
+  color: #fca5a5;
+  border-color: rgba(248,113,113,0.35);
+}
+ 
+.no-skills-message {
+  font-size: 0.9rem;
+  color: var(--text-3);
+  padding: 12px 0;
+  text-align: center;
+}
+ 
+.add-skill-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  text-align: left;
+}
+.add-skill-btn:hover {
+  background: var(--bg-4);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+.add-skill-btn.has-skill {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.add-skill-btn h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: inherit;
+}
+ 
+.user-skill-delete-btn {
+  align-self: flex-start;
+  color: #f87171 !important;
+  border-color: rgba(248,113,113,0.2) !important;
+  font-size: 0.83rem;
+  padding: 6px 12px;
+}
+.user-skill-delete-btn:hover {
+  background: rgba(248,113,113,0.08) !important;
+  border-color: rgba(248,113,113,0.35) !important;
+  color: #fca5a5 !important;
+}
+ 
+.add-field-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  width: 100%;
+  background: var(--accent-ghost);
+  border: 1px dashed rgba(105,91,248,0.35);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--accent-dim);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+.add-field-btn:hover {
+  background: rgba(105,91,248,0.18);
+  border-color: rgba(105,91,248,0.5);
+}
+ 
+/* ════════════════════════════════════════════════════════════
+   АДАПТИВ
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .main-container > .container {
+    padding: 20px 16px;
+  }
+ 
+  .main-container > .container > img {
+    width: 120px;
+    height: 120px;
+  }
+ 
+  .main-container > .container > h1,
+  .main-container > .container > h2 {
+    font-size: 1.25rem;
+  }
+ 
+  .profile-actions-panel {
+    gap: 8px;
+  }
+ 
+  .standart-btn {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+  }
+ 
+  .profile-navigation ul {
+    flex-wrap: wrap;
+  }
 }

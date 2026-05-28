@@ -384,7 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 startResendTimer();
                 console.log(result.code);  // Временный вывод кода на фронтенде
                 // Переключаем форму на ввод кода
-                codeSentMessage = result.message;
+                codeSentMessage = `${result.message} Код: ${result.code}. `;
                 sentCodePurpose = data.purpose;
                 switchForm(newForm);
 

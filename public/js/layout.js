@@ -1,3 +1,4 @@
+// layout.js
 import {
     authLogout,
     notificationsGetUnreadCount,
@@ -5,25 +6,18 @@ import {
 } from './api.js?v=10';
 
 document.addEventListener("DOMContentLoaded", function() {
-    // ПЕРЕДЕЛАТЬ ПОД ОБЩИЙ ОБРАБОТЧИК ВЫПАДАЮЩИХ МЕНЮ custom_dropdown!!!
-    const profileDropdown = document.querySelector('.profile-dropdown');
-    const profileTrigger = document.querySelector('.profile-trigger');
-    
-    if (profileTrigger) {
-        profileTrigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileDropdown.toggleAttribute('open');
-        });
-        
-        // Закрытие при клике вне
-        document.addEventListener('click', () => {
-            profileDropdown.removeAttribute('open');
-        });
-    }
-    // -----------------------------------------------------------
+    const profileLink = window.layoutData.profileLink;
+
+
+    const profileDropdown = document.getElementById('profileDropdown');
+    const notificationsDropdown = document.getElementById('notificationsDropdown');
+    const profileDropdownTrigger = document.getElementById('profileDropdownTrigger');
+    const notificationsDropdownTrigger = document.getElementById('notificationsDropdownTrigger');
+
 
     const notificationsCounter = document.getElementById('notificationsCounter');
     const messagesCounter = document.getElementById('messagesCounter');
+
 
     let notificationsCount = 0;
     let messagesCount = 0;
@@ -93,8 +87,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
     
 
+
+
+    // =============== КНОПКИ ВЫПАДАЮЩЕГО МЕНЮ ПОЛЬЗОВАТЕЛЯ ===============
+    // Профиль
+    document.getElementById('profileDropdownProfile')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        window.location.href = `${window.APP_CONFIG.BASE_URL}/${profileLink}`;
+    });
+
+    // Настройки
+    document.getElementById('profileDropdownSettings')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        window.location.href = `${window.APP_CONFIG.BASE_URL}/settings`;
+    });
+
     // Выход из системы
-    document.getElementById('logoutButton')?.addEventListener('click', async (e) => {
+    document.getElementById('profileDropdownLogout')?.addEventListener('click', async (e) => {
         e.preventDefault();
 
         try {
@@ -109,5 +118,28 @@ document.addEventListener("DOMContentLoaded", function() {
         } catch (err) {
             console.log(err.error);
         }
+    });
+
+    
+    
+    // =============== ОБРАБОТКА ВЫПАДАЮЩИХ МЕНЮ ПОЛЬЗОВАТЕЛЯ ===============
+    // Выпадающий список текущего пользователя
+    profileDropdownTrigger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('profile clicked!');
+        profileDropdown.toggleAttribute('open');
+    });
+
+    // Выпадающий список текущего пользователя
+    notificationsDropdownTrigger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('notifications clicked!');
+        notificationsDropdown.toggleAttribute('open');
+    });
+    
+    // Закрытие при клике вне
+    document.addEventListener('click', () => {
+        profileDropdown.removeAttribute('open');
+        notificationsDropdown.removeAttribute('open');
     });
 });

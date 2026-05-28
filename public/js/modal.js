@@ -1,3 +1,4 @@
+// modal.js
 document.addEventListener('DOMContentLoaded', function() {
     let modalStack = [];  // Стек ID открытых окон
     
