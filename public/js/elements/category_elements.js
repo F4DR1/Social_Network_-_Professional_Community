@@ -1,8 +1,9 @@
+// category_elements.js
 document.addEventListener('DOMContentLoaded', function() {
 
     // Функция создания HTML карточки пользователя
     window.createUserHTML = function(user) {
-        const fullname = `${user.firstname} ${user.lastname}`;
+        const fullname = user.fullname ?? `${user.firstname} ${user.lastname}`;
         const linkname = user.linkname ?? `user${user.id}`;
         const photo = user.photo ?? `${window.APP_CONFIG.IMAGES}/empty.webp`;
         

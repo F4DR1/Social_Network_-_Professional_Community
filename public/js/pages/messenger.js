@@ -1,3 +1,4 @@
+// messenger.js
 import {
     usersGetById,
     messagesGet, messagesMarkRead, messagesSend,
@@ -421,9 +422,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const data = {
             type: chatSubType
         }
-        if (chatSubType === 'chat') data.chatId = activeChatId;
-        if (chatSubType === 'user') data.userId = chatSubId;
-        if (chatSubType === 'group') data.groupId = chatSubId;
+        switch (chatSubType) {
+            case 'chat':
+                data.chatId = activeChatId;
+                break;
+                
+            case 'user':
+                data.userId = chatSubId;
+                break;
+                
+            case 'group':
+                data.groupId = chatSubId;
+                break;
+        
+            default:
+                return;
+        }
         
         try {
             const result = await chatsGetInfo(data);

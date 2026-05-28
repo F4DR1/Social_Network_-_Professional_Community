@@ -98,6 +98,15 @@ export async function codesConfirm(data) {
 }
 
 
+// ========== ПОИСК ==========
+export async function searchesSearch(data) {
+    return apiRequest('/searches/search', {
+        method: 'POST',
+        body: data
+    });
+}
+
+
 // ========== УВЕДОМЛЕНИЯ ==========
 export async function notificationsGetUnreadCount() {
     return apiRequest(`/notifications/get/unread-count`, {

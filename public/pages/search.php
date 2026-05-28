@@ -15,14 +15,32 @@
 
 <div class="centered-container">
     <div class="container">
+        <h2>Результаты поиска</h2>
+        
+        <div class="search-result-list" id="searchResultList"></div>
+
+    </div>
+</div>
+
+
+<!-- Боковой контейнер (находится справа) -->
+<div class="right-container">
+    <div class="container">
         <h2>Поиск</h2>
 
-        <?php foreach ($sections as $section): ?>
-            <div class="category" id="<?= $section['type'] ?>">
-                <h3 class="title"><?= $section['title'] ?></h3>
-                <div class="list"></div>
-            </div>
-        <?php endforeach ?>
+        <div class="input-field">
+            <input type="search" id="searchInput">
+            <label>Текст для поиска</label>
+        </div>
+        
+        <div class="search-category-buttons-list" id="searchButtonsList">
+            <button class="button search-category-btn" data-category="users">
+                <span>Пользователи</span>
+            </button>
+            <button class="button search-category-btn" data-category="groups">
+                <span>Группы</span>
+            </button>
+        </div>
 
     </div>
 </div>

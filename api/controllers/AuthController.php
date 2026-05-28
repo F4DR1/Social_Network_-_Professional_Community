@@ -227,7 +227,7 @@
         }
         
         /**
-         * POST /register/validate
+         * POST /register-validate
          */
         public function registerValidate() {
             $data = json_decode(file_get_contents('php://input'), true);

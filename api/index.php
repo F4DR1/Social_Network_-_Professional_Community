@@ -77,6 +77,9 @@
     $router->add('POST', '/codes/send', 'CodeController', 'sendCode', $db, null);
     $router->add('POST', '/codes/confirm', 'CodeController', 'confirmCode', $db, null);
     
+    // ========== ПОИСК ==========
+    $router->add('POST', '/searches/search', 'SearchController', 'search', $db, $auth);
+    
     // ========== УВЕДОМЛЕНИЯ ==========
     $router->add('GET', '/notifications/get/unread-count', 'NotificationController', 'getUnreadCount', $db, $auth);
     
