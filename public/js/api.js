@@ -47,7 +47,7 @@ export async function authRegister(data) {
     });
 }
 export async function authRegisterDataValidate(data) {
-    return apiRequest('/register/validate', {
+    return apiRequest('/register-validate', {
         method: 'POST',
         body: data
     });

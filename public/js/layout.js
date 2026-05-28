@@ -6,6 +6,7 @@ import {
 } from './api.js?v=10';
 
 document.addEventListener("DOMContentLoaded", function() {
+    const userIsAuthorized = window.layoutData.userIsAuthorized;
     const profileLink = window.layoutData.profileLink;
 
 
@@ -75,15 +76,18 @@ document.addEventListener("DOMContentLoaded", function() {
     
     
 
-    // Обновляем данные через API
-    window.updateNotificationsCounter();
-    window.updateMessagesCounter();
+    // Начальная настройка счётчиков (только если авторизован)
+    if (userIsAuthorized) {
+        // Обновляем данные через API
+        window.updateNotificationsCounter();
+        window.updateMessagesCounter();
 
-    // Включаем автоматическое обновление данные через WS
-    if (window.socket)
-        setWebSocketHandlers();
-    else
-        document.addEventListener('socketReady', setWebSocketHandlers);
+        // Включаем автоматическое обновление данные через WS
+        if (window.socket)
+            setWebSocketHandlers();
+        else
+            document.addEventListener('socketReady', setWebSocketHandlers);
+    }
 
     
 
@@ -126,20 +130,18 @@ document.addEventListener("DOMContentLoaded", function() {
     // Выпадающий список текущего пользователя
     profileDropdownTrigger?.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('profile clicked!');
-        profileDropdown.toggleAttribute('open');
+        profileDropdown?.toggleAttribute('open');
     });
 
     // Выпадающий список текущего пользователя
     notificationsDropdownTrigger?.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('notifications clicked!');
-        notificationsDropdown.toggleAttribute('open');
+        notificationsDropdown?.toggleAttribute('open');
     });
     
     // Закрытие при клике вне
     document.addEventListener('click', () => {
-        profileDropdown.removeAttribute('open');
-        notificationsDropdown.removeAttribute('open');
+        profileDropdown?.removeAttribute('open');
+        notificationsDropdown?.removeAttribute('open');
     });
 });

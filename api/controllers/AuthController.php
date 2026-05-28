@@ -88,7 +88,7 @@
         /**
          * Валидация данных
          */
-        public static function validateData($db, $phone, $password, $lastname, $firstname) {
+        private static function validateData($db, $phone, $password, $lastname, $firstname) {
             // Валидация обязательных полей
             if (empty($phone) || empty($password) || empty($lastname) || empty($firstname)) {
                 Helpers::errorResponse('Телефон, пароль и имя обязательны');
@@ -231,15 +231,14 @@
          */
         public function registerValidate() {
             $data = json_decode(file_get_contents('php://input'), true);
-
+            
             $phone = $data['phone'] ?? null;
             $password = $data['password'] ?? null;
             $lastname = $data['lastname'] ?? null;
             $firstname = $data['firstname'] ?? null;
-            
+
             // Валидация обязательных полей
             self::validateData($this->db, $phone, $password, $lastname, $firstname);
-            
             Helpers::jsonResponse(['success' => true]);
         }
         

@@ -11,6 +11,8 @@
 
     $userToken = !empty($currentUser) ? $_COOKIE['auth_token'] : null;
     
+    $profileLink = '';
+
 
     // Обрабатываем каждый отдельно
     if (empty($layout)) $layout = Layout::Standart;  // Шаблон по умолчанию
@@ -45,10 +47,10 @@
             echo $title ?? $base_title;
         ?>
     </title>
-
     <link rel="icon" href="<?= API ?>/images/static/logotype.png" type="image/x-icon">
 
 
+    <!-- Конфиг -->
     <script>
         window.APP_CONFIG = <?= isset($clientConfig) ? json_encode($clientConfig, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) : json_encode([]) ?>;
     </script>
@@ -56,26 +58,29 @@
     
     <!-- Стартовые данные для layout -->
     <?php if ($layout === Layout::Standart): ?>
-        <!-- <link rel="stylesheet" href="<?= CSS_URL ?>/global.css?v=<?= time() ?>"> -->
-        <link rel="stylesheet" href="<?= CSS_URL ?>/layout_standart.css?v=<?= time() ?>">
         <link rel="stylesheet" href="<?= CSS_URL ?>/containers.css?v=<?= time() ?>">
-        <script>
-            window.layoutData = <?= json_encode([
-                'profileLink' => $profileLink
-            ]) ?>;
-        </script>
     <?php elseif ($layout === Layout::Mini): ?>
-        <link rel="stylesheet" href="<?= CSS_URL ?>/layout_mini.css?v=<?= time() ?>">
     <?php elseif ($layout === Layout::Micro): ?>
-        <link rel="stylesheet" href="<?= CSS_URL ?>/layout_micro.css?v=<?= time() ?>">
     <?php endif; ?>
 
+    
+    <!-- Данные для layout.js -->
+    <script>
+        window.layoutData = <?= json_encode([
+            'userIsAuthorized' => !empty($currentUser),
+            'profileLink' => $profileLink
+        ]) ?>;
+    </script>
+    
+
+    <!-- Разметка layout -->
+    <link rel="stylesheet" href="<?= CSS_URL ?>/layout.css?v=<?= time() ?>">
 
     <!-- Главные скрипты -->
     <script src="<?= JS_URL ?>/modal.js?v=<?= time() ?>" type="module"></script>
     <script src="<?= JS_URL ?>/layout.js?v=<?= time() ?>" type="module"></script>
 
-    <!-- Скрипты страницы -->
+    <!-- Скрипты и стили страницы -->
     <?php
         // Подгружаем скрипты
         if (isset($scripts) && $scripts > 0) {

@@ -153,8 +153,7 @@
         'pages/auth.js'
     ];
     $stylesheets = [
-        'pages/auth.css',
-        'elements/input_field.css'
+        'pages/auth.css'
     ];
     require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Mini;

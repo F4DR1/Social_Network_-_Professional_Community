@@ -1,7 +1,6 @@
 <?php
     require_once 'core/Helpers.php';
     require_once 'GroupController.php';
-    use Core\Redis;
 
     class ChatController {
         private $db;

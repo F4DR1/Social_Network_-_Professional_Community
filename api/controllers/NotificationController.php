@@ -1,6 +1,5 @@
 <?php
     require_once 'core/Helpers.php';
-    use Core\Redis;
 
     class NotificationController {
         private $db;
