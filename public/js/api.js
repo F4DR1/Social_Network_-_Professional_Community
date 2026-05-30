@@ -1,3 +1,4 @@
+// api.js
 // Универсальная функция для всех AJAX запросов
 async function apiRequest(endpoint, options = {}) {
     const url = `${window.APP_CONFIG.API}${endpoint}`;

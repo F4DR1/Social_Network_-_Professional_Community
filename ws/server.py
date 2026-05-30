@@ -5,6 +5,9 @@ import aiohttp
 import json
 from typing import Optional, List, Dict, Set
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import redis.asyncio as redis
 import websockets
 from websockets.server import WebSocketServerProtocol
@@ -19,7 +22,7 @@ REDIS_PORT = int(os.getenv('REDIS_PORT', '6379'))
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', None)
 REDIS_CHANNEL = 'events'
 
-WS_HOST = os.getenv('WS_HOST', 'localhost')
+WS_HOST = os.getenv('WS_HOST', '127.0.0.1')
 WS_PORT = int(os.getenv('WS_PORT', '8765'))
 
 API_KEY = os.getenv('API_KEY', '123456')
@@ -240,6 +243,7 @@ async def redis_listener():
             port=REDIS_PORT,
             password=REDIS_PASSWORD,
             decode_responses=True,
+            protocol=2,
         )
         pubsub = r.pubsub()
         await pubsub.subscribe(REDIS_CHANNEL)
