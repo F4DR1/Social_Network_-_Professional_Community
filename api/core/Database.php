@@ -6,10 +6,10 @@
          * При создании объекта сразу подключаемся к БД
          */
         public function __construct() {
-            $host = 'localhost';
-            $dbname = 'social_network_pc';
-            $user = 'root';
-            $pass = '';
+            $host = env('DATABASE_HOST') ?: 'localhost';
+            $dbname = env('DATABASE_NAME') ?: 'social_network_pc';
+            $user = env('DATABASE_USER') ?: 'root';
+            $pass = env('DATABASE_PASSWORD') ?: '';
             
             try {
                 $this->pdo = new PDO(

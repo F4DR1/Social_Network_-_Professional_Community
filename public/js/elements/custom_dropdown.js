@@ -1,3 +1,4 @@
+// custom_dropdown.js
 document.addEventListener('DOMContentLoaded', function() {
 
     // Функция создания кастомного выпадающего списка с выбором элемента
@@ -32,4 +33,43 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
     }
 
+    
+
+    // Закрытие dropdown при клике вне их
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.custom-dropdown.open').forEach(d => {
+            d.classList.remove('open');
+        });
+    });
+    
+    // Открытие dropdown (можно переназначить)
+    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+        const trigger = dropdown.querySelector('.dropdown-trigger');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        
+        // Удаляем старые обработчики, чтобы не дублировать
+        trigger.replaceWith(trigger.cloneNode(true));
+        const newTrigger = dropdown.querySelector('.dropdown-trigger');
+        
+        // Открытие/закрытие
+        newTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Закрыть все другие открытые dropdown
+            document.querySelectorAll('.custom-dropdown.open').forEach(d => {
+                if (d !== dropdown) d.classList.remove('open');
+            });
+            dropdown.classList.toggle('open');
+        });
+        
+        // Выбор пункта
+        const items = dropdown.querySelectorAll('.dropdown-menu li');
+        items.forEach(item => {
+            item.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                
+                // Закрыть dropdown
+                dropdown.classList.remove('open');
+            });
+        });
+    });
 });

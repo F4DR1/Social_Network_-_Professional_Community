@@ -8,24 +8,25 @@
         return $_ENV[$key] ?? $default;
     }
     
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(E_ALL);  // Ошибки будут писаться в лог, но не в браузер
+    
 
     require_once 'core/Helpers.php';
 
-    
+
     // Разрешаем запросы только с конкретного домена
     $allowedOrigin = 'https://' . Helpers::getMainDomain();
     if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] === $allowedOrigin) {
         header("Access-Control-Allow-Origin: " . $allowedOrigin);
-        header("Access-Control-Allow-Credentials: true");
-        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization");
     } else {
         // Разрешаем запросы с любого сайта (для разработки)
         header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Credentials: true");
-        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization");
     }
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 
     // Для preflight запросов OPTIONS
@@ -61,8 +62,8 @@
     // ========== АВТОРИЗАЦИЯ ==========
     $router->add('POST', '/logout', 'AuthController', 'logout', $db, null);
     $router->add('POST', '/login', 'AuthController', 'login', $db, null);
+    $router->add('POST', '/register-validate', 'AuthController', 'registerValidate', $db, null);
     $router->add('POST', '/register', 'AuthController', 'register', $db, null);
-    $router->add('POST', '/register/validate', 'AuthController', 'registerValidate', $db, null);
     $router->add('POST', '/auth/check', 'AuthController', 'check', $db, null);
     
     // ========== СЕССИИ ==========
@@ -75,6 +76,9 @@
     // ========== КОДЫ ==========
     $router->add('POST', '/codes/send', 'CodeController', 'sendCode', $db, null);
     $router->add('POST', '/codes/confirm', 'CodeController', 'confirmCode', $db, null);
+    
+    // ========== ПОИСК ==========
+    $router->add('POST', '/searches/search', 'SearchController', 'search', $db, $auth);
     
     // ========== УВЕДОМЛЕНИЯ ==========
     $router->add('GET', '/notifications/get/unread-count', 'NotificationController', 'getUnreadCount', $db, $auth);

@@ -1,3 +1,4 @@
+// api.js
 // Универсальная функция для всех AJAX запросов
 async function apiRequest(endpoint, options = {}) {
     const url = `${window.APP_CONFIG.API}${endpoint}`;
@@ -47,7 +48,7 @@ export async function authRegister(data) {
     });
 }
 export async function authRegisterDataValidate(data) {
-    return apiRequest('/register/validate', {
+    return apiRequest('/register-validate', {
         method: 'POST',
         body: data
     });
@@ -92,6 +93,15 @@ export async function codesSend(data) {
 }
 export async function codesConfirm(data) {
     return apiRequest('/codes/confirm', {
+        method: 'POST',
+        body: data
+    });
+}
+
+
+// ========== ПОИСК ==========
+export async function searchesSearch(data) {
+    return apiRequest('/searches/search', {
         method: 'POST',
         body: data
     });

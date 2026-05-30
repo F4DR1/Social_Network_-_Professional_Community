@@ -1,4 +1,7 @@
-import { fileUpload } from '../api.js';
+// files_uploads.js
+import {
+    fileUpload
+} from '../api.js';
 
 document.addEventListener('DOMContentLoaded', function() {
 

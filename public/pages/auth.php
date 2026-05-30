@@ -40,11 +40,11 @@
             <div id="loginForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input type="text" id="loginLogin" name="login" required autocomplete="username">
+                        <input type="text" id="loginLogin" required autocomplete="username">
                         <label>Телефон или email</label>
                     </div>
                     <div class="input-field">
-                        <input type="password" id="loginPassword" name="password" required autocomplete="current-password">
+                        <input type="password" id="loginPassword" required autocomplete="current-password">
                         <label>Пароль</label>
                     </div>
                 </div>
@@ -64,19 +64,19 @@
             <div id="registerForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input type="text" id="registerLogin" name="login" inputmode="numeric" pattern="^\+7[1-9]{10}$" required autocomplete="username">
+                        <input type="text" id="registerLogin" inputmode="numeric" pattern="^\+7[1-9]{10}$" required autocomplete="username">
                         <label class="required">Телефон</label>
                     </div>
                     <div class="input-field">
-                        <input type="password" id="registerPassword" name="password" required autocomplete="new-password" minlength="6">
+                        <input type="password" id="registerPassword" required autocomplete="new-password" minlength="6">
                         <label class="required">Пароль</label>
                     </div>
                     <div class="input-field">
-                        <input type="text" id="registerFirstname" name="firstname" required autocomplete="given-name">
+                        <input type="text" id="registerFirstname" required autocomplete="given-name">
                         <label class="required">Имя</label>
                     </div>
                     <div class="input-field">
-                        <input type="text" id="registerLastname" name="lastname" required autocomplete="family-name">
+                        <input type="text" id="registerLastname" required autocomplete="family-name">
                         <label class="required">Фамилия</label>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
             <div id="recoveryForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input type="text" id="recoveryLogin" name="login" required autocomplete="username">
+                        <input type="text" id="recoveryLogin" required autocomplete="username">
                         <label>Телефон или email</label>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
             <div id="codeForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input type="text" id="codeInput" name="code" required autocomplete="code">
+                        <input type="text" id="codeInput" required autocomplete="one-time-code">
                         <label>Код</label>
                     </div>
                 </div>
@@ -153,8 +153,7 @@
         'pages/auth.js'
     ];
     $stylesheets = [
-        'pages/auth.css',
-        'elements/input_field.css'
+        'pages/auth.css'
     ];
     require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Mini;

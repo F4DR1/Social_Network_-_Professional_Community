@@ -58,8 +58,7 @@
     $stylesheets = [
         'elements/category.css',
         'elements/group_card.css',
-        'elements/group_create.css',
-        'elements/input_field.css'
+        'elements/group_create.css'
     ];
     require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;

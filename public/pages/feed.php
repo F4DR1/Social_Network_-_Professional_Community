@@ -1,6 +1,9 @@
 <?php
+    // feed.php
     require_once __DIR__ . '/../bootstrap.php';
+    require_once INCLUDES_PATH . '/init.php';
     require_once INCLUDES_PATH . '/elements.php';
+    global $currentUserId;
     
     ob_start();
 ?>
@@ -9,12 +12,19 @@
 
 <div class="centered-container">
     <?= postCreationField(); ?>
-    <?= postsPanel('Лента'); ?>
+    <?= postsPanel('Лента новостей'); ?>
 </div>
     
     
 <script>
     window.appData = <?= json_encode([
+        'postsType' => 'feed'
+    ]) ?>;
+</script>
+<script>
+    window.appData = <?= json_encode([
+        'path' => PATH,
+        'currentUserId' => $currentUserId,
         'postsType' => 'feed'
     ]) ?>;
 </script>
@@ -25,11 +35,13 @@
     $content = ob_get_clean();
     $title = 'Лента новостей';
     $scripts = [
+        'elements/files_upload.js',
         'elements/posts.js'
     ];
     $stylesheets = [
-        'elements/post_create.css',
-        'elements/post.css'
+        'elements/files_upload.css',
+        'elements/posts.css',
+        'elements/post_create.css'
     ];
     require_once ENUMS_PATH . '/layout.php';
     $layout = Layout::Standart;

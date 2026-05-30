@@ -1,3 +1,4 @@
+// socket_manager.js
 class SocketManager {
     constructor() {
         this.ws = null;                     // Здесь будет сам объект WebSocket
@@ -20,7 +21,8 @@ class SocketManager {
     // Подключиться и подписаться на чаты
     connect(token) {
         this.close();  // Закрываем старое соединение, если было
-        const wsUrl = `ws://localhost:8765`;
+        // const wsUrl = `wss://ws.xn--h1aakjefb7a.xn--p1ai/ws/`;  // Продакшен-подключение
+        const wsUrl = `ws://localhost:8765`;  // Локальное подключение
         this.ws = new WebSocket(wsUrl);
 
         // Соединение установлено

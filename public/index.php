@@ -9,6 +9,9 @@
     $route = $_GET['route'] ?? '';
     $route = trim($route, '/');
     unset($_GET['route']); // чтобы не мешался в дальнейшем
+
+
+    $returnUrl = $_GET['return_url'] ?? BASE_URL;
     
 
     // Разбираем route на сегменты (например, 'feed' или 'user123')
@@ -53,6 +56,7 @@
                 
                 $form = $route;  // Передаём активную форму
                 $_GET['form'] = $form;
+                $_GET['return_url'] = $returnUrl;
                 include PAGES_PATH . '/auth.php';
                 break;
             default:

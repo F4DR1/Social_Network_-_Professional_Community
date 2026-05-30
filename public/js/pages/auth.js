@@ -353,6 +353,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Проверить доступность данных для регистрации
+    async function validateRegisterDataAPI(message) {
+        const data = {
+            phone: registerLogin.value,
+            password: registerPassword.value,
+            firstname: registerFirstname.value,
+            lastname: registerLastname.value
+        };
+
+        try {
+            const result = await authRegisterDataValidate(data);
+
+            if (result.success) {
+                clearMessages();
+                sendCodeAPI(registerMessage);
+
+            } else {
+                setMessage(message, result.error || 'Ошибка регистрации', 'error');
+            }
+
+        } catch (err) {
+            setMessage(message, err, 'error');
+        }
+    }
+
     // Отправить код
     async function sendCodeAPI(message) {
         const currentForm = authContainer.dataset.currentForm;
@@ -384,7 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 startResendTimer();
                 console.log(result.code);  // Временный вывод кода на фронтенде
                 // Переключаем форму на ввод кода
-                codeSentMessage = result.message;
+                codeSentMessage = `${result.message} Код: ${result.code}. `;
                 sentCodePurpose = data.purpose;
                 switchForm(newForm);
 
@@ -429,31 +454,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     default:
                         return;
                 }
-            } else {
-                setMessage(message, result.error || 'Ошибка регистрации', 'error');
-            }
-
-        } catch (err) {
-            setMessage(message, err, 'error');
-        }
-    }
-
-    // Проверить доступность данных для регистрации
-    async function validateRegisterDataAPI(message) {
-        const data = {
-            phone: registerLogin.value,
-            password: registerPassword.value,
-            firstname: registerFirstname.value,
-            lastname: registerLastname.value
-        };
-
-        try {
-            const result = await authRegisterDataValidate(data);
-
-            if (result.success) {
-                clearMessages();
-                sendCodeAPI(registerMessage);
-
             } else {
                 setMessage(message, result.error || 'Ошибка регистрации', 'error');
             }

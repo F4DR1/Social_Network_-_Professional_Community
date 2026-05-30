@@ -1,3 +1,4 @@
+// user_profile.js
 import {
     relationshipsSubscribe, relationshipsUnsubscribe,
     skillLevelsGet, skillsGet,
@@ -11,6 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    const profilePath = window.appData.path;
+
     const currentUserId = window.appData.currentUserId;
     const userId = window.appData.userId;
     const panel = window.appData.panel;
@@ -34,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
 
+    //=============== МОДАЛЬНЫЕ ОКНА ===============
     // Создание модального окна добавления навыка пользователя
     function createAddSkillPanel(id, closeBtnId) {
         createModalHTML(id, `
@@ -68,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     
+    //=============== РАЗМЕТКА ДОБАВЛЕНИЯ НАВЫКОВ ===============
     // Возвращает HTML навыка в панели добавления навыка из данных
     function createElementAddSkillPanel(skill) {
         const skillId = skill.id;
@@ -121,6 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+    //=============== РАЗМЕТКА РЕДАКТИРОВАНИЯ НАВЫКОВ ===============
     // Возвращает HTML навыка в панели редактирования навыков пользователя из данных
     function createElementEditUserSkillPanel(skill) {
         let userSkillId = skill.user_skill_id;
@@ -242,17 +248,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         });
-        
-        // Закрытие dropdown при клике вне их
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.custom-dropdown.open').forEach(d => {
-                d.classList.remove('open');
-            });
-        });
     }
 
 
 
+    //=============== РАЗМЕТКА НАВЫКОВ ПОЛЬЗОВАТЕЛЯ ===============
     // Возвращает HTML навыка в панели навыков на странице пользователя из данных
     function createElementUserSkills(skill) {
         let userSkillId = skill.user_skill_id;
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     
-    //=============== НАВЫКИ ===============
+    //=============== API ===============
     // Получить навыки пользователя
     async function getUserSkillsAPI() {
         const data = {};
@@ -602,8 +602,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+
+
     if (userId != currentUserId) {
-        // Кнопки заявок
+        // =============== КНОПКИ В ЧУЖОМ ПРОФИЛЕ ===============
+        document.getElementById("mainMessageUserButton")?.addEventListener("click", (e) => {
+            // Написать пользователю
+            e.preventDefault();
+            window.location.href = `${window.APP_CONFIG.BASE_URL}/msg?type=user&id=${userId}`;
+        });
+        document.getElementById("baseMessageUserButton")?.addEventListener("click", (e) => {
+            // Написать пользователю
+            e.preventDefault();
+            window.location.href = `${window.APP_CONFIG.BASE_URL}/msg?type=user&id=${userId}`;
+        });
         document.getElementById("followButton")?.addEventListener("click", (e) => {
             // Отправить заявку
             e.preventDefault();
@@ -624,5 +636,31 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             subscribeAPI(false);
         });
+
+    } else {
+        // =============== КНОПКИ В СВОЁМ ПРОФИЛЕ ===============
+        document.getElementById("selfEditProfile")?.addEventListener("click", (e) => {
+            // Написать пользователю
+            e.preventDefault();
+            window.location.href = `${window.APP_CONFIG.BASE_URL}/edit-profile`;
+        });
+        document.getElementById("selfSettings")?.addEventListener("click", (e) => {
+            // Написать пользователю
+            e.preventDefault();
+            window.location.href = `${window.APP_CONFIG.BASE_URL}/settings`;
+        });
     }
+    
+
+    // =============== КНОПКИ В ЛЮБОМ ПРОФИЛЕ ===============
+    document.getElementById("postsNavigationButton")?.addEventListener("click", (e) => {
+        // Написать пользователю
+        e.preventDefault();
+        window.location.href = `${profilePath}`;
+    });
+    document.getElementById("skillsNavigationButton")?.addEventListener("click", (e) => {
+        // Написать пользователю
+        e.preventDefault();
+        window.location.href = `${profilePath}?p=skills`;
+    });
 });
