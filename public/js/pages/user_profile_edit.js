@@ -1,6 +1,6 @@
 import {
-    groupsEdit
-} from '../api.js';
+    updateUserProfile
+} from '../api.js?v=20';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Проверяем, есть ли данные
@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Базовые данные
-    const groupPath = window.appData.groupPath;
-    const groupId = window.appData.groupId;
+    const userPath = window.appData.userPath;
+    const userId = window.appData.userId;
 
 
 
@@ -19,16 +19,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     
-    const groupBackBtn = document.getElementById('groupPath');
-    const editGroupDataCategoryBtnsPanel = document.getElementById('editGroupDataCategoryButtonsPanel');
-    const editGroupDataPanel = document.getElementById('editGroupDataPanel');
+    const userBackBtn = document.getElementById('userPath');
+    const editUserDataCategoryBtnsPanel = document.getElementById('editUserDataCategoryButtonsPanel');
+    const editProfileDataPanel = document.getElementById('editProfileDataPanel');
 
 
     // Название категории
-    const categoryTitle = editGroupDataPanel.querySelector('.container-title');
+    const categoryTitle = editProfileDataPanel.querySelector('.container-title');
 
     // Панель сообщения
-    const messagePanel = editGroupDataPanel.querySelector('.message-panel');
+    const messagePanel = editProfileDataPanel.querySelector('.message-panel');
     const messageIcon = messagePanel.querySelector('.message-icon');
     const messageTitle = messagePanel.querySelector('.message-title');
     const messageText = messagePanel.querySelector('.message-text');
@@ -36,10 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
     // Элементы базовой категории
-    const mainDataCategoryBtn = editGroupDataCategoryBtnsPanel.querySelector('.category-main')
-    const mainDataPanel = editGroupDataPanel.querySelector('.main-data');
-    const groupName = mainDataPanel.querySelector('.group-name');
-    const groupLinkname = mainDataPanel.querySelector('.group-linkname');
+    const mainDataCategoryBtn = editUserDataCategoryBtnsPanel.querySelector('.category-main')
+    const mainDataPanel = editProfileDataPanel.querySelector('.main-data');
+    const userLinkname = mainDataPanel.querySelector('.user-linkname');
 
 
 
@@ -104,11 +103,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =============== API ===============
     // Отправить данные на скрипт
-    async function editGroupDataAPI() {
+    async function editUserDataAPI() {
         setMessageVisible(false);
         
         const data = {
-            groupId: groupId,
+            userId: userId,
             category: currentCategory
         };
 
@@ -118,8 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'base':
                 successMsg = 'Основная информация была обновлена.';
                 const baseInfo = {
-                    name: groupName.value,
-                    linkname: groupLinkname.value === '' ? `group${groupId}` : groupLinkname.value
+                    linkname: userLinkname.value === '' ? `user${userId}` : userLinkname.value
                 };
                 data.base = JSON.stringify(baseInfo);
                 break;
@@ -129,13 +127,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const result = await groupsEdit(data);
+            const result = await updateUserProfile(data);
 
             if (result.success) {
                 updateMessage(successMsg, 'success');
                 if (currentCategory === 'base') {
-                    groupLinkname.value = result.linkname;
-                    groupBackBtn.href = result.linkname;
+                    userLinkname.value = result.linkname;
+                    userBackBtn.href = result.linkname;
                     
                     // Устанавливаем новый адрес (без поддержки истории)
                     const pathParts = window.location.pathname.split('/');
@@ -161,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Сохранение данных группы
     document.getElementById('saveData').addEventListener('click', (e) => {
         e.preventDefault();
-        editGroupDataAPI();
+        editUserDataAPI();
     });
 
     mainDataCategoryBtn.addEventListener('click', (e) => {

@@ -85,7 +85,7 @@
                         device_type,
                         ip_address,
                         last_activity,
-                        created_at 
+                        created_at
                     FROM
                         sessions 
                     WHERE

@@ -314,30 +314,43 @@
                         END AS chat_photo,
                         c.is_private,
                         COALESCE(unread.cnt, 0) AS unread_count,
+                        last_msg.sender_id AS last_message_sender_id,
                         last_msg.text AS last_message_text,
                         last_msg.sent_at AS last_message_time,
                         last_user.id AS last_message_author_id,
                         CONCAT(last_user.firstname, ' ', last_user.lastname) AS last_message_author_name,
-                        last_user_photo.file_path AS last_message_author_photo
+                        last_user_photo.file_path AS last_message_author_photo,
+                        COALESCE(last_reads.reads_count, 0) AS last_message_reads_count
                     FROM
                         chats c
                         INNER JOIN chat_members cm ON c.id = cm.chat_id AND cm.user_id = ?
                         LEFT JOIN (
-                            SELECT chat_id, COUNT(*) AS cnt
-                            FROM chat_messages cm2
-                            WHERE NOT EXISTS (
-                                SELECT 1 FROM chat_message_reads mr 
-                                WHERE mr.message_id = cm2.id AND mr.user_id = ?
-                            )
-                            GROUP BY chat_id
+                            SELECT
+                                chat_id,
+                                COUNT(*) AS cnt
+                            FROM
+                                chat_messages cm2
+                            WHERE
+                                cm2.sender_id != ?
+                                AND
+                                NOT EXISTS (
+                                    SELECT 1 FROM chat_message_reads mr 
+                                    WHERE mr.message_id = cm2.id AND mr.user_id = ?
+                                )
+                            GROUP BY
+                                chat_id
                         ) unread ON unread.chat_id = c.id
                         LEFT JOIN (
-                            SELECT cm3.chat_id, cm3.text, cm3.sent_at, cm3.sender_id
+                            SELECT cm3.id, cm3.chat_id, cm3.text, cm3.sent_at, cm3.sender_id
                             FROM chat_messages cm3
                             INNER JOIN (
-                                SELECT chat_id, MAX(id) AS max_id
-                                FROM chat_messages
-                                GROUP BY chat_id
+                                SELECT
+                                    chat_id,
+                                    MAX(id) AS max_id
+                                FROM
+                                    chat_messages
+                                GROUP
+                                    BY chat_id
                             ) last_ids ON cm3.chat_id = last_ids.chat_id AND cm3.id = last_ids.max_id
                         ) last_msg ON last_msg.chat_id = c.id
                         LEFT JOIN users last_user ON last_user.id = last_msg.sender_id
@@ -347,16 +360,31 @@
                         LEFT JOIN chat_members cm2 ON c.id = cm2.chat_id AND cm2.user_id != ? AND c.is_private = 1
                         LEFT JOIN users other_user ON other_user.id = cm2.user_id
                         LEFT JOIN files other_user_photo ON other_user.photo_id = other_user_photo.id
+                        -- Подсчёт прочтений последнего сообщения
+                        LEFT JOIN (
+                            SELECT
+                                message_id,
+                                COUNT(*) AS reads_count
+                            FROM
+                                chat_message_reads
+                            GROUP BY
+                                message_id
+                        ) last_reads ON last_reads.message_id = last_msg.id
                     ORDER BY
                         last_msg.sent_at DESC
                 ",
-                [$currentUserId, $currentUserId, $currentUserId]
+                [$currentUserId, $currentUserId, $currentUserId, $currentUserId]
             );
 
             foreach ($chats as &$chat) {
                 // Проставляем полные URL для фото
                 $chat['chat_photo'] = Helpers::fileUrl($chat['chat_photo'] ?? Helpers::imagePlaceholder(($chat['is_private'] ? 'user' : 'chat')));
                 $chat['last_message_author_photo'] = Helpers::fileUrl($chat['last_message_author_photo'] ?? Helpers::imagePlaceholder('user'));
+
+                // Счётчик прочтений показываем только автору последнего сообщения
+                if ($chat['last_message_author_id'] != $currentUserId) {
+                    unset($chat['last_message_reads_count']);
+                }
             }
             unset($chat);
             

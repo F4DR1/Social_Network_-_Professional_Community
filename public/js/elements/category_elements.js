@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="group-panel">
                 <img src="${photo}" alt="${fullname}" width=80>
                 <a href="${linkname}" class="name-line">${fullname}</a>
-                <a href="messages?type=user&id=${user.id}" class="message-line">Написать сообщение</a>
+                <a href="msg?type=user&id=${user.id}" class="message-line">Написать сообщение</a>
             </div>
         `
     }
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="group-panel">
                 <img src="${photo}" alt="${name}" width=80>
                 <a href="${linkname}" class="name-line">${name}</a>
-                <a href="messages?type=group&id=${group.id}" class="message-line">Написать в чат группы</a>
+                <a href="msg?type=group&id=${group.id}" class="message-line">Написать в чат группы</a>
             </div>
         `
     }

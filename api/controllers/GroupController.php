@@ -29,20 +29,56 @@
                 ",
                 [$groupId, $currentUserId]
             );
-            if (!$isMember) {
-                Helpers::errorResponse('Вы не являетесь участником этой группы', 403);
-            }
+            if (!$isMember) Helpers::errorResponse('Вы не являетесь участником этой группы', 403);
         }
-        
+
+        /**
+         * Проверяет является ли пользователь администратором группы
+         */
+        public static function checkIsAdmin($db, $groupId, $currentUserId) {
+            $adminRoles = Helpers::getGroupAdminRoles();
+            $adminRolesNames = $adminRoles['names'];
+            $isAdmin = $db->fetchOne("
+                    SELECT 1
+                    FROM
+                        group_members gm
+                        INNER JOIN
+                            group_roles gr ON gm.role_id = gr.id
+                    WHERE
+                        gm.group_id = ?
+                        AND
+                        gm.user_id = ?
+                        AND
+                        gr.name IN ($adminRolesNames)
+                    LIMIT 1
+                ",
+                array_merge([$groupId, $currentUserId], $adminRoles['roles'])
+            );
+            if (!$isAdmin) return false;
+            return true;
+        }
+
 
 
         /**
-         * Общий обработчик поиска группы
+         * Выполняет запрос группы по переданному условию и параметрам,
+         * затем обрабатывает и отпраляет ответ.
          */
-        private function getGroup($group) {
-            if (!$group) {
-                Helpers::errorResponse('Группа не найдена', 404);
-            }
+        private function fetchGroup(string $where, array $params): void {
+            $sql = "
+                SELECT
+                    g.id,
+                    g.linkname,
+                    g.name,
+                    f.file_path AS photo
+                FROM
+                    `groups` g
+                    LEFT JOIN files f ON f.id = g.photo_id
+                WHERE
+                    $where
+            ";
+            $group = $this->db->fetchOne($sql, $params);
+            if (!$group) Helpers::errorResponse('Группа не найдена', 404);
             
             $group['photo'] = Helpers::fileUrl($group['photo'] ?? Helpers::imagePlaceholder('group'));
             
@@ -51,50 +87,56 @@
 
         
 
+
+
         /**
          * GET /groups/{group_id} - получить данные группы по id
          */
         public function getGroupById($groupId) {
             Helpers::validateGroupId($groupId);
-
-            $group = $this->db->fetchOne("
-                    SELECT
-                        g.id,
-                        g.linkname,
-                        g.name,
-                        f.file_path AS photo
-                    FROM
-                        `groups` g
-                        LEFT JOIN files f ON f.id = g.photo_id
-                    WHERE
-                        g.id = ?
-                ",
-                [$groupId]
-            );
-            $this->getGroup($group);
+            $this->fetchGroup('g.id = ?', [$groupId]);
         }
         
         /**
          * GET /groups/{linkname} - получить данные группы по linkname
          */
         public function getGroupByLinkname($linkname) {
-            $group = $this->db->fetchOne("
-                    SELECT
-                        g.id,
-                        g.linkname,
-                        g.name,
-                        f.file_path AS photo
-                    FROM
-                        `groups` g
-                        LEFT JOIN files f ON f.id = g.photo_id
-                    WHERE
-                        g.linkname = ?
-                ",
-                [$linkname]
-            );
-            $this->getGroup($group);
+            $this->fetchGroup("g.linkname = ?", [$linkname]);
         }
         
+        
+        /**
+         * GET /groups/members/{group_id} - получить список участников группы
+         */
+        public function members($groupId) {
+            Helpers::validateGroupId($groupId);
+
+            $members = $this->db->fetchAll("
+                    SELECT
+                        u.id,
+                        u.linkname,
+                        u.firstname,
+                        f.file_path AS photo
+                    FROM
+                        group_members gm 
+                        INNER JOIN users u ON gm.user_id = u.id
+                        LEFT JOIN files f ON f.id = u.photo_id
+                    WHERE
+                        gm.group_id = ?
+                ",
+                [$groupId]
+            );
+
+            // Преобразуем относительные пути в полные URL
+            foreach ($members as &$member) {
+                $member['photo'] = Helpers::fileUrl($member['photo'] ?? Helpers::imagePlaceholder('user'));
+            }
+            unset($member);
+            
+            Helpers::jsonResponse(['success' => true, 'members' => $members]);
+        }
+        
+
         /**
          * GET /groups/list/{user_id} - получаем списки групп пользователя
          */
@@ -164,218 +206,9 @@
             Helpers::validateGroupId($groupId);
             Helpers::validateUserId($userId);
 
-            
-            $adminRoles = Helpers::getGroupAdminRoles();
-            $adminRolesNames = $adminRoles['names'];
-            
-            $isAdmin = $this->db->fetchOne("
-                    SELECT 1
-                    FROM
-                        group_members gm
-                        INNER JOIN
-                            group_roles gr ON gm.role_id = gr.id
-                    WHERE
-                        gm.group_id = ?
-                        AND
-                        gm.user_id = ?
-                        AND
-                        gr.name IN ($adminRolesNames)
-                    LIMIT 1
-                ",
-                array_merge([$groupId, $userId], $adminRoles['roles'])
-            );
+            $isAdmin = self::checkIsAdmin($this->db, $groupId, $userId);
 
-            Helpers::jsonResponse(['success' => true, 'isAdmin' => !empty($isAdmin)]);
-        }
-        
-        /**
-         * POST /groups/create - создать группу
-         */
-        public function createGroup() {
-            $this->auth->check();
-            $currentUser = $this->auth->getCurrentUser();
-            
-            $data = json_decode(file_get_contents('php://input'), true);
-            $groupName = $data['name'];
-
-            // Валидация входных данных
-            if (empty($groupName) || strlen($groupName) < 4) {
-                Helpers::errorResponse('Название группы должно содержать минимум 4 символа', 400);
-                return;
-            }
-
-            try {
-                $this->db->beginTransaction();
-
-                $this->db->query("
-                        INSERT INTO `groups` (name, created_at) 
-                        VALUES (?, NOW())
-                    ",
-                    [$groupName]
-                );
-                
-                $groupId = $this->db->lastInsertId();
-
-                $role = $this->db->fetchOne("
-                        SELECT
-                            id
-                        FROM
-                            group_roles
-                        WHERE
-                            name = ?
-                    ",
-                    ['owner']
-                );
-
-                if (!$role) {
-                    throw new Exception('Роль "owner" не найдена');
-                }
-
-                $this->db->query("
-                        INSERT INTO group_members (group_id, user_id, role_id, joined_at) 
-                        VALUES (?, ?, ?, NOW())
-                    ",
-                    [$groupId, $currentUser['id'], $role['id']]
-                );
-
-                $this->db->commit();
-                Helpers::jsonResponse(['success' => true, 'groupId' => $groupId]);
-
-            } catch (Exception $e) {
-                $this->db->rollBack();
-                Helpers::errorResponse('Ошибка создания группы: ' . $e->getMessage(), 500);
-            }
-        }
-        
-        /**
-         * POST /groups/edit - редактировать группу
-         */
-        public function editGroup() {
-            $this->auth->check();
-            $currentUserId = $this->auth->getCurrentUser()['id'];
-
-            
-            $data = json_decode(file_get_contents('php://input'), true);
-            $groupId = $data['groupId'] ?? null;
-            $category = $data['category'] ?? null;
-            $valueJson = $data['value'] ?? null;
-            
-            
-            $value = json_decode($valueJson, true);
-            if (!$value) {
-                Helpers::errorResponse('Неверные данные', 400);
-            }
-            Helpers::validateGroupId($groupId);
-
-
-            // Проверка админ ли группы
-            $adminRoles = Helpers::getGroupAdminRoles();
-            $adminRolesNames = $adminRoles['names'];
-            $isAdmin = $this->db->fetchOne("
-                    SELECT 1
-                    FROM
-                        group_members gm
-                        INNER JOIN
-                            group_roles gr ON gm.role_id = gr.id
-                    WHERE
-                        gm.group_id = ?
-                        AND
-                        gm.user_id = ?
-                        AND
-                        gr.name IN ($adminRolesNames)
-                    LIMIT 1
-                ",
-                array_merge([$groupId, $currentUserId], $adminRoles['roles'])
-            );
-            if (empty($isAdmin)) {
-                Helpers::errorResponse('Нет прав на редактирование', 403);
-                return;
-            }
-            
-
-            switch ($category) {
-                case 'base':
-                    $groupName = $value['name'];
-                    $groupLinkname = trim($value['linkname']);
-
-                    // Валидация входных данных
-                    if (empty($groupName) || strlen($groupName) < 4) {
-                        Helpers::errorResponse('Название группы должно содержать минимум 4 символа', 400);
-                        return;
-                    }
-                    if (empty($groupLinkname) || strlen($groupLinkname) < 4) {
-                        Helpers::errorResponse('Ссылка группы должна содержать минимум 4 символа', 400);
-                        return;
-                    }
-
-                    $exists = $this->db->fetchOne("
-                            SELECT
-                                id
-                            FROM
-                                `groups`
-                            WHERE
-                                linkname = ?
-                                AND
-                                id != ?
-                        ",
-                        [$groupLinkname, $groupId]
-                    );
-                    if ($exists) {
-                        Helpers::errorResponse('Ссылка уже занята', 400);
-                        return;
-                    }
-
-                    $this->db->query("
-                            UPDATE
-                                `groups`
-                            SET
-                                name = ?,
-                                linkname = ? 
-                            WHERE
-                                id = ?
-                        ",
-                        [$groupName, $groupLinkname, $groupId]
-                    );
-                    
-                    Helpers::jsonResponse(['success' => true, 'linkname' => $groupLinkname]);
-                    break;
-                
-                default:
-                    break;
-            }
-            
-            Helpers::errorResponse('Ошибка создания группы', 500);
-        }
-        
-        /**
-         * GET /groups/members/{group_id} - получить список участников группы
-         */
-        public function members($groupId) {
-            Helpers::validateGroupId($groupId);
-
-            $members = $this->db->fetchAll("
-                    SELECT
-                        u.id,
-                        u.linkname,
-                        u.firstname,
-                        f.file_path AS photo
-                    FROM
-                        group_members gm 
-                        INNER JOIN users u ON gm.user_id = u.id
-                        LEFT JOIN files f ON f.id = u.photo_id
-                    WHERE
-                        gm.group_id = ?
-                ",
-                [$groupId]
-            );
-
-            // Преобразуем относительные пути в полные URL
-            foreach ($members as &$member) {
-                $member['photo'] = Helpers::fileUrl($member['photo'] ?? Helpers::imagePlaceholder('user'));
-            }
-            unset($member);
-            
-            Helpers::jsonResponse(['success' => true, 'members' => $members]);
+            Helpers::jsonResponse(['success' => true, 'isAdmin' => $isAdmin]);
         }
         
         /**
@@ -468,6 +301,145 @@
 
             } catch (Exception $e) {
                 Helpers::errorResponse('Ошибка отписки', 409);
+            }
+        }
+        
+
+        /**
+         * POST /groups/create - создать группу
+         */
+        public function createGroup() {
+            $this->auth->check();
+            $currentUser = $this->auth->getCurrentUser();
+            
+            $data = json_decode(file_get_contents('php://input'), true);
+            $groupName = $data['name'];
+
+            // Валидация входных данных
+            if (empty($groupName) || strlen($groupName) < 4) {
+                Helpers::errorResponse('Название группы должно содержать минимум 4 символа', 400);
+                return;
+            }
+
+            try {
+                $this->db->beginTransaction();
+
+                $this->db->query("
+                        INSERT INTO `groups` (name, created_at) 
+                        VALUES (?, NOW())
+                    ",
+                    [$groupName]
+                );
+                
+                $groupId = $this->db->lastInsertId();
+
+                $role = $this->db->fetchOne("
+                        SELECT
+                            id
+                        FROM
+                            group_roles
+                        WHERE
+                            name = ?
+                    ",
+                    ['owner']
+                );
+
+                if (!$role) {
+                    throw new Exception('Роль "owner" не найдена');
+                }
+
+                $this->db->query("
+                        INSERT INTO group_members (group_id, user_id, role_id, joined_at) 
+                        VALUES (?, ?, ?, NOW())
+                    ",
+                    [$groupId, $currentUser['id'], $role['id']]
+                );
+
+                $this->db->commit();
+                Helpers::jsonResponse(['success' => true, 'groupId' => $groupId]);
+
+            } catch (Exception $e) {
+                $this->db->rollBack();
+                Helpers::errorResponse('Ошибка создания группы: ' . $e->getMessage(), 500);
+            }
+        }
+        
+        /**
+         * POST /groups/edit - редактировать группу
+         */
+        public function editGroup() {
+            $this->auth->check();
+            $currentUserId = $this->auth->getCurrentUser()['id'];
+
+            $data = json_decode(file_get_contents('php://input'), true);
+            $groupId = $data['groupId'] ?? null;
+            $category = $data['category'] ?? null;
+            
+            Helpers::validateGroupId($groupId);
+
+
+            // Проверка админ ли группы
+            $isAdmin = self::checkIsAdmin($this->db, $groupId, $currentUserId);
+            if (!$isAdmin) Helpers::errorResponse('Нет прав на редактирование', 403);
+            
+            
+            
+            try {
+                switch ($category) {
+                    case 'base':
+                        // Изменяем базовую информацию
+                        $baseJson = $data['base'] ?? null;
+                        $base = json_decode($baseJson, true);
+
+                        if (!$base) Helpers::errorResponse('Неверные данные', 400);
+
+
+                        $groupName = $base['name'];
+                        $groupLinkname = trim($base['linkname']);
+
+                        // Валидация входных данных
+                        Helpers::validateNameLength($groupName);
+                        Helpers::validateLinknameLength($groupLinkname);
+
+
+                        // Проверяем ссылку
+                        $noneLinkname = "group$groupId";
+                        if ($groupLinkname === $noneLinkname) {
+                            $groupLinkname = null;
+                        } else {
+                            // Проверка ссылки на верный формат
+                            if (!Helpers::isValidLinknameFormat($groupLinkname))
+                                Helpers::errorResponse('Ссылка не должна быть формата "user123" или "group123"!', 400);
+                            
+                            // Проверка ссылки на занятость
+                            if (!Helpers::isLinknameUnique($this->db, $groupLinkname, excludeGroupId: $groupId))
+                                Helpers::errorResponse('Ссылка уже занята', 400);
+                        }
+
+
+                        // Обновляем данные
+                        $this->db->query("
+                                UPDATE
+                                    `groups`
+                                SET
+                                    name = ?,
+                                    linkname = ? 
+                                WHERE
+                                    id = ?
+                            ",
+                            [$groupName, $groupLinkname, $groupId]
+                        );
+                        
+                        Helpers::jsonResponse(['success' => true, 'linkname' => $groupLinkname ?: $noneLinkname]);
+                        break;
+                    
+                    default:
+                        Helpers::errorResponse('Не удалось получить данные для редактирования', 400);
+                        break;
+                }
+
+            } catch (Exception $e) {
+                Helpers::errorResponse('Ошибка редактирования группы', 500);
             }
         }
     }

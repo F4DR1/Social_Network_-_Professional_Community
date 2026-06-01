@@ -61,7 +61,7 @@ export async function authCheck() {
 
 
 // ========== СЕССИИ ==========
-export async function sessionsGetMy() {
+export async function sessionsGet() {
     return apiRequest('/sessions', {
         method: 'GET'
     });
@@ -71,13 +71,12 @@ export async function sessionsTerminateCurrent() {
         method: 'DELETE'
     });
 }
-export async function sessionsTerminate(data) {
-    return apiRequest(`/sessions/id`, {
-        method: 'DELETE',
-        body: data
+export async function sessionsTerminate(sessionId) {
+    return apiRequest(`/sessions/${sessionId}`, {
+        method: 'DELETE'
     });
 }
-export async function sessionsTerminateAll() {
+export async function sessionsTerminateAllOther() {
     return apiRequest('/sessions', {
         method: 'DELETE'
     });
@@ -116,7 +115,12 @@ export async function notificationsGetUnreadCount() {
 }
 export async function notificationsGet() {
     return apiRequest(`/notifications/get`, {
-        method: 'GET'
+        method: 'POST'
+    });
+}
+export async function notificationsMarkRead() {
+    return apiRequest(`/notifications/mark-read`, {
+        method: 'POST'
     });
 }
 
@@ -214,12 +218,12 @@ export async function usersGetById(userId) {
         method: 'GET'
     });
 }
-// export async function updateUserProfile(userId, data) {
-//     return apiRequest(`/users/${userId}`, { 
-//         method: 'PUT', 
-//         body: data 
-//     });
-// }
+export async function updateUserProfile(data) {
+    return apiRequest(`/users/update-profile`, { 
+        method: 'PUT',
+        body: data 
+    });
+}
 
 
 // ========== НАВЫКИ ПОЛЬЗОВАТЕЛЯ ==========

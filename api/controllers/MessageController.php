@@ -17,15 +17,15 @@
 
         /**
          * Получает сообщение по ID с данными автора.
-         * $currentUserId нужен для отображения "Вы".
          */
-        private function getMessageById($messageId) {
+        private function getMessageById($currentUserId, $messageId) {
             $message = $this->db->fetchOne("
                     SELECT
                         m.*,
                         u.linkname AS author_linkname,
                         CONCAT(u.firstname, ' ', u.lastname) AS author_name,
-                        f.file_path AS author_photo
+                        f.file_path AS author_photo,
+                        (SELECT COUNT(*) FROM chat_message_reads WHERE message_id = m.id) AS reads_count
                     FROM
                         chat_messages m
                         JOIN users u ON m.sender_id = u.id
@@ -38,6 +38,10 @@
             if ($message) {
                 $message['author_photo'] = Helpers::fileUrl($message['author_photo'] ?? Helpers::imagePlaceholder('user'));
             }
+            // Убираем счётчик, если пользователь не автор
+            if ($message['sender_id'] != $currentUserId) {
+                unset($message['reads_count']);
+            }
             return $message;
         }
 
@@ -46,7 +50,7 @@
 
 
         /**
-         * POST /messages/mark-read - отметить прочитанными сообщения в чате
+         * POST /messages/mark-read - отметить прочитанными чужие сообщения в чате
          */
         public function markRead() {
             $this->auth->check();
@@ -57,10 +61,8 @@
             $messageIds = $data['messageIds'] ?? null;  // Если передан массив конкретных сообщений
 
 
-
-            
             if ($chatId) {
-                // Отмечаем все непрочитанные сообщения в чате как прочитанные
+                // Отмечаем все непрочитанные чужие сообщения в чате как прочитанные
                 Helpers::validateChatId($chatId);
                 ChatController::checkIsMember($this->db, $chatId, $currentUserId);
                 $this->db->query("
@@ -71,6 +73,8 @@
                             chat_messages cm
                         WHERE
                             cm.chat_id = ?
+                            AND
+                            cm.sender_id != ?
                             AND
                             cm.id NOT IN (
                                 SELECT
@@ -83,19 +87,31 @@
                                     mr.message_id = cm.id
                             )
                     ",
-                    [$currentUserId, $chatId, $currentUserId]
+                    [$currentUserId, $chatId, $currentUserId, $currentUserId]
                 );
 
             } elseif ($messageIds && is_array($messageIds)) {
-                // Отмечаем конкретные сообщения
+                // Отмечаем конкретные чужие сообщения как прочитанные
                 $placeholders = [];
                 $params = [];
                 foreach ($messageIds as $msgId) {
-                    $placeholders[] = '(?, ?, NOW())';
+                    $placeholders[] = '?';
                     $params[] = $msgId;
-                    $params[] = $currentUserId;
                 }
-                $sql = "INSERT IGNORE INTO chat_message_reads (message_id, user_id, read_at) VALUES " . implode(', ', $placeholders);
+
+                $sql = "
+                    INSERT IGNORE INTO chat_message_reads (message_id, user_id, read_at)
+                    SELECT
+                        cm.id, ?, NOW()
+                    FROM
+                        chat_messages cm
+                    WHERE
+                        cm.id IN (" . implode(',', $placeholders) . ")
+                        AND
+                        cm.sender_id != ?
+                ";
+                $params = array_merge([$currentUserId], $params, [$currentUserId]);
+
                 $this->db->query($sql, $params);
             }
             
@@ -129,7 +145,8 @@
                     m.*,
                     u.linkname AS author_linkname,
                     CONCAT(u.firstname, ' ', u.lastname) AS author_name,
-                    f.file_path AS author_photo
+                    f.file_path AS author_photo,
+                    (SELECT COUNT(*) FROM chat_message_reads WHERE message_id = m.id) AS reads_count
                 FROM
                     chat_messages m
                     JOIN users u ON m.sender_id = u.id
@@ -154,6 +171,11 @@
             // Ставим заглушки на фото пользователей, если у них нет фото
             foreach ($messages as &$message) {
                 $message['author_photo'] = Helpers::fileUrl($message['author_photo'] ?? Helpers::imagePlaceholder('user'));
+
+                // Счётчик прочтений показываем только владельцу сообщения
+                if ($message['sender_id'] != $currentUserId) {
+                    unset($message['reads_count']);
+                }
             }
 
             Helpers::jsonResponse(['success' => true, 'messages' => $messages]);
@@ -223,7 +245,7 @@
             Redis::newMessage($chatId, $currentUserId, $messageId);
 
             // Получаем полные данные сообщения
-            $message = $this->getMessageById($messageId);
+            $message = $this->getMessageById($currentUserId, $messageId);
             
             Helpers::jsonResponse(['success' => true, 'message' => $message]);
         }

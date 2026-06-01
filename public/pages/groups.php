@@ -18,9 +18,10 @@
 
 
 <div class="centered-container">
-    <div class="container">
-        <h2>Группы</h2>
+    <section class="container user-groups-list-panel">
+        <h2 class="container-title">Группы</h2>
 
+        <!-- Категории контактор -->
         <?php foreach ($sections as $section): ?>
             <div class="category" id="<?= $section['type'] ?>">
                 <h3 class="title" data-count=""><?= $section['title'] ?></h3>
@@ -29,13 +30,20 @@
         <?php endforeach ?>
 
         </div>
-    </div>
+    </section>
 </div>
 
 <div class="right-container">
-    <div class="container">
-        <button id="openCreateGroupPanel">Создать группу</button>
-    </div>
+    <section class="container group-create-panel">
+        <button id="openCreateGroupPanel">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8"/>
+                <line x1="12" y1="9" x2="12" y2="15"/>
+                <line x1="9" y1="12" x2="15" y2="12"/>
+            </svg>
+            <span>Создать группу</span>
+        </button>
+    </section>
 </div>
 
 
@@ -56,6 +64,7 @@
         'pages/groups.js'
     ];
     $stylesheets = [
+        'pages/groups.css',
         'elements/category.css',
         'elements/group_card.css',
         'elements/group_create.css'

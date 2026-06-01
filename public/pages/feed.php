@@ -14,13 +14,9 @@
     <?= postCreationField(); ?>
     <?= postsPanel('Лента новостей'); ?>
 </div>
-    
-    
-<script>
-    window.appData = <?= json_encode([
-        'postsType' => 'feed'
-    ]) ?>;
-</script>
+
+
+
 <script>
     window.appData = <?= json_encode([
         'path' => PATH,

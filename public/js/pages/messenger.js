@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastChatMessageId = -1;  // id последнего сообщения в чате
     let localMessageId = -1;  // Локальный id для отправленных сообщений в чат
 
+    const typingUsers = {};  // Кто в каком чате печатает на данный момент
+
 
 
     const chatsList = document.getElementById('chatsList');
@@ -31,79 +33,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatBackBtn = document.getElementById('chatBackButton');
     const chatMessages = document.getElementById('chatMessages');
 
-    const typingMessage = document.getElementById('typingMessage');
+    const activeChatTypingMessage = document.getElementById('typingMessage');
     const messageInput = document.getElementById('messageInput');
     const sendMessageBtn = document.getElementById('sendMessageButton');
 
 
-    
 
 
-    // -------------------- ДАТЫ И ВРЕМЯ --------------------
-    // Форматирование даты
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        
-        const day = date.getDate();
-        const month = date.toLocaleDateString('ru-RU', { month: 'long' });
-        const year = date.getFullYear();
-        
-        if (year === now.getFullYear()) {
-            return `${day} ${month}`;
-        } else {
-            return `${day} ${month} ${year}`;
-        }
-    }
 
-    // Формирование времени
-    function formatTime(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('ru-RU', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    }
-
-    // Сколько времени прошло
-    function relativeTime(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now - date;  // Разница в миллисекундах
-
-        // Будущее время – просто показываем абсолютную дату
-        if (diffMs < 0) {
-            return formatDate(date);
-        }
-
-        const diffSeconds = Math.floor(diffMs / 1000);
-        if (diffSeconds < 60) {
-            return 'только что';
-        }
-
-        const diffMinutes = Math.floor(diffSeconds / 60);
-        if (diffMinutes < 60) {
-            return `${diffMinutes}м`;
-        }
-
-        const diffHours = Math.floor(diffMinutes / 60);
-        if (diffHours < 24) {
-            return `${diffHours}ч`;
-        }
-
-        const diffDays = Math.floor(diffHours / 24);
-        if (diffDays < 7) {
-            return `${diffDays}д`;
-        }
-
-        const diffWeeks = Math.floor(diffDays / 7);
-        if (diffWeeks <= 4) {
-            return `${diffWeeks}н`;
-        }
-
-        // Более 4 недель – абсолютная дата
-        return formatDate(date);
-    }
+    // -------------------- СТАТУСЫ --------------------
+    const errorStatus = `
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+    `;
+    const sendingStatus = `
+        <polyline points="1 4 1 10 7 10"/>
+        <polyline points="23 20 23 14 17 14"/>
+        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+    `;
+    const deliveredStatus = `
+        <polyline points="16 8 9 17 4 12"/>
+    `;
+    const readStatus = `
+        <polyline points="16 8 9 17 4 12"/>
+        <polyline points="22 8 15 17 10 12"/>
+    `;
 
 
 
@@ -115,19 +69,36 @@ document.addEventListener('DOMContentLoaded', function() {
         const authorPhoto = message.author_photo;
         const authorName = message.sender_id === currentUser.id ? 'Вы' : message.author_name;
         const authorLinkname = message.author_linkname ?? `user${message.sender_id}`;
-        const sent_at = message.sent_at;
-        const updated_at = message.updated_at;
+        const sentAt = message.sent_at;
+        const updatedAt = message.updated_at;
         
-        let messageStatus = '';
-        if ('isLocal' in message) {
-            messageStatus = 'sentError' in message ? '❌' : '🔄';
-        } else {
-            messageStatus = '✅';
+        let messageStatusSVG = '';
+        let messageStatusClass = '';
+        if (message.sender_id == currentUser.id) {
+            if ('isLocal' in message) {
+                if ('sentError' in message) {
+                    messageStatusClass = 'message-status-error';
+                    messageStatusSVG = errorStatus;
+                } else {
+                    // Должна быть анимирована (для красоты) через CSS
+                    messageStatusClass = 'message-status-sending';
+                    messageStatusSVG = sendingStatus;
+                }
+            } else {
+                const readsCount = message.reads_count;
+                if (readsCount > 0) {
+                    messageStatusClass = 'message-status-read';
+                    messageStatusSVG = readStatus;
+                } else {
+                    messageStatusClass = 'message-status-delivered';
+                    messageStatusSVG = deliveredStatus;
+                }
+            }
         }
 
-        const elementId = `chatMessage${message.id}`;
+        const messageId = message.id;
         const elementHTML = `
-            <div class="message" id="${elementId}" data-message-id="${message.id}">
+            <div class="message" data-message-id="${messageId}">
                 <a class="message-author-photo" href="${authorLinkname}">
                     <img src="${authorPhoto}" alt="${authorName}" width="40" height="40">
                 </a>
@@ -136,15 +107,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="message-text">${message.text}</div>
                 </div>
                 <div class="message-info">
-                    <time class="message-time" datetime="${sent_at}">${formatTime(sent_at)}</time>
-                    <time class="message-date" datetime="${sent_at}">${formatDate(sent_at)}</time>
+                    <time class="message-time" datetime="${sentAt}">${formatTime(sentAt)}</time>
+                    <time class="message-date" datetime="${sentAt}">${formatDate(sentAt)}</time>
                     <div class="messageStatus">
-                        ${messageStatus}
+                        <span class="message-status ${messageStatusClass}">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                ${messageStatusSVG}
+                            </svg>
+                        </span>
                     </div>
                 </div>
             </div>
         `
-        return {elementId, elementHTML};
+        return {messageId, elementHTML};
     }
     
     // Обновляет список сообщений
@@ -152,8 +127,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (messages && messages.length > 0) {
             // Выводим сообщения в чат
             messages.forEach(message => {
-                const {elementId, elementHTML} = formateMessageHTML(message);
-                if (document.getElementById(elementId)) return;  // Пропускаем уже существующее сообщение в чате
+                const {messageId, elementHTML} = formateMessageHTML(message);
+                if (chatMessages.querySelector(`.message[data-message-id="${messageId}"]`)) return;  // Пропускаем уже существующее сообщение в чате
                 chatMessages.insertAdjacentHTML('beforeend', elementHTML);
                 lastChatMessageId = message.id > lastChatMessageId ? message.id : lastChatMessageId;  // Находим id последнего сообщения
             });
@@ -171,38 +146,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Обновляем отправляемое сообщение
-    function updateSendingMessage(message, previousElementId = null) {
-        const {elementId, elementHTML} = formateMessageHTML(message);  // Создаём новое сообщение
+    function updateSendingMessage(message, previousMessageId = null) {
+        const {messageId, elementHTML} = formateMessageHTML(message);  // Создаём новое сообщение
 
-        if (previousElementId === null) {
+        if (previousMessageId === null) {
             // Старого сообщения нет - просто создаём сообщение
             chatMessages.insertAdjacentHTML('beforeend', elementHTML);
 
         } else {
-            // Старое сообщение есть
-            
             // Получаем старое сообщение
-            const previousMessageElement = document.getElementById(previousElementId);  // Старое сообщение (локальное)
+            console.log(`previousMessageId: ${previousMessageId}`);
+            const previousMessageElement = chatMessages.querySelector(`.message[data-message-id="${previousMessageId}"]`);  // Старое сообщение (локальное)
             if (!previousMessageElement) return null;  // Проверка на всякий случай
 
 
             const isLocal = ('isLocal' in message);
             const isNewMessage = message.id > lastChatMessageId;
             if (isLocal || !isNewMessage) {
+                console.log(`заменяем сообщение ${previousMessageId}`);
                 // Замена старого сообщения на новое
                 const temp = document.createElement('div');
                 temp.innerHTML = elementHTML.trim();
                 const newMessageElement = temp.firstChild;
                 chatMessages.replaceChild(newMessageElement, previousMessageElement);
-                return elementId;
 
             } else {
+                console.log(`удаляем сообщение ${previousMessageId} и создаём новое`);
                 // Удаляем старое сообщение и загружаем все новые с сервера
                 previousMessageElement.remove();
                 getMessagesAPI();
             }
         }
-        return elementId;
+        return messageId;
     }
 
     
@@ -217,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const unreadCount = chat.unread_count;
 
+        const lastMessageSenderId = chat.last_message_sender_id;
         const lastMessageText = chat.last_message_text;
         const lastMessageTime = chat.last_message_time;
         const lastMessageAuthorId = chat.last_message_author_id;
@@ -227,7 +203,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (unreadCount > 0) {
             messageStatusHTML = `<span class="message-unread-count">${unreadCount}</span>`;
         } else {
-            messageStatusHTML = `<span class="message-read-status">✅</span>`;
+            let messageStatusSVG = '';
+            if (lastMessageSenderId == currentUser.id) {
+                const lastMessageReadsCount = chat.last_message_reads_count;
+                if (lastMessageReadsCount > 0) {
+                    messageStatusSVG = readStatus;
+                } else {
+                    messageStatusSVG = deliveredStatus;
+                }
+            }
+            messageStatusHTML = `
+                <span class="message-read-status">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        ${messageStatusSVG}
+                    </svg>
+                </span>
+            `;
         }
 
         const lastMessageHTML = `
@@ -238,23 +229,23 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        const elementId = `chat${chatId}`;
         const elementHTML = `
-            <button class="chat" id="${elementId}" data-chat-id="${chatId}">
+            <button class="chat" data-chat-id="${chatId}">
                 <img class="chat-photo" src="${chatPhoto}" alt="${chatTitle}" width="60" height="60">
                 <div class="chat-main">
                     <span class="chat-title">${chatTitle}</span>
                     <div class="chat-last-message">${lastMessageHTML}</div>
+                    <span class="chat-typing-message"></span>
                 </div>
                 <div class="chat-info">
-                    <time class="chat-last-message-time" datetime="${lastMessageTime}">${relativeTime(lastMessageTime)}</time>
+                    <time class="chat-last-message-time" datetime="${lastMessageTime}">${relativeTime(lastMessageTime, true)}</time>
                     <div class="chat-status">
                         ${messageStatusHTML}
                     </div>
                 </div>
             </button>
         `;
-        return {elementId, elementHTML};
+        return {chatId, elementHTML};
     }
 
     // Обновляет список чатов
@@ -264,12 +255,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (chats && chats.length > 0) {
             // Выводим чаты в список чатов
             chats.forEach(chat => {
-                const {elementId, elementHTML} = formateChatHTML(chat);
-                if (document.getElementById(elementId)) return;  // Пропускаем уже существующее сообщение в чате
+                const {chatId, elementHTML} = formateChatHTML(chat);
+                if (chatsList.querySelector(`.chat[data-chat-id="${chatId}"]`)) return;  // Пропускаем уже существующий чат в списке
                 chatsList.insertAdjacentHTML('beforeend', elementHTML);
             });
             initChatsListActions();
-
         }
         
         const noChatsClass = 'no-chats';
@@ -306,8 +296,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // -------------------- API ЗАПРОСЫ --------------------
     // Отправляем новое сообщение
-    async function sendMessageAPI(message, previousElementId = null) {
-        previousElementId = updateSendingMessage(message, previousElementId);  // Временно показываем в чате локальное сообщение
+    async function sendMessageAPI(message, previousMessageId = null) {
+        previousMessageId = updateSendingMessage(message, previousMessageId);  // Временно показываем в чате локальное сообщение
         
         const data = {
             text: message.text.trim()
@@ -325,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Обновляем чат (если во время отправки сообщения его только создаём)
                 if (activeChatId === null)
                     await getActiveChatId();
-                updateSendingMessage(result.message, previousElementId);  // Показываем отправленное сообщение
+                updateSendingMessage(result.message, previousMessageId);  // Показываем отправленное сообщение
                 updateChatList();  // Обновляем список чатов
                 return;
             } else {
@@ -339,12 +329,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Пытаемся отправить данные снова через некоторое время
         setTimeout(() => {
             if (!('sentError' in message)) message.sentError = true;  // Добавляем локальному сообщению ошибку об отправке
-            sendMessageAPI(message, previousElementId);
+            sendMessageAPI(message, previousMessageId);
         }, 2000);
     }
 
     // Отмечаем что сообщение прочитано
-    async function markReadAPI() {
+    async function markReadMessagesAPI() {
         const data = {
             chatId: activeChatId
         };
@@ -366,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Пытаемся отправить данные снова через некоторое время
         setTimeout(() => {
-            markReadAPI()
+            markReadMessagesAPI()
         }, 2000);
     }
 
@@ -387,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await messagesGet(data);
 
             if (result.success) {
-                markReadAPI();  // Отмечаем сообщения как прочитанные
+                markReadMessagesAPI();  // Отмечаем сообщения как прочитанные
                 await updateMessages(result.messages);
                 return;
             } else {
@@ -512,42 +502,81 @@ document.addEventListener('DOMContentLoaded', function() {
         sendMessageBtn.disabled = !hasText;
     }
 
+    // Возращает строку печатающих в чате пользователей
+    function typingMessage(chatId) {
+        const users = typingUsers[chatId] || [];
+        const names = users.map(u => u.name);
+
+        if (users.length === 0) return '';
+        if (users.length === 1) return `${names[0]} печатает...`;
+        if (users.length === 2) return `${names[0]} и ${names[1]} печатают...`;
+        return `${names[0]}, ${names[1]} и ещё ${names.length - 2} печатают...`;
+    }
+
     // Индикатор кто печатает в чате
     async function typingIndicator(data) {
         const type = data.type;
         const chatId = data.chatId;
         const userId = data.userId;
 
-        if (chatId !== activeChatId) return;
 
+        const chatButton = chatsList.querySelector(`.chat[data-chat-id="${chatId}"]`);
+        if (!chatButton) return;
+        const chatTypingMessage = chatButton.querySelector('.chat-typing-message');
+        if (!chatTypingMessage) return;
+
+
+        // Создаём переменную печатающих (если нет)
+        if (!typingUsers[chatId]) {
+            typingUsers[chatId] = [];
+        }
+
+
+        // Обработка события печатания
         switch (type) {
             case 'typing_start':
-                let userName = `user${userId}`;
-                try {
-                    const result = await usersGetById(userId);
-
-                    if (result.success) {
-                        const user = result.user;
-                        userName = user.fullname;
-                    } else {
-                        console.log(result.error || 'Ошибка обработки чатов');
+                // Если кто-то начал печатать - заносим его в переменную
+                const exists = typingUsers[chatId].some(user => user.id === userId);
+                if (!exists) {
+                    // Получаем имя пользователя
+                    let userName = `user${userId}`;
+                    try {
+                        const result = await usersGetById(userId);
+                        if (result.success) {
+                            const user = result.user;
+                            userName = user.fullname;
+                        } else {
+                            console.log(result.error || 'Ошибка обработки чатов');
+                        }
+                    } catch (err) {
+                        console.error('Ошибка сервера');
                     }
-
-                } catch (err) {
-                    console.error('Ошибка сервера');
+                    typingUsers[chatId].push({ id: userId, name: userName });
                 }
-
-                typingMessage.innerHTML = `${userName} печатает...`;
-                typingMessage.classList.add('active');
                 break;
             
             case 'typing_end':
-                typingMessage.innerHTML = '';
-                typingMessage.classList.remove('active');
+                // Если кто-то перестал печатать - удаляем его из переменной
+                if (typingUsers[chatId]) {
+                    typingUsers[chatId] = typingUsers[chatId].filter(user => user.id !== userId);
+                    // Если массив опустел, можно удалить ключ, чтобы не накапливались пустые записи
+                    if (typingUsers[chatId].length === 0) {
+                        delete typingUsers[chatId];
+                    }
+                }
                 break;
             
             default:
                 return;
+        }
+        
+        const msg = typingMessage(chatId);
+        chatTypingMessage.innerHTML = msg;
+        chatTypingMessage.classList.toggle('active', chatTypingMessage.innerHTML.length > 0);
+
+        if (chatId === activeChatId) {
+            activeChatTypingMessage.innerHTML = msg;
+            activeChatTypingMessage.classList.toggle('active', activeChatTypingMessage.innerHTML.length > 0);
         }
     }
     
@@ -584,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateLastMessageTimes() {
         document.querySelectorAll('.chat').forEach(btn => {
             const chatLastMessageTime = btn.querySelector('.chat-last-message-time');
-            chatLastMessageTime.textContent = relativeTime(chatLastMessageTime.dateTime);
+            chatLastMessageTime.textContent = relativeTime(chatLastMessageTime.dateTime, true);
         });
 
         setTimeout(updateLastMessageTimes, 30000);
