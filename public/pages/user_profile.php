@@ -72,7 +72,7 @@
                             <span>Адрес:</span>
                             <div class="field">
                                 <div class="input-typed">
-                                    <span class="included"><?= htmlspecialchars(PROTOCOL . '://' . HOST . '/') ?></span>
+                                    <span class="included"><?= htmlspecialchars(decodeUrl(PROTOCOL . '://' . HOST . '/')) ?></span>
                                     <input class="user-linkname" type="text" value="<?= htmlspecialchars($userLinkname) ?>" name="name" required autocomplete="name">
                                 </div>
                                 <span class="hint">Номер пользователя — <u><?= htmlspecialchars($userNumber) ?></u>.</span>

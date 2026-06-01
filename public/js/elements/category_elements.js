@@ -3,30 +3,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Функция создания HTML карточки пользователя
     window.createUserHTML = function(user) {
-        const fullname = user.fullname ?? `${user.firstname} ${user.lastname}`;
-        const linkname = user.linkname ?? `user${user.id}`;
-        const photo = user.photo ?? `${window.APP_CONFIG.IMAGES}/empty.webp`;
+        const userId = user.id;
+        const userLinkname = user.linkname ?? `user${userId}`;
+        const userFullname = user.fullname ?? `${user.firstname} ${user.lastname}`;
+        const userPhoto = user.photo;
         
         return `
-            <div class="group-panel">
-                <img src="${photo}" alt="${fullname}" width=80>
-                <a href="${linkname}" class="name-line">${fullname}</a>
-                <a href="msg?type=user&id=${user.id}" class="message-line">Написать сообщение</a>
+            <div class="card">
+                <a class="photo">
+                    <img src="${userPhoto}" alt="${userFullname}" width=80>
+                </a>
+                <div class="main">
+                    <a href="${userLinkname}" class="name-line">${userFullname}</a>
+                    <a href="msg?type=user&id=${userId}" class="message-line">Написать сообщение</a>
+                </div>
             </div>
         `
     }
     
     // Функция создания HTML карточки группы
     window.createGroupHTML = function(group) {
-        const name = group.name;
-        const linkname = group.linkname ?? `group${group.id}`;
-        const photo = group.photo ?? `${window.APP_CONFIG.IMAGES}/empty.webp`;
+        const groupId = group.id;
+        const groupName = group.name;
+        const groupLinkname = group.linkname ?? `group${groupId}`;
+        const groupPhoto = group.photo;
         
         return `
-            <div class="group-panel">
-                <img src="${photo}" alt="${name}" width=80>
-                <a href="${linkname}" class="name-line">${name}</a>
-                <a href="msg?type=group&id=${group.id}" class="message-line">Написать в чат группы</a>
+            <div class="card">
+                <a class="photo">
+                    <img src="${groupPhoto}" alt="${groupName}" width=80>
+                </a>
+                <div class="main">
+                    <a href="${groupLinkname}" class="name-line">${groupName}</a>
+                    <a href="msg?type=user&id=${groupId}" class="message-line">Написать в чат группы</a>
+                </div>
             </div>
         `
     }

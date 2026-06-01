@@ -86,7 +86,7 @@
                             <span>Адрес:</span>
                             <div class="field">
                                 <div class="input-typed">
-                                    <span class="included"><?= htmlspecialchars(PROTOCOL . '://' . HOST . '/') ?></span>
+                                    <span class="included"><?= htmlspecialchars(decodeUrl(PROTOCOL . '://' . HOST . '/')) ?></span>
                                     <input class="group-linkname" type="text" value="<?= htmlspecialchars($groupLinkname) ?>" name="name" required autocomplete="name">
                                 </div>
                                 <span class="hint">Номер группы — <u><?= htmlspecialchars($groupNumber) ?></u>.</span>

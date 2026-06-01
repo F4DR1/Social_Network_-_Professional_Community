@@ -120,7 +120,7 @@
                 [$sessionId, $currentUser['id']]
             );
             
-            echo json_encode(['success' => true]);
+            Helpers::jsonResponse(['success' => true]);
         }
 
         /**
@@ -143,7 +143,7 @@
                 [$currentUser['id'], $currentSession['id']]
             );
             
-            echo json_encode(['success' => true]);
+            Helpers::jsonResponse(['success' => true]);
         }
     }
 ?>

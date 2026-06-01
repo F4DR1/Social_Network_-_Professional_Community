@@ -131,17 +131,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
     // Модальное окно с информацией
-    window.informationModal = function(text, title = null, cancelBtnText = null) {
+    window.informationModal = async function(text, title = null, cancelBtnText = null) {
         title = title ?? 'Информация';
         const modalId = 'informationModal';
-        formatedModal(modalId, text, title, 1, cancelBtnText);
+        return await formatedModal(modalId, text, title, 1, cancelBtnText);
     };
     
     // Модальное окно подтверждения действия
-    window.confirmationModal = function(text, title = null, cancelBtnText = null, acceptBtnText = null) {
+    window.confirmationModal = async function(text, title = null, cancelBtnText = null, acceptBtnText = null) {
         title = title ?? 'Подтверждение действия';
         const modalId = 'confirmationModal';
-        formatedModal(modalId, text, title, 2, cancelBtnText, acceptBtnText);
+        return await formatedModal(modalId, text, title, 2, cancelBtnText, acceptBtnText);
     };
 
 
@@ -184,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 resolve(result);
             };
 
+            // Обработчики кнопок
             const onAccept = () => cleanupAndRemove(true);
             const onCancel = () => cleanupAndRemove(false);
             const onBackdropClick = (e) => {

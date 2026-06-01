@@ -35,8 +35,9 @@
                 case 'users':
                     $sql = "
                         SELECT
-                            CONCAT(u.firstname, ' ', u.lastname) AS fullname,
+                            u.id,
                             u.linkname,
+                            CONCAT(u.firstname, ' ', u.lastname) AS fullname,
                             f.file_path AS photo
                         FROM
                             users u
@@ -52,8 +53,9 @@
                 case 'groups':
                     $sql = "
                         SELECT 
-                            g.name,
+                            g.id,
                             g.linkname,
+                            g.name,
                             f.file_path AS photo
                         FROM
                             groups g

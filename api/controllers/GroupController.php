@@ -169,6 +169,11 @@
                 ";
                 
                 $allGroups = $this->db->fetchAll($sql, [$userId]);
+
+                foreach ($allGroups as &$group) {
+                    $group['photo'] = Helpers::fileUrl($group['photo'] ?? Helpers::imagePlaceholder('group'));
+                }
+                unset($group);
                 
                 $groups = ['all' => [], 'admin' => []];
                 $seenAll = [];

@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         }
         
-        if (!activeChatId) return;
+        if (!activeChatId && !chatSubId) return;
         
         const noMessageClass = 'welcome-chat-message';
         const hasMessages = chatMessages.children.length > 0 && !chatMessages.querySelector(`.${noMessageClass}`);
@@ -740,8 +740,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // Закрыть открытый чат
-    chatBackBtn?.addEventListener('click', async (e) => {
-        if (!activeChatId) return;
+    chatBackBtn.addEventListener('click', async (e) => {
+        if (!activeChatId && !chatSubId) return;
         
         // Устанавливаем новый адрес (с поддержкой истории)
         const url = new URL(window.location);

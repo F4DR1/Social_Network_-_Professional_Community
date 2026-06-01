@@ -138,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Обновляет список сессий
     function updateSessionsList(sessions) {
+        sessionsList.innerHTML = '';
         if (sessions && sessions.length > 0) {
             // Выводим сессии в список
             let sessionsHTML = '';
@@ -146,13 +147,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (sessionsList.querySelector(`.session[data-session-id="${sessionId}"]`)) return;  // Пропускаем уже существующее сообщение в чате
 
                 if (isCurrent) {
+                    const deleteActiveSessionsBtn = sessions.length == 1 ? '' : `
+                        <button class="sessions-active-delete-btn">
+                            <span>Завершить все другие сеансы</span>
+                        </button>
+                    `;
                     const currentSessionHTML = `
                         <div class="session-current-list">
                             <h3>Этот сеанс<h3>
                             <div class="list">${elementHTML}</div>
-                            <button class="sessions-active-delete-btn">
-                                <span>Завершить все другие сеансы</span>
-                            </button>
+                            ${deleteActiveSessionsBtn}
                         </div>
                     `;
                     sessionsList.insertAdjacentHTML('beforeend', currentSessionHTML);
@@ -173,31 +177,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasSessions = sessionsList.children.length > 0 && !sessionsList.querySelector(`.${noSessionsClass}`);
         
         if (!hasSessions) {
-            sessionsList.innerHTML = `<h3 class="${noSessionsClass}">Не удалось получить список сессий. Попробуйте ещё раз.</h3>`;
+            sessionsList.innerHTML = `<h3 class="${noSessionsClass}">Не удалось получить список сеансов. Попробуйте ещё раз.</h3>`;
         } else {
             // Завершить все другие сеансы
             sessionsList.querySelector('.sessions-active-delete-btn').addEventListener('click', async (e) => {
                 e.preventDefault();
-
-                const confirmed = await confirmationModal('Вы точно хотите завершить все сеансы, кроме текущего?');
-                if (!confirmed) return;
-
-                // Удаляем сессии
-                terminateAllOtherSessionsAPI();
+                if (!await confirmationModal('Вы точно хотите завершить все сеансы, кроме текущего?')) return;
+                terminateAllOtherSessionsAPI();  // Удаляем сессии
             });
 
             // Завершить сеанс
-            const activeSessions = sessionsList.querySelectorAll('.session-active-list .list');
-            activeSessions.forEach(session => {
-                session.querySelector('.session-delete-btn').addEventListener('click', async (e) => {
+            const activeSessionsList = sessionsList.querySelector('.session-active-list .list');
+            activeSessionsList.querySelectorAll('.session-delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
                     e.preventDefault();
-
-                    const confirmed = await confirmationModal('Завершить этот сеанс?');
-                    if (!confirmed) return;
-
-                    const sessionId = session.dataset.sessionId;
-                    // Удаляем сессию
-                    terminateSessionAPI(sessionId);
+                    if (!await confirmationModal('Завершить этот сеанс?')) return;
+                    terminateSessionAPI(e.target.closest('.session').dataset.sessionId);  // Удаляем сессию
                 });
             });
         }
@@ -293,12 +288,34 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Завершить все другие сеансы
     async function terminateAllOtherSessionsAPI() {
-        console.log('удаляем все сессии');
+        try {
+            const result = await sessionsTerminateAllOther();
+
+            if (result.success) {
+                getSessionsList();  // Загружаем список сессий
+            } else {
+                updateMessage(result.error || 'Ошибка соединения. Попробуйте ещё раз.', 'error');
+            }
+            
+        } catch (err) {
+            updateMessage('Ошибка сервера.', 'error');
+        }
     }
     
     // Завершить сеанс
     async function terminateSessionAPI(sessionId) {
-        console.log(`удаляем сессию ${sessionId}`);
+        try {
+            const result = await sessionsTerminate(sessionId);
+
+            if (result.success) {
+                getSessionsList();  // Загружаем список сессий
+            } else {
+                updateMessage(result.error || 'Ошибка соединения. Попробуйте ещё раз.', 'error');
+            }
+            
+        } catch (err) {
+            updateMessage('Ошибка сервера.', 'error');
+        }
     }
 
 
