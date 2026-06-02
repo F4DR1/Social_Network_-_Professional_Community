@@ -370,7 +370,7 @@
         }
         
         /**
-         * POST /groups/edit - редактировать группу
+         * PUT /groups/edit - редактировать группу
          */
         public function editGroup() {
             $this->auth->check();

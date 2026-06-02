@@ -1,0 +1,107 @@
+/* ============================================================
+   МирПрофи — containers.css
+   Система контейнеров для страниц: main-container, centered-container,
+   right-container. Подключается только для Layout::Standart.
+   ============================================================ */
+ 
+/* ── Сетка контейнеров внутри .page-content ── */
+/*
+  Структура страницы (пример user_profile):
+  ┌─────────────────────────────────────────────────┐
+  │  .main-container   (полная ширина, над сеткой)  │
+  ├─────────────────────────┬───────────────────────┤
+  │  .centered-container    │  .right-container     │
+  │  (основной контент)     │  (боковая панель)     │
+  └─────────────────────────┴───────────────────────┘
+*/
+ 
+.page-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Важно: НЕ overflow: hidden.
+     Выпадающие меню внутри .main-container и других блоков
+     используют position: absolute и должны выходить за пределы
+     своих контейнеров. Любой overflow: hidden/clip на предке
+     обрежет их. */
+  overflow: visible;
+}
+ 
+/* ── Верхний широкий контейнер ── */
+.main-container {
+  width: 100%;
+  /* visible, чтобы дропдауны в шапке профиля не обрезались */
+  overflow: visible;
+}
+ 
+/* Автоматическая двухколоночная сетка для centered + right */
+.page-content:has(.centered-container):has(.right-container) {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "top"
+    "center"
+    "right";
+}
+.page-content > .main-container    { grid-area: top; }
+.page-content > .centered-container { grid-area: center; }
+.page-content > .right-container    { grid-area: right; }
+ 
+@media (min-width: 860px) {
+  .page-content:has(.centered-container):has(.right-container) {
+    grid-template-columns: 1fr 280px;
+    grid-template-areas:
+      "top   top"
+      "center right";
+    gap: 20px 20px;
+  }
+}
+ 
+/* ── Базовая «карточка» контейнера ── */
+.container {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color var(--transition);
+  /* НЕ overflow: hidden — иначе выпадающие меню обрезаются.
+     border-radius сам по себе не клипает потомков без overflow: hidden.
+     Если нужно скрыть что-то конкретное внутри контейнера —
+     добавляй overflow на конкретный дочерний элемент, а не на .container. */
+}
+ 
+/* ── centered-container: вертикальный стек карточек ── */
+.centered-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  overflow: visible;
+}
+ 
+/* ── right-container: вертикальный стек виджетов ── */
+.right-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  overflow: visible;
+}
+ 
+/* Виджет в боковой панели */
+.right-container .container {
+  padding: 16px;
+}
+ 
+/* ── Адаптив ── */
+@media (max-width: 720px) {
+  .page-content:has(.centered-container):has(.right-container) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "top"
+      "center"
+      "right";
+    gap: 14px;
+  }
+}

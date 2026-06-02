@@ -302,6 +302,7 @@
     <?php if ($layout !== Layout::Micro): ?>
         <!-- Подвал (видно в любом layout, кроме Micro) -->
         <footer class="global">
+            <p>Связаться с нами: <a href="mailto:support@мирпрофи.рф">support@мирпрофи.рф</a></p>
             &copy; <?= htmlspecialchars($base_title) ?>
         </footer>
     <?php endif; ?>

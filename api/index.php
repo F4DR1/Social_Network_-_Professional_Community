@@ -78,7 +78,7 @@
     $router->add('POST', '/codes/confirm', 'CodeController', 'confirmCode', $db, null);
     
     // ========== ПОИСК ==========
-    $router->add('POST', '/searches/search', 'SearchController', 'search', $db, $auth);
+    $router->add('POST', '/search', 'SearchController', 'search', $db, $auth);
     
     // ========== УВЕДОМЛЕНИЯ ==========
     $router->add('GET', '/notifications/get/unread-count', 'NotificationController', 'getUnreadCount', $db, $auth);
@@ -128,7 +128,7 @@
     $router->add('GET', '/groups/list/{user_id}', 'GroupController', 'getUserGroups', $db, null);
     $router->add('GET', '/groups/is-admin/{group_id}/{user_id}', 'GroupController', 'getUserIsAdminGroup', $db, null);
     $router->add('POST', '/groups/create', 'GroupController', 'createGroup', $db, $auth);
-    $router->add('POST', '/groups/edit', 'GroupController', 'editGroup', $db, $auth);
+    $router->add('PUT', '/groups/edit', 'GroupController', 'editGroup', $db, $auth);
     $router->add('GET', '/groups/members/{group_id}', 'GroupController', 'members', $db, null);
     $router->add('GET', '/groups/status/subscribe/{group_id}', 'GroupController', 'statusSubscribe', $db, $auth);
     $router->add('POST', '/groups/subscribe', 'GroupController', 'subscribe', $db, $auth);

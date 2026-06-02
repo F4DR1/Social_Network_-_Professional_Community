@@ -100,7 +100,7 @@ export async function codesConfirm(data) {
 
 // ========== ПОИСК ==========
 export async function searchesSearch(data) {
-    return apiRequest('/searches/search', {
+    return apiRequest('/search', {
         method: 'POST',
         body: data
     });
@@ -290,7 +290,7 @@ export async function groupsCreate(data) {
 }
 export async function groupsEdit(data) {
     return apiRequest(`/groups/edit`, {
-        method: 'POST',
+        method: 'PUT',
         body: data
     });
 }

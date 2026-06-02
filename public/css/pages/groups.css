@@ -1,0 +1,19 @@
+/* ============================================================
+   МирПрофи — groups.css
+   Страница «Группы»: список групп пользователя + панель создания.
+   Карточки групп — group_card.css, секции — category.css.
+   ============================================================ */
+
+.user-groups-list-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Отступ между секциями «Мои группы» / «Мои подписки» */
+.user-groups-list-panel .category + .category {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+/* Боковая панель создания группы — оформление в group_create.css */

@@ -150,6 +150,7 @@
                         <!-- Главная кнопка -->
                         <div class="main-action">
                             <?php if (!$isSubscribe): ?>
+                                <!-- Кнопка "Вступить" -->
                                 <div id="mainRequestSubscribe" class="active">
                                     <button class="standart-btn" id="subscribeButton">
                                         <span>Вступить в группу</span>
@@ -157,24 +158,31 @@
                                 </div>
 
                             <?php else: ?>
+                                
                                 <div id="mainRequestUnsubscribe" class="active">
                                     <?php if ($isOwner): ?>
-                                        <div class="action-dropdown">
-                                            <button class="standart-btn action-trigger">
+                                        <!-- Кнопка "Вы владелец" -->
+                                        <div id="mainRequestSubscribe" class="active">
+                                            <button class="standart-btn">
                                                 <span>Вы владелец</span>
                                             </button>
                                         </div>
 
                                     <?php else: ?>
-                                        <div class="action-dropdown">
-                                            <button class="standart-btn action-trigger">
+                                        <!-- Кнопка-выпадающий список -->
+                                        <div class="custom-dropdown">
+                                            <!-- Кнопка-триггер для открытия выпадающего списка -->
+                                            <button class="dropdown-trigger" type="button">
                                                 <span>Вы участник</span>
-                                                <svg viewBox="0 0 16 12" width="16" height="12" fill="currentColor" style="width: 16px; height: 12px;">
+                                                <svg viewBox="0 0 16 12" width="16" height="12" fill="currentColor">
                                                     <path d="m8 6.778 3.773-3.107a.75.75 0 1 1 .954 1.158l-4.25 3.5a.75.75 0 0 1-.954 0l-4.25-3.5a.75.75 0 0 1 .954-1.158z"/>
                                                 </svg>
                                             </button>
-                                            <ul class="dropdown-list">
+
+                                            <!-- Список действий -->
+                                            <ul class="dropdown-menu">
                                                 <li>
+                                                    <!-- Кнопка "Выйти из группы" -->
                                                     <button class="dropdown-button" id="unsubscribeButton">
                                                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                                             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -192,13 +200,13 @@
                         </div>
 
                         <!-- Второстепенная -->
-                        <div class="second-action">
+                        <!-- <div class="second-action">
                             <?php if ($isSubscribe): ?>
                                 <div id="secondMessage" class="active">
                                     <a href="messages?type=group&id=<?= $groupId ?>" class="btn">Написать в чат</a>
                                 </div>
                             <?php endif; ?>
-                        </div>
+                        </div> -->
 
                     </div>
                 <?php endif; ?>

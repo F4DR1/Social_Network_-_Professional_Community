@@ -1,0 +1,24 @@
+/* ============================================================
+   МирПрофи — group_card.css
+   Карточка группы (.card). Базовая раскладка в category.css.
+   Отличие группы — фото со скруглёнными углами (не круг).
+   Подключается на страницах: группы, поиск.
+
+   Скругление применяется только в контексте групп, чтобы на
+   странице поиска (где загружаются обе карточки) пользователи
+   оставались с круглым фото, а группы — с прямоугольным.
+   ============================================================ */
+
+#myGroups .card .photo img,
+#allGroups .card .photo img,
+.category.groups .card .photo img {
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--bg-3);
+}
+
+/* Лёгкий акцент при наведении на фото группы */
+#myGroups .card:hover .photo img,
+#allGroups .card:hover .photo img,
+.category.groups .card:hover .photo img {
+  border-color: var(--accent-ghost-2);
+}

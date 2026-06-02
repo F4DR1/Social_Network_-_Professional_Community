@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </a>
                 <div class="main">
                     <a href="${groupLinkname}" class="name-line">${groupName}</a>
-                    <a href="msg?type=user&id=${groupId}" class="message-line">Написать в чат группы</a>
+                    <!-- <a href="msg?type=group&id=${groupId}" class="message-line">Написать в чат группы</a> -->
                 </div>
             </div>
         `
