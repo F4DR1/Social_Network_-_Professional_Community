@@ -148,6 +148,9 @@
                 [$type, $id, $type, $id]
             );
             
+            foreach ($posts as &$post) {
+                $post['author_photo'] = Helpers::fileUrl($post['author_photo'] ?? Helpers::imagePlaceholder($type));
+            }
 
             $posts = $this->getContentOfPosts($posts);
 

@@ -1,59 +1,94 @@
 // modal.js
 document.addEventListener('DOMContentLoaded', function() {
     let modalStack = [];  // Стек ID открытых окон
+
+
+    window.isNoModals = function() {
+        return (modalStack.length === 0);
+    };
     
 
+
     // Создать HTML модального окна
-    window.createModalHTML = function(modalId, contentHTML) {
+    window.createModalHTML = function(modalId, contentHTML, isDisableHideActions = false) {
         // Удаляем предыдущее окно с таким же ID, чтобы избежать дублей
         const existingModal = document.getElementById(modalId);
-        if (existingModal) existingModal.remove();
+        // if (existingModal) existingModal.remove();
+        if (existingModal) {
+            console.warn(`Модальное окно с id "${modalId}" уже существует`);
+            return null;
+        }
         
+        // Кнопка закрытия окна
+        const closeBtn = `
+            <button class="modal-close-btn">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="8"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                    <line x1="9" y1="15" x2="15" y2="9"/>
+                </svg>
+            </button>
+        `;
+        
+        // Модальное окно ("modal") должно быть на весь экран, а уже контент ("modal-content") - это панель
         const modalHTML = `
             <div class="modal" id="${modalId}">
                 <div class="modal-content">
                     ${contentHTML}
                 </div>
+                ${isDisableHideActions ? '' : closeBtn}
             </div>
-        `
-        document.querySelector('main').insertAdjacentHTML("beforeend", modalHTML);
-        
-        // Закрытие по клику на фон
-        document.getElementById(modalId).addEventListener('click', function(e) {
-            if (e.target === this)
-                hideModal(modalId);
-        });
-    }
+        `;
+        document.querySelector('main').insertAdjacentHTML('beforeend', modalHTML);
+        const modal = document.getElementById(modalId);
+
+        // Закрытие окна стандартными методами
+        if (!isDisableHideActions) {
+            // Закрытие по крестику
+            modal.querySelector('.modal-close-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                hideModal(modalId, true);
+            });
+            
+            // Закрытие по клику на фон
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) hideModal(modalId);
+            });
+        }
+
+        return modal;
+    };
 
 
 
     // Показать модальное окно
-    window.showModal = function(id) {
-        const modal = document.getElementById(id);
+    window.showModal = function(modalId) {
+        const modal = document.getElementById(modalId);
         if (!modal) return;
 
         // Если окно уже в стеке – игнорируем повторный вызов
-        if (modalStack.includes(id)) return;
+        if (modalStack.includes(modalId)) return;
 
         // Скрываем текущее активное окно (верхнее в стеке)
         if (modalStack.length > 0) {
             const topId = modalStack[modalStack.length - 1];
             const topModal = document.getElementById(topId);
             if (topModal) topModal.classList.remove('active');
+            
         } else {
-            // Первое окно – блокируем скролл
-            document.body.style.overflow = 'hidden';
-            document.body.classList.add('modal-open');
+            // // Первое окно – блокируем скролл
+            // document.body.style.overflow = 'hidden';
+            // document.body.classList.add('modal-open');
         }
 
         // Показываем новое окно и добавляем в стек
         modal.classList.add('active');
-        modalStack.push(id);
+        modalStack.push(modalId);
     };
 
     // Скрыть модальное окно (если ID не указан – скрываем верхнее)
-    window.hideModal = function(id = null, remove = false) {
-        let targetId = id;
+    window.hideModal = function(modalId = null, remove = false) {
+        let targetId = modalId;
         if (!targetId) {
             if (modalStack.length === 0) return;
             targetId = modalStack[modalStack.length - 1];
@@ -76,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const prevId = modalStack[modalStack.length - 1];
             const prevModal = document.getElementById(prevId);
             if (prevModal) prevModal.classList.add('active');
+
         } else {
             // Стек пуст – разблокируем скролл
             document.body.style.overflow = '';
@@ -86,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (remove && modal) {
             setTimeout(() => {
                 if (modal.parentNode) modal.remove();
-            }, 300);  // задержка для анимации закрытия
+            }, 200);  // Задержка для анимации закрытия
         }
     };
 
@@ -94,15 +130,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     
-    window.confirmationModal = function(text, title = null, btnCount = 2, cancelBtnText = null, acceptBtnText = null) {
+    // Модальное окно с информацией
+    window.informationModal = async function(text, title = null, cancelBtnText = null) {
+        title = title ?? 'Информация';
+        const modalId = 'informationModal';
+        return await formatedModal(modalId, text, title, 1, cancelBtnText);
+    };
+    
+    // Модальное окно подтверждения действия
+    window.confirmationModal = async function(text, title = null, cancelBtnText = null, acceptBtnText = null) {
         title = title ?? 'Подтверждение действия';
         const modalId = 'confirmationModal';
-        const cancelBtnId = 'confirmationCancelButton';
-        const acceptBtnId = 'confirmationAcceptButton';
+        return await formatedModal(modalId, text, title, 2, cancelBtnText, acceptBtnText);
+    };
 
-        const cancelBtnHTML = `<button class="modal-btn" id="${cancelBtnId}">${cancelBtnText || 'Отмена'}</button>`
-        const acceptBtnHTML = `<button class="modal-btn" id="${acceptBtnId}">${acceptBtnText || 'Подтвердить'}</button>`
-        const confirmationHTML = `
+
+
+    // Создаёт форматированное модальное окно
+    function formatedModal(modalId, text, title, btnCount, cancelBtnText = null, acceptBtnText = null) {
+        const formatedModalHTML = `
             <div class="modal-title">
                 <h2>${title}</h2>
             </div>
@@ -110,42 +156,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p>${text}</p>
             </div>
             <div class="modal-footer">
-                ${btnCount < 1 ? '' : cancelBtnHTML}
-                ${btnCount < 2 ? '' : acceptBtnHTML}
+                ${btnCount < 1 ? '' : `<button class="modal-btn confiramtion-modal-cancel-btn">${cancelBtnText || 'Отмена'}</button>`}
+                ${btnCount < 2 ? '' : `<button class="modal-btn confiramtion-modal-accept-btn">${acceptBtnText || 'Подтвердить'}</button>`}
             </div>
-        `
-        createModalHTML(modalId, confirmationHTML);
+        `;
+        const modal = createModalHTML(modalId, formatedModalHTML);
         showModal(modalId);
 
 
 
         // Возвращаем Promise, который разрешится при выборе пользователя
         return new Promise((resolve) => {
-            const acceptBtn = document.getElementById(acceptBtnId);
-            const cancelBtn = document.getElementById(cancelBtnId);
-            const modal = document.getElementById(modalId);
+            const acceptBtn = modal.querySelector('.confiramtion-modal-accept-btn');
+            const cancelBtn = modal.querySelector('.confiramtion-modal-cancel-btn');
 
+            // Очищаем и удаляем модальное окно
             const cleanupAndRemove = (result) => {
-                acceptBtn?.removeEventListener('click', onAccept);
-                cancelBtn?.removeEventListener('click', onCancel);
-                modal?.removeEventListener('click', onBackdropClick);
+                // Отключаем ивенты для кнопок
+                acceptBtn.removeEventListener('click', onAccept);
+                cancelBtn.removeEventListener('click', onCancel);
+                modal.removeEventListener('click', onBackdropClick);
                 
                 // Удаляем окно
-                hideModal(modalId);
+                hideModal(modalId, true);
                 
                 // Возвращаем результат
                 resolve(result);
             };
 
+            // Обработчики кнопок
             const onAccept = () => cleanupAndRemove(true);
             const onCancel = () => cleanupAndRemove(false);
             const onBackdropClick = (e) => {
                 if (e.target === modal) cleanupAndRemove(false);
             };
 
-            acceptBtn?.addEventListener('click', onAccept);
-            cancelBtn?.addEventListener('click', onCancel);
-            modal?.addEventListener('click', onBackdropClick);
+            // Инициализация кликов на элементы
+            acceptBtn.addEventListener('click', onAccept);
+            cancelBtn.addEventListener('click', onCancel);
+            modal.addEventListener('click', onBackdropClick);
         });
-    }
+    };
 });

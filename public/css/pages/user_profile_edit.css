@@ -1,0 +1,18 @@
+/* ============================================================
+   МирПрофи — user_profile_edit.css
+   Редактирование профиля пользователя.
+   Основные примитивы (форма, message-panel, категории,
+   кнопка возврата, .standart-btn) — в containers.css.
+   ============================================================ */
+
+#editProfileDataPanel { gap: 18px; }
+
+/* Кнопка «Сохранить» — на всю ширину контейнера данных */
+#editProfileDataPanel #saveData {
+  align-self: flex-start;
+  min-width: 160px;
+}
+
+@media (max-width: 600px) {
+  #editProfileDataPanel #saveData { width: 100%; }
+}

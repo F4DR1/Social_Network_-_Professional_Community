@@ -102,8 +102,7 @@
                     SELECT DISTINCT
                         u.id,
                         u.linkname,
-                        u.firstname,
-                        u.lastname,
+                        CONCAT(u.firstname, ' ', u.lastname) AS fullname,
                         f.file_path as photo,
                         COALESCE(r1.is_blocked, 0) as my_relation_blocked,
                         COALESCE(r2.is_blocked, 0) as their_relation_blocked,
@@ -154,12 +153,17 @@
                         relationship_type ASC, u.firstname, u.lastname
                 ";
                 
-                $allRows = $this->db->fetchAll($sql, [$userId, $userId, $userId]);
+                $allUsers = $this->db->fetchAll($sql, [$userId, $userId, $userId]);
+
+                foreach ($allUsers as &$user) {
+                    $user['photo'] = Helpers::fileUrl($user['photo'] ?? Helpers::imagePlaceholder('user'));
+                }
+                unset($user);
                 
                 $users = ['mutual' => [], 'outgoing' => [], 'incoming' => []];
                 $seenIds = [];
                 
-                foreach ($allRows as $user) {
+                foreach ($allUsers as $user) {
                     if (in_array($user['id'], $seenIds) || $user['relationship_type'] === 'unknown') {
                         continue;
                     }

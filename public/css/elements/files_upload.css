@@ -57,7 +57,7 @@
 }
 .image-preview:hover {
   border-color: var(--border-hover);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(19, 19, 8, 0.08);
 }
 .image-preview img {
   display: block;
@@ -83,7 +83,7 @@
 }
 .video-preview:hover {
   border-color: var(--border-hover);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(19, 19, 8, 0.08);
 }
 .video-preview img {
   display: block;
@@ -206,9 +206,9 @@
   transform: scale(1);
 }
 .preview-remove-btn:hover {
-  background: rgba(248, 113, 113, 0.75);
+  background: rgba(229, 72, 77, 0.75);
   color: #fff;
-  border-color: rgba(248, 113, 113, 0.4);
+  border-color: rgba(229, 72, 77, 0.4);
 }
 .preview-remove-btn svg {
   width: 12px;
@@ -232,9 +232,9 @@
   height: 26px;
 }
 .file-preview .preview-remove-btn:hover {
-  background: rgba(248, 113, 113, 0.1);
-  border-color: rgba(248, 113, 113, 0.3);
-  color: #f87171;
+  background: rgba(229, 72, 77, 0.1);
+  border-color: rgba(229, 72, 77, 0.3);
+  color: #E5484D;
 }
 .file-preview .preview-remove-btn svg {
   width: 14px;

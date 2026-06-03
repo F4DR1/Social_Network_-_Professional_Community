@@ -38,17 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
  
-    // =============== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ===============
-    // Форматирование даты
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('ru-RU');
-    }
- 
-
-
-
- 
     // =============== МОДАЛЬНОЕ ОКНО ЧТЕНИЯ СТАТЬИ ===============
     async function openContentArticle(articleId) {
         const id = `OpenArticleId${articleId}`;
@@ -70,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 footerHTML = `
                     <p>
                         ${article.updatedAt !== article.createdAt ? 'Обновлено' : 'Создано'}:
-                        <time class="article-date" datetime="${article.updatedAt}">${formatDate(article.updatedAt)}</time>
+                        <time class="article-date" datetime="${article.updatedAt}">${relativeTime(article.updatedAt, true)}</time>
                     </p>
                 `
             } else {
@@ -336,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
  
                 <div class="post-footer">
                     ${groupPostAuthor}
-                    <time class="post-date" datetime="${post.updated_at}">${formatDate(post.updated_at)}</time>
+                    <time class="post-date" datetime="${post.updated_at}">${relativeTime(post.updated_at, true)}</time>
                 </div>
             </article>
         `;

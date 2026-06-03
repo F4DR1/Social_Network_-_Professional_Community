@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Обработчики для кнопок категорий
-    document.getElementById('searchButtonsList').querySelectorAll('.search-category-btn').forEach(btn => {
+    document.getElementById('searchButtonsList').querySelectorAll('.category-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             e.preventDefault();
             currentCategory = btn.dataset.category;

@@ -2,11 +2,6 @@
     require_once __DIR__ . '/../bootstrap.php';
     require_once INCLUDES_PATH . '/init.php';
     global $currentUserId;
-    
-    $sections = [
-        ['type' => 'searched-users', 'title' => 'Пользователи:'],
-        ['type' => 'searched-groups', 'title' => 'Группы:']
-    ];
 
     ob_start();
 ?>
@@ -14,35 +9,35 @@
 
 
 <div class="centered-container">
-    <div class="container">
-        <h2>Результаты поиска</h2>
+    <section class="container search-result-panel">
+        <h2 class="container-title">Результаты поиска</h2>
         
         <div class="search-result-list" id="searchResultList"></div>
 
-    </div>
+    </section>
 </div>
 
 
 <!-- Боковой контейнер (находится справа) -->
 <div class="right-container">
-    <div class="container">
-        <h2>Поиск</h2>
+    <section class="container category-navigation-panel">
+        <h2 class="container-title">Поиск</h2>
 
         <div class="input-field">
             <input type="search" id="searchInput">
             <label>Текст для поиска</label>
         </div>
         
-        <div class="search-category-buttons-list" id="searchButtonsList">
-            <button class="button search-category-btn" data-category="users">
+        <div class="category-navigation" id="searchButtonsList">
+            <button class="category-btn category-users" data-category="users">
                 <span>Пользователи</span>
             </button>
-            <button class="button search-category-btn" data-category="groups">
+            <button class="category-btn category-groups" data-category="groups">
                 <span>Группы</span>
             </button>
         </div>
 
-    </div>
+    </section>
 </div>
 
 

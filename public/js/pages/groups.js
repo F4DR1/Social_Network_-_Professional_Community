@@ -1,56 +1,42 @@
 import { groupsListGet, groupsCreate } from '../api.js';
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем, есть ли данные
+    if (!window.appData) {
+        console.error('appData не определен');
+        return;
+    }
+    
+    // Базовые данные
     const currentUserId = window.appData.currentUserId;
 
+
+    // Категории контактов
     const myGroupsCategory = document.getElementById('myGroups');
     const allGroupsCategory = document.getElementById('allGroups');
 
-    const message = document.getElementById('createGroupErrorMessage');
 
 
-    // ID элементов модального окна создания группы
-    const createGroupModalId = 'createGroupModal';
-    const createGroupBtnId = 'createGroupButton';
-    const cancelCreateGroupBtnId = 'cancelCreateGroupButton';
+    
 
-
-
-
-
-    async function createCreateGroupPanel(id, cancelBtnId, createBtnId) {
-        const nameInputId = 'inputNameCreateGroup';
-        await createModalHTML(id, `
-            <div class="modal-title">
-                <h2>Создание группы</h2>
-            </div>
-            <div class="modal-main create-group">
-                <div class="input-field">
-                    <input id="${nameInputId}" type="text" name="name" required autocomplete="name">
-                    <label class="required">Название группы</label>
-                </div>
-                <p class="message" id="createGroupErrorMessage"></p>
-            </div>
-            <div class="modal-footer">
-                <button class="create-group-cancel-btn" id="${cancelBtnId}">Отмена</button>
-                <button class="create-group-accept-btn" id="${createBtnId}">Создать группу</button>
-            </div>
-        `);
-
-        // Изменяем состояние кнопки в зависимости от заполненности поля
-        const createBtn = document.getElementById(createGroupBtn)
-        document.getElementById(nameInputId).addEventListener('input', function() {
-            const hasText = this.value.trim().length > 0;
-            createBtn.classList.toggle('active', hasText);
-            createBtn.disabled = !hasText;
-        });
+    // Показать/скрыть сообщение
+    function toggleMessage(message, text = '') {
+        message.textContent = text;
+        message.classList.toggle('active', text !== '')
+    }
+    
+    // Включить/отключить кнопку
+    function updateButtonActive(btn, isActive) {
+        btn.classList.toggle('active', isActive);
+        btn.disabled = !isActive;
     }
 
 
 
 
 
-    // Обновить посты в категории на странице
+    // =============== ВЫВОД СПИСКОВ ===============
+    // Обновить группы в категории на странице
     function updateCategoryGroups(groups, categoryType) {
         if (!groups || !categoryType || !myGroupsCategory || !allGroupsCategory) return;
 
@@ -87,87 +73,136 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-    // Показать сообщение
-    function setMessage(text) {
-        message.textContent = text;
-        message.classList.add('active');
-    }
-
-    // Скрыть сообщение
-    function clearMessage() {
-        message.textContent = '';
-        message.classList.remove('active');
-    }
-
 
     
+    // =============== API ===============
     // Получить список групп
-    async function getGroupsList() {
+    async function getGroupsListAPI() {
+        let myGroups = [];
+        let allGroups = [];
         try {
             const result = await groupsListGet(currentUserId);
 
             if (result.success) {
-                updateCategoryGroups(result.groups['admin'], 'my');
-                updateCategoryGroups(result.groups['all'], 'all');
-                return;
+                myGroups = result.groups['admin'];
+                allGroups = result.groups['all'];
             } else {
-                console.error(result.error || "Ошибка получения списка групп");
-            }
-
-        } catch (err) {
-            console.error("Ошибка сервера");
-        }
-        updateCategoryGroups([], 'my');
-        updateCategoryGroups([], 'all');
-    }
-
-    // Создать группу
-    async function createGroupAPI() {
-        const data = {
-            name: document.getElementById('groupName').value,
-        };
-
-        try {
-            const result = await groupsCreate(data);
-
-            if (result.success) {
-                clearMessage();
-                setTimeout(() => (window.location.href = `group${result.groupId}`), 2000);
-
-            } else {
-                setMessage(result.error || 'Ошибка создания группы');
+                console.error(result.error || 'Ошибка получения списка групп');
             }
 
         } catch (err) {
             console.error('Ошибка сервера');
         }
+        updateCategoryGroups(myGroups, 'my');
+        updateCategoryGroups(allGroups, 'all');
+    }
+
+    // Создать группу
+    async function createGroupAPI(message, data) {
+        try {
+            const result = await groupsCreate(data);
+
+            if (result.success) {
+                toggleMessage(message);
+                setTimeout(() => (window.location.href = `group${result.groupId}`), 2000);
+
+            } else {
+                toggleMessage(message, result.error || 'Ошибка создания группы');
+            }
+
+        } catch (err) {
+            toggleMessage('Ошибка сервера');
+        }
     }
 
 
 
-    // Создать панель создания группы
-    createCreateGroupPanel(createGroupModalId, cancelCreateGroupBtnId, createGroupBtnId);
 
+
+    // =============== МОДАЛЬНОЕ ОКНО ===============
+    // Модальное окно создания группы
+    async function createCreateGroupPanel(id) {
+        const modal = await createModalHTML(id, `
+            <div class="modal-title">
+                <h2>Создание группы</h2>
+            </div>
+            <div class="modal-main create-group">
+            
+                <!-- Имя группы -->
+                <div class="input-field">
+                    <span class="required">Название:</span>
+                    <div class="field">
+                        <input class="group-name" type="text" name="name" required autocomplete="name">
+                    </div>
+                </div>
+                <p class="message create-group-message" id="createGroupErrorMessage"></p>
+
+            </div>
+            <div class="modal-footer">
+                <button class="create-group-cancel-btn">Отмена</button>
+                <button class="create-group-accept-btn">Создать группу</button>
+            </div>
+        `);
+
+        
+
+        // Элементы модального окна
+        const message = modal.querySelector('.create-group-message');
+        const groupName = modal.querySelector('.group-name');
+
+
+
+        // ===== КНОПКИ И ВВОД =====
+        const acceptBtn = modal.querySelector('.create-group-accept-btn');
+        const cancelBtn = modal.querySelector('.create-group-cancel-btn');
+        
+
+        // Изменяем состояние кнопки в зависимости от заполненности поля
+        await updateButtonActive(acceptBtn, false);
+        groupName.addEventListener('input', () => {
+            const hasText = groupName.value.trim().length > 0;
+            updateButtonActive(acceptBtn, hasText);
+        });
+
+        // Закрыть панель создания группы
+        cancelBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal(id, true);
+        });
+        
+        // Создание группы
+        acceptBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const data = {
+                name: groupName.value.trim()
+            };
+            createGroupAPI(message, data);
+        });
+    }
+
+
+
+
+
+    // =============== СТАРТОВЫЕ ДЕЙСТВИЯ ===============
     // Получить список групп пользователя
-    getGroupsList();
-
-
-    
+    getGroupsListAPI();
 
 
 
+
+
+    // =============== ОБРАБОТКА КНОПОК ===============
     // Открыть панель создания группы
     document.getElementById('openCreateGroupPanel').addEventListener('click', (e) => {
         e.preventDefault();
+        if (!isNoModals()) return;
+        
+        const createGroupModalId = 'createGroupModal';
+
+        // Создать панель создания группы
+        createCreateGroupPanel(createGroupModalId);
         showModal(createGroupModalId)
     });
-
-    // Закрыть панель создания группы
-    document.getElementById(cancelCreateGroupBtnId).addEventListener('click', (e) => {
-        e.preventDefault();
-        hideModal(createGroupModalId);
-    });
-    
-    // Создание группы
-    document.getElementById(createGroupBtnId).addEventListener('click', createGroupAPI);
 });

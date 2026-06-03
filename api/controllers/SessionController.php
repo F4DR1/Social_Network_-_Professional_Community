@@ -11,6 +11,21 @@
         }
         
 
+        
+        // Формируем текст последней активности
+        private static function timeAgo($timestamp) {
+            $time = strtotime($timestamp);
+            $diff = time() - $time;
+            
+            if ($diff < 60) return 'только что';
+            if ($diff < 3600) return round($diff/60) . ' минут назад';
+            if ($diff < 86400) return round($diff/3600) . ' часов назад';
+            return date('d.m.Y H:i', $time);
+        }
+        
+
+
+
 
         /**
          * GET /validate_token - верифицировать токен и получить id пользователя
@@ -51,10 +66,11 @@
             $currentSessionId = $this->auth->getCurrentSession()['id'];
             foreach ($sessions as &$session) {
                 $session['is_current'] = ($session['id'] == $currentSessionId);
-                $session['last_activity_human'] = $this->timeAgo($session['last_activity']);
+                $session['last_activity_human'] = self::timeAgo($session['last_activity']);
+                $session['device_type_photo'] = Helpers::fileUrl(Helpers::imagePlaceholder($session['device_type']));
             }
             
-            echo json_encode(['sessions' => $sessions]);
+            Helpers::jsonResponse(['success' => true, 'sessions' => $sessions]);
         }
         
         /**
@@ -84,7 +100,7 @@
         }
         
         /**
-         * DELETE /sessions/{id} - завершить конкретную сессию
+         * DELETE /sessions/{session_id} - завершить конкретную сессию
          */
         public function terminateSession($sessionId) {
             Helpers::validateSessionId($sessionId);
@@ -104,7 +120,7 @@
                 [$sessionId, $currentUser['id']]
             );
             
-            echo json_encode(['success' => true]);
+            Helpers::jsonResponse(['success' => true]);
         }
 
         /**
@@ -127,19 +143,7 @@
                 [$currentUser['id'], $currentSession['id']]
             );
             
-            echo json_encode(['success' => true]);
-        }
-        
-
-        
-        private function timeAgo($timestamp) {
-            $time = strtotime($timestamp);
-            $diff = time() - $time;
-            
-            if ($diff < 60) return 'только что';
-            if ($diff < 3600) return round($diff/60) . ' минут назад';
-            if ($diff < 86400) return round($diff/3600) . ' часов назад';
-            return date('d.m.Y H:i', $time);
+            Helpers::jsonResponse(['success' => true]);
         }
     }
 ?>

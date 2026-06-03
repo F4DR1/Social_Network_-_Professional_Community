@@ -1,0 +1,194 @@
+/* 404.css - Стили для страницы 404 ошибки */
+
+/* Основные стили для страницы 404 */
+.error-404 {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Заголовок 404 */
+.error-404 h1 {
+    font-size: 8rem;
+    font-weight: 800;
+    color: #3b82f6;
+    line-height: 1;
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+/* Эффект для цифр 404 */
+.error-404 h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    border-radius: 2px;
+}
+
+/* Текст ошибки */
+.error-404 p {
+    font-size: 1.5rem;
+    color: #4b5563;
+    margin-bottom: 2.5rem;
+    font-weight: 500;
+}
+
+/* Кнопка "На главную" */
+.error-404 a {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    text-decoration: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Эффект наведения на кнопку */
+.error-404 a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+}
+
+.error-404 a:active {
+    transform: translateY(-1px);
+}
+
+/* Дополнительный декор */
+.error-404::before {
+    content: '404';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 25rem;
+    font-weight: 900;
+    color: rgba(59, 130, 246, 0.03);
+    z-index: -1;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Иконка (опционально) */
+.error-404 .error-icon {
+    font-size: 4rem;
+    color: #ef4444;
+    margin-bottom: 1.5rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .error-404 {
+        padding: 2rem 1rem;
+    }
+    
+    .error-404 h1 {
+        font-size: 6rem;
+    }
+    
+    .error-404 h1::after {
+        width: 80px;
+    }
+    
+    .error-404 p {
+        font-size: 1.25rem;
+    }
+    
+    .error-404 a {
+        padding: 0.75rem 1.75rem;
+        font-size: 0.9375rem;
+    }
+    
+    .error-404::before {
+        font-size: 18rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-404 h1 {
+        font-size: 4.5rem;
+    }
+    
+    .error-404 h1::after {
+        width: 60px;
+    }
+    
+    .error-404 p {
+        font-size: 1.125rem;
+    }
+    
+    .error-404 a {
+        padding: 0.625rem 1.5rem;
+        width: 100%;
+        max-width: 280px;
+    }
+    
+    .error-404::before {
+        font-size: 14rem;
+    }
+}
+
+/* Для Layout::Micro */
+body.layout-micro {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+body.layout-micro main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    width: 100%;
+}
+
+body.layout-micro .page-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -70,7 +70,7 @@
     $router->add('POST', '/validate_token', 'SessionController', 'validateToken', $db, null);
     $router->add('GET', '/sessions', 'SessionController', 'getAllMySessions', $db, $auth);
     $router->add('DELETE', '/sessions/current', 'SessionController', 'terminateCurrentSession', $db, $auth);
-    $router->add('DELETE', '/sessions/id', 'SessionController', 'terminateSession', $db, $auth);
+    $router->add('DELETE', '/sessions/{session_id}', 'SessionController', 'terminateSession', $db, $auth);
     $router->add('DELETE', '/sessions', 'SessionController', 'terminateAllOtherSessions', $db, $auth);
     
     // ========== КОДЫ ==========
@@ -78,10 +78,12 @@
     $router->add('POST', '/codes/confirm', 'CodeController', 'confirmCode', $db, null);
     
     // ========== ПОИСК ==========
-    $router->add('POST', '/searches/search', 'SearchController', 'search', $db, $auth);
+    $router->add('POST', '/search', 'SearchController', 'search', $db, $auth);
     
     // ========== УВЕДОМЛЕНИЯ ==========
     $router->add('GET', '/notifications/get/unread-count', 'NotificationController', 'getUnreadCount', $db, $auth);
+    $router->add('POST', '/notifications/get', 'NotificationController', 'get', $db, $auth);
+    $router->add('POST', '/notifications/mark-read', 'NotificationController', 'markRead', $db, $auth);
     
     // ========== СООБЩЕНИЯ ==========
     $router->add('POST', '/messages/get', 'MessageController', 'get', $db, $auth);
@@ -108,7 +110,7 @@
     // ========== ПОЛЬЗОВАТЕЛИ ==========
     $router->add('GET', '/users/{id}', 'UserController', 'getUserById', $db, null);
     $router->add('GET', '/users/by-link/{linkname}', 'UserController', 'getUserByLinkname', $db, null);
-    $router->add('PUT', '/users/update', 'UserController', 'updateProfile', $db, $auth);
+    $router->add('PUT', '/users/update-profile', 'UserController', 'updateProfile', $db, $auth);
     
     // ========== НАВЫКИ ПОЛЬЗОВАТЕЛЕЙ ==========
     $router->add('GET', '/skills/levels/get', 'UserSkillController', 'getSkillLevels', $db, $auth);
@@ -126,7 +128,7 @@
     $router->add('GET', '/groups/list/{user_id}', 'GroupController', 'getUserGroups', $db, null);
     $router->add('GET', '/groups/is-admin/{group_id}/{user_id}', 'GroupController', 'getUserIsAdminGroup', $db, null);
     $router->add('POST', '/groups/create', 'GroupController', 'createGroup', $db, $auth);
-    $router->add('POST', '/groups/edit', 'GroupController', 'editGroup', $db, $auth);
+    $router->add('PUT', '/groups/edit', 'GroupController', 'editGroup', $db, $auth);
     $router->add('GET', '/groups/members/{group_id}', 'GroupController', 'members', $db, null);
     $router->add('GET', '/groups/status/subscribe/{group_id}', 'GroupController', 'statusSubscribe', $db, $auth);
     $router->add('POST', '/groups/subscribe', 'GroupController', 'subscribe', $db, $auth);

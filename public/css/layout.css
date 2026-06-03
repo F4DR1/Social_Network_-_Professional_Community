@@ -1,31 +1,62 @@
 /* ============================================================
-   МирПрофи — standart_layout.css
-   Dark minimalist · Accent #695BF8
-   Единый фон #131308 · Выделенные header/footer
+   МирПрофи — layout.css
+   Светлая тема · Акцент #695BF8 · Контраст #131308
+   Воздушный, строгий, деловой интерфейс
+   Выделенные header/footer (холодный светлый тон)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
-/* ── CSS-переменные ── */
+/* Модальные окна (modal.js доступен на всех страницах, поэтому стили
+   модалок подгружаются глобально вместе с layout.css). */
+@import url('modal.css');
+
+/* ── CSS-переменные (светлая палитра) ── */
 :root {
+  /* Акцент */
   --accent:          #695BF8;
-  --accent-dim:      #8879fa;
-  --accent-ghost:    rgba(105, 91, 248, 0.12);
-  --accent-glow:     rgba(105, 91, 248, 0.35);
+  --accent-dim:      #5544E6;   /* темнее — для текста/ссылок/ховера на светлом */
+  --accent-strong:   #4231C9;   /* нажатие */
+  --accent-ghost:    rgba(105, 91, 248, 0.10);
+  --accent-ghost-2:  rgba(105, 91, 248, 0.16);
+  --accent-glow:     rgba(105, 91, 248, 0.26);
 
-  /* Новая осветлённая палитра */
-  --bg:              #1c1c13;
-  --bg-2:            #202016;
-  --bg-3:            #242419;
-  --bg-4:            #29291d;
-  --bg-5:            #2e2e21;
+  /* Поверхности (светлые) */
+  --bg:              #F8F9FA;   /* фон экрана */
+  --bg-2:            #FFFFFF;   /* карточки и контейнеры */
+  --bg-3:            #F3F4F6;   /* поля ввода, вложенные поверхности */
+  --bg-4:            #E9ECEF;   /* ховер */
+  --bg-5:            #DCE0E6;   /* нажатие / скроллбар / скелетон */
 
-  --border:          rgba(255,255,255,0.09);
-  --border-hover:    rgba(255,255,255,0.16);
+  /* Полупрозрачная карточка (воздушность) */
+  --card-bg:         rgba(255, 255, 255, 0.82);
 
-  --text:            #eaeaf2;
-  --text-2:          #9a9ab4;
-  --text-3:          #62627a;
+  /* Зона header/footer — холодный светлый лавандовый тон */
+  --zone-bg:         rgba(238, 240, 251, 0.85);
+  --zone-solid:      #EEF0FB;
+  --zone-border:     rgba(105, 91, 248, 0.14);
+
+  /* Текст — #131308 только для основного */
+  --text:            #131308;   /* основной текст, заголовки, ключевые иконки */
+  --text-2:          #4A4A52;   /* вторичный */
+  --text-3:          #8A8A95;   /* приглушённый */
+
+  --border:          #E5E7EB;
+  --border-hover:    #D1D5DB;
+  --border-input:    #DCDFE4;
+
+  /* Статусы */
+  --success:         #1F9254;
+  --error:           #E5484D;
+  --error-dim:       #C2363B;
+  --error-ghost:     rgba(229, 72, 77, 0.10);
+
+  /* Тени (мягкие, тёплый чёрный #131308) */
+  --shadow-sm:       0 1px 2px rgba(19, 19, 8, 0.06);
+  --shadow-card:     0 1px 2px rgba(19, 19, 8, 0.04), 0 1px 3px rgba(19, 19, 8, 0.05);
+  --shadow-md:       0 4px 16px rgba(19, 19, 8, 0.08);
+  --shadow-lg:       0 16px 44px rgba(19, 19, 8, 0.12);
+  --shadow-zone:     0 1px 0 rgba(19, 19, 8, 0.04);
 
   --radius:          12px;
   --radius-sm:       8px;
@@ -82,9 +113,11 @@ header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #29291d;                     /* светлее фона */
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.5);  /* тень для отделения */
+  background: var(--zone-bg);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border-bottom: 1px solid var(--zone-border);
+  box-shadow: var(--shadow-zone);
 }
 
 .header-container {
@@ -256,11 +289,11 @@ nav.auth a.inline:last-child:hover { background: var(--accent-dim); }
   top: calc(100% + 8px);
   right: 0;
   min-width: 220px;
-  background: var(--bg-3);
+  background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 6px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04);
+  box-shadow: var(--shadow-lg);
   opacity: 0;
   transform: translateY(-8px) scale(0.97);
   pointer-events: none;
@@ -321,10 +354,10 @@ nav.auth a.inline:last-child:hover { background: var(--accent-dim); }
 .header-dropdown-button:hover { background: var(--bg-4); color: var(--text); }
 .header-dropdown-button:hover svg { fill: var(--text-2); }
 
-.header-dropdown-button.logout { color: #f87171; }
-.header-dropdown-button.logout svg { fill: #f87171; }
-.header-dropdown-button.logout:hover { background: rgba(248,113,113,0.08); color: #fca5a5; }
-.header-dropdown-button.logout:hover svg { fill: #fca5a5; }
+.header-dropdown-button.logout { color: #E5484D; }
+.header-dropdown-button.logout svg { fill: #E5484D; }
+.header-dropdown-button.logout:hover { background: rgba(229,72,77,0.08); color: #C2363B; }
+.header-dropdown-button.logout:hover svg { fill: #C2363B; }
 
 /* Уведомления дропдаун — контент */
 #notifications {
@@ -439,9 +472,11 @@ main {
    ════════════════════════════════════════════════════════════ */
 footer.global {
   grid-area: footer;
-  background: #29291d;                         /* тот же светлый оттенок */
-  border-top: 1px solid var(--border);
-  box-shadow: 0 -4px 14px rgba(0,0,0,0.5);    /* тень вверх */
+  background: var(--zone-bg);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border-top: 1px solid var(--zone-border);
+  box-shadow: var(--shadow-zone);
   padding: 18px 24px;
   text-align: center;
   font-size: 0.8rem;
@@ -455,7 +490,7 @@ footer.global {
    ════════════════════════════════════════════════════════════ */
 
 .card {
-  background: var(--bg-2);
+  background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
@@ -463,7 +498,7 @@ footer.global {
 }
 .card:hover {
   border-color: var(--border-hover);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.28);
+  box-shadow: var(--shadow-md);
 }
 
 .btn {
@@ -576,11 +611,11 @@ footer.global {
     right: 0;
     top: auto;
     z-index: 200;
-    background: #29291de6;                /* полупрозрачный, но того же оттенка */
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border);
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.3);
+    background: rgba(238, 240, 251, 0.92);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-top: 1px solid var(--zone-border);
+    box-shadow: 0 -6px 24px rgba(19, 19, 8, 0.08);
     padding: 0 4px;
     height: var(--tabbar-h);
     grid-area: unset;

@@ -38,9 +38,10 @@
 .modal.active {
   opacity: 1;
   pointer-events: auto;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  /* Лёгкое затемнение тёплым тоном #131308, чтобы акцентировать панель */
+  background: rgba(19, 19, 8, 0.38);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
  
 /* Неактивное окно под верхним в стеке:
@@ -58,6 +59,56 @@
 }
  
  
+/* ════════════════════════════════════════════════════════════
+   КНОПКА ЗАКРЫТИЯ — .modal-close-btn
+   (создаётся modal.js как соседний к .modal-content элемент внутри
+   .modal; позиционируется в правом верхнем углу оверлея)
+   ════════════════════════════════════════════════════════════ */
+
+.modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+.modal.active .modal-close-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+.modal-close-btn:hover {
+  background: var(--bg-3);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+.modal-close-btn svg {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+
 /* ════════════════════════════════════════════════════════════
    КАРТОЧКА ОКНА
    ════════════════════════════════════════════════════════════ */
@@ -80,8 +131,8 @@
   padding: 24px;
  
   box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.04);
+    var(--shadow-lg),
+    0 0 0 1px rgba(19, 19, 8, 0.03);
  
   /* Активное окно — плавный вход */
   transform: translateY(10px) scale(0.985);
@@ -105,7 +156,7 @@
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
+  height: 3px;
   background: linear-gradient(90deg, var(--accent), var(--accent-dim), transparent 70%);
   border-radius: var(--radius) var(--radius) 0 0;
   pointer-events: none;
@@ -124,10 +175,10 @@
 .modal:not(.active) .modal-content {
   transform: translateY(0) scale(0.94);
   opacity: 0.45;
-  filter: brightness(0.6) blur(1px);
+  filter: saturate(0.85) blur(1px);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.02);
+    var(--shadow-md),
+    0 0 0 1px rgba(19, 19, 8, 0.03);
   pointer-events: none;
 }
  
@@ -429,14 +480,14 @@
 }
  
 /* Нейтральная (Отмена / Закрыть) */
-.modal-btn:not(.primary-btn):not(.secondary-btn):not(#publicateNewPostButton):not(#confirmationAcceptButton) {
+.modal-btn:not(.primary-btn):not(.secondary-btn):not(#publicateNewPostButton):not(#confirmationAcceptButton):not(.confiramtion-modal-accept-btn) {
   background: var(--bg-3);
   color: var(--text-2);
   border-color: var(--border);
   opacity: 1;
   pointer-events: auto;
 }
-.modal-btn:not(.primary-btn):not(.secondary-btn):not(#publicateNewPostButton):not(#confirmationAcceptButton):hover {
+.modal-btn:not(.primary-btn):not(.secondary-btn):not(#publicateNewPostButton):not(#confirmationAcceptButton):not(.confiramtion-modal-accept-btn):hover {
   background: var(--bg-4);
   border-color: var(--border-hover);
   color: var(--text);
@@ -457,7 +508,8 @@
 /* Первичная / акцентная (Опубликовать) */
 .primary-btn,
 #publicateNewPostButton,
-#confirmationAcceptButton {
+#confirmationAcceptButton,
+.confiramtion-modal-accept-btn {
   background: var(--accent);
   color: #fff;
   border-color: transparent;
@@ -465,7 +517,8 @@
 }
 .primary-btn.active:hover,
 #publicateNewPostButton.active:hover,
-#confirmationAcceptButton:hover {
+#confirmationAcceptButton:hover,
+.confiramtion-modal-accept-btn:hover {
   background: var(--accent-dim);
   box-shadow: 0 4px 20px var(--accent-glow);
   transform: translateY(-1px);
@@ -478,7 +531,9 @@
  
 /* Кнопки «Подтвердить» и «Отмена» всегда активны */
 #confirmationAcceptButton,
-#confirmationCancelButton {
+#confirmationCancelButton,
+.confiramtion-modal-accept-btn,
+.confiramtion-modal-cancel-btn {
   opacity: 1;
   pointer-events: auto;
 }
@@ -510,7 +565,8 @@
 }
  
 /* Подтверждение: две кнопки в ряд */
-.modal-footer:has(#confirmationCancelButton):has(#confirmationAcceptButton) {
+.modal-footer:has(#confirmationCancelButton):has(#confirmationAcceptButton),
+.modal-footer:has(.confiramtion-modal-cancel-btn):has(.confiramtion-modal-accept-btn) {
   flex-direction: row;
   justify-content: flex-end;
   gap: 8px;
@@ -595,11 +651,13 @@ body.modal-open {
   }
  
   /* Кнопки подтверждения — колонка на мобильном */
-  .modal-footer:has(#confirmationCancelButton):has(#confirmationAcceptButton) {
+  .modal-footer:has(#confirmationCancelButton):has(#confirmationAcceptButton),
+  .modal-footer:has(.confiramtion-modal-cancel-btn):has(.confiramtion-modal-accept-btn) {
     flex-direction: column-reverse;
     gap: 6px;
   }
-  .modal-footer:has(#confirmationCancelButton):has(#confirmationAcceptButton) .modal-btn {
+  .modal-footer:has(#confirmationCancelButton):has(#confirmationAcceptButton) .modal-btn,
+  .modal-footer:has(.confiramtion-modal-cancel-btn):has(.confiramtion-modal-accept-btn) .modal-btn {
     width: 100%;
     justify-content: center;
   }

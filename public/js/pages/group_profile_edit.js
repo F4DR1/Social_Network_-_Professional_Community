@@ -1,4 +1,6 @@
-import { groupsEdit } from '../api.js';
+import {
+    groupsEdit
+} from '../api.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Проверяем, есть ли данные
@@ -7,100 +9,173 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    // Базовые данные
     const groupPath = window.appData.groupPath;
     const groupId = window.appData.groupId;
 
+
+
+    let currentCategory = 'base';
+
+
     
-    const baseInfo = document.getElementById('baseInfo');
+    const groupBackBtn = document.getElementById('groupPath');
+    const editGroupDataCategoryBtnsPanel = document.getElementById('editGroupDataCategoryButtonsPanel');
+    const editGroupDataPanel = document.getElementById('editGroupDataPanel');
+
+
+    // Название категории
+    const categoryTitle = editGroupDataPanel.querySelector('.container-title');
+
+    // Панель сообщения
+    const messagePanel = editGroupDataPanel.querySelector('.message-panel');
+    const messageIcon = messagePanel.querySelector('.message-icon');
+    const messageTitle = messagePanel.querySelector('.message-title');
+    const messageText = messagePanel.querySelector('.message-text');
+
+
     
-    const groupLinkname = document.getElementById('groupLinkname');
+    // Элементы базовой категории
+    const mainDataCategoryBtn = editGroupDataCategoryBtnsPanel.querySelector('.category-main')
+    const mainDataPanel = editGroupDataPanel.querySelector('.main-data');
+    const groupName = mainDataPanel.querySelector('.group-name');
+    const groupLinkname = mainDataPanel.querySelector('.group-linkname');
 
 
 
-    function updateGroupPath(path) {
-        document.getElementById('groupPath').href = path;
+    
+    // =============== ПАНЕЛЬ СООБЩЕНИЯ ===============
+    // Переключаем видимость сообщения
+    function setMessageVisible(isVisible = false) {
+        messagePanel.classList.toggle('active', isVisible);
     }
 
-    function updateInfoMessage(category = null, message_status = null, message = null) {
-        [baseInfo]
-            .forEach(el => el?.classList.remove('active', 'success', 'error'));
-        
-        let infoPanel;
-        switch (category) {
-            case 'base':
-                infoPanel = baseInfo;
-                break;
-                
-            default:
-                return;
-        }
+    // Отображаем сообщение
+    function updateMessage(msg, status = 'error') {
+        messagePanel.classList.remove('success');
+        messagePanel.classList.remove('error');
 
-        const infoSVG = infoPanel.getElementsByClassName('info-icon-svg')[0];
-        const infoTitle = infoPanel.getElementsByClassName('info-title')[0];
-        const infoMessage = infoPanel.getElementsByClassName('info-message')[0];
-        switch (message_status) {
+        messagePanel.classList.add(status);
+        
+        switch (status) {
             case 'success':
-                infoPanel.classList.add('success');
-                infoTitle.textContent = 'Изменения сохранены';
-                infoMessage.textContent = 'Основная информация группы сохранена.';
+                // Зелёная галочка
+                messageIcon.innerHTML = `
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <polyline points="8,12 11,15 16,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                `;
+                messageTitle.innerHTML = 'Изменения сохранены';
                 break;
         
             case 'error':
-                infoPanel.classList.add('error');
-                infoTitle.textContent = 'Ошибка при сохранении';
-                infoMessage.textContent = message;
-                break;
-            
             default:
-                return;
+                // Красный крестик
+                messageIcon.innerHTML = `
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <line x1="8" y1="8" x2="16" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="16" y1="8" x2="8" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                `;
+                messageTitle.innerHTML = 'Ошибка обновления данных';
+                break;
         }
-
-        infoPanel.classList.add('active');
+        messageText.innerHTML = msg;
+        setMessageVisible(true);
     }
 
 
-    // Ставим ссылку назад при загрузке
-    updateGroupPath(groupPath);
-
-    // Скрываем панели сообщений
-    updateInfoMessage();
 
 
 
+    // =============== ПАНЕЛИ КАТЕГОРИЙ ===============
+    // Переключаем панели
+    function changeCategory(category, panel) {
+        currentCategory = category;
+
+        // Панели категорий
+        mainDataPanel.classList.toggle('active', panel === mainDataPanel);
+
+        // Кнопки категорий
+        mainDataCategoryBtn.classList.toggle('active', panel === mainDataPanel);
+    }
+
+
+
+
+
+    // =============== API ===============
     // Отправить данные на скрипт
-    async function editGroupData(category, value) {
+    async function editGroupDataAPI() {
+        setMessageVisible(false);
+        
         const data = {
             groupId: groupId,
-            category: category,
-            value: JSON.stringify(value)
+            category: currentCategory
         };
+
+        // Подгружаем данные для каждой категории отдельно
+        let successMsg = '';
+        switch (currentCategory) {
+            case 'base':
+                successMsg = 'Основная информация была обновлена.';
+                const baseInfo = {
+                    name: groupName.value,
+                    linkname: groupLinkname.value === '' ? `group${groupId}` : groupLinkname.value
+                };
+                data.base = JSON.stringify(baseInfo);
+                break;
+        
+            default:
+                break;
+        }
 
         try {
             const result = await groupsEdit(data);
 
             if (result.success) {
-                updateGroupPath(result.linkname);
-                updateInfoMessage(category, 'success');
+                updateMessage(successMsg, 'success');
+                if (currentCategory === 'base') {
+                    groupLinkname.value = result.linkname;
+                    groupBackBtn.href = result.linkname;
+                    
+                    // Устанавливаем новый адрес (без поддержки истории)
+                    const pathParts = window.location.pathname.split('/');
+                    pathParts[pathParts.length - 1] = result.linkname;
+                    const newPath = pathParts.join('/');
+                    const newUrl = newPath + window.location.search + window.location.hash;
+                    window.history.replaceState({}, '', newUrl);
+                }
             } else {
-                updateInfoMessage(category, 'error', result.error || 'Ошибка соединения');
+                updateMessage(result.error || 'Ошибка соединения. Попробуйте ещё раз.', 'error');
             }
             
         } catch (err) {
-            updateInfoMessage(category, 'error', 'Ошибка сервера');
-            console.log("Ошибка сервера: " . result.error || '');
+            updateMessage('Ошибка сервера.', 'error');
         }
     }
 
 
 
-    // Сохранение базовой информации группы
-    document.getElementById("saveBaseInfo").addEventListener("click", (e) => {
+
+
+    // =============== КНОПКИ ===============
+    // Сохранение данных группы
+    document.getElementById('saveData').addEventListener('click', (e) => {
         e.preventDefault();
-        if (groupLinkname.value == '') groupLinkname.value = 'group' + groupId;
-        const baseInfo = {
-            name: document.getElementById('groupName').value,
-            linkname: groupLinkname.value
-        };
-        editGroupData('base', baseInfo);
+        editGroupDataAPI();
     });
+
+    mainDataCategoryBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Категория основных данных
+        if (mainDataCategoryBtn.classList.contains('active')) return;
+        categoryTitle.innerHTML = 'Основная информация';
+        changeCategory('base', mainDataPanel)
+    });
+
+
+
+
+    
+    // =============== СТАРТОВАЯ НАСТРОЙКА ===============
+    mainDataCategoryBtn.click();
 });

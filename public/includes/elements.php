@@ -6,7 +6,8 @@
      */
     function postCreationField() {
         return <<<HTML
-            <section class="container">
+            <!-- Панель создания постов -->
+            <section class="container post-create-panel">
                 <button class="post-create-btn" id="newPostButton">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -32,7 +33,8 @@
     function postsPanel($title = null) {
         $title = htmlspecialchars($title ?? 'Посты');
         return <<<HTML
-            <section class="container">
+            <!-- Панель постов -->
+            <section class="container posts-panel">
                 <h2>$title</h2>
                 <div class="posts" id="postsList"></div>
             </section>

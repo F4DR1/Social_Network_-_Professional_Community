@@ -36,7 +36,7 @@
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--bg-4);
-  box-shadow: 0 0 0 2px var(--accent-ghost), 0 8px 24px rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 2px var(--accent-ghost), 0 8px 24px rgba(19,19,8,0.10);
   flex-shrink: 0;
   transition: box-shadow var(--transition), transform var(--transition);
 }
@@ -283,8 +283,8 @@
   padding: 4px;
   list-style: none;
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
+    0 16px 48px rgba(19,19,8,0.12),
+    0 0 0 1px rgba(19, 19, 8, 0.03);
   /* Поднимаем над всем контентом страницы */
   z-index: 1000;
   /* Анимация */
@@ -427,7 +427,7 @@
   border-radius: var(--radius);
   padding: 5px;
   list-style: none;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  box-shadow: 0 12px 40px rgba(19,19,8,0.10), 0 0 0 1px rgba(19,19,8,0.03);
   z-index: 1000;
   opacity: 0;
   transform: translateY(-6px) scale(0.97);
@@ -489,7 +489,7 @@
   border-radius: var(--radius);
   padding: 5px;
   list-style: none;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+  box-shadow: 0 12px 40px rgba(19,19,8,0.10), 0 0 0 1px rgba(19,19,8,0.03);
   z-index: 1100;
   opacity: 0;
   transform: translateX(-6px) scale(0.97);
@@ -590,7 +590,7 @@
 }
 .user-skill:hover {
   border-color: var(--border-hover);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 12px rgba(19,19,8,0.07);
 }
  
 .skill-head {
@@ -667,15 +667,15 @@
   padding: 6px 12px;
 }
 .btn-skill-endorsement-add svg  { fill: var(--accent-dim); }
-.btn-skill-endorsement-delete svg { fill: #f87171; }
+.btn-skill-endorsement-delete svg { fill: #E5484D; }
 .btn-skill-endorsement-delete {
-  color: #f87171;
-  border-color: rgba(248,113,113,0.2);
+  color: #E5484D;
+  border-color: rgba(229,72,77,0.2);
 }
 .btn-skill-endorsement-delete:hover {
-  background: rgba(248,113,113,0.08);
-  color: #fca5a5;
-  border-color: rgba(248,113,113,0.35);
+  background: rgba(229,72,77,0.08);
+  color: #C2363B;
+  border-color: rgba(229,72,77,0.35);
 }
  
 .no-skills-message {
@@ -719,15 +719,15 @@
  
 .user-skill-delete-btn {
   align-self: flex-start;
-  color: #f87171 !important;
-  border-color: rgba(248,113,113,0.2) !important;
+  color: #E5484D !important;
+  border-color: rgba(229,72,77,0.2) !important;
   font-size: 0.83rem;
   padding: 6px 12px;
 }
 .user-skill-delete-btn:hover {
-  background: rgba(248,113,113,0.08) !important;
-  border-color: rgba(248,113,113,0.35) !important;
-  color: #fca5a5 !important;
+  background: rgba(229,72,77,0.08) !important;
+  border-color: rgba(229,72,77,0.35) !important;
+  color: #C2363B !important;
 }
  
 .add-field-btn {

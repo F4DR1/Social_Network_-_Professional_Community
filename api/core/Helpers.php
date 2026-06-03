@@ -21,6 +21,8 @@
             return $host === 'localhost' || strpos($host, '.local') !== false;
         }
 
+
+
         /**
          * Возвращает основной домен (без протокола и поддоменов)
          */
@@ -50,6 +52,23 @@
             return self::apiBaseUrl() . '/' . ltrim($relativePath, '/');
         }
 
+
+
+    
+
+
+
+        /**
+         * Возвращает список ролей администраторов групп
+         */
+        public static function getGroupAdminRoles() {
+            $roles = ['owner', 'admin', 'moderator'];
+            return [
+                'roles' => $roles,
+                'names' => implode(',', array_fill(0, count($roles), '?'))
+            ];
+        }
+
         /**
          * Формирует заглушки для изображений
          */
@@ -67,8 +86,6 @@
             }
         }
 
-
-
         /**
          * Конвертирует markdown в html
          */
@@ -79,39 +96,11 @@
             ]);
             return $converter->convert($markdown)->getContent();
         }
-
-
-
-        /**
-         * Проверка на корректный id
-         */
-        private static function validateId($id, $text) {
-            if (empty($id) || !is_numeric($id) || $id <= 0) {
-                self::errorResponse($text, 400);
-            }
-        }
         
-        /**
-         * Получение домена для cookie
-         */
-        private static function getCookieDomain() {
-            $domain = self::getMainDomain();
-            return ($domain === 'localhost') ? $domain : '.' . $domain;
-        }
 
-    
 
-        /**
-         * Возвращает список ролей администраторов групп
-         */
-        public static function getGroupAdminRoles() {
-            $roles = ['owner', 'admin', 'moderator'];
-            return [
-                'roles' => $roles,
-                'names' => implode(',', array_fill(0, count($roles), '?'))
-            ];
-        }
-        
+
+
         /**
          * Генерация случайного токена
          */
@@ -119,6 +108,10 @@
             return bin2hex(random_bytes(32));
         }
         
+
+
+
+
         /**
          * Извлекает токен из запроса
          */
@@ -157,6 +150,14 @@
         }
         
         /**
+         * Получение домена для cookie
+         */
+        private static function getCookieDomain() {
+            $domain = self::getMainDomain();
+            return ($domain === 'localhost') ? $domain : '.' . $domain;
+        }
+        
+        /**
          * Устанавливает HttpOnly cookie
          */
         public static function setAuthCookie($token) {
@@ -187,23 +188,10 @@
                 'samesite' => 'Strict'
             ]);
         }
-        
-        /**
-         * Форматирует телефон
-         */
-        public static function formatPhone($phone) {
-            $cleaned = preg_replace('/[^0-9]/', '', $phone);
-            
-            if (strlen($cleaned) == 11 && $cleaned[0] == '8') {
-                $cleaned[0] = '7';
-            }
-            
-            if (strlen($cleaned) == 10 && $cleaned[0] == '9') {
-                $cleaned = '7' . $cleaned;
-            }
-            
-            return $cleaned;
-        }
+
+
+
+
 
         /**
          * Маскирует email: оставляет первый и последний символ локальной части,
@@ -257,6 +245,27 @@
         }
         
         /**
+         * Форматирует телефон
+         */
+        public static function formatPhone($phone) {
+            $cleaned = preg_replace('/[^0-9]/', '', $phone);
+            
+            if (strlen($cleaned) == 11 && $cleaned[0] == '8') {
+                $cleaned[0] = '7';
+            }
+            
+            if (strlen($cleaned) == 10 && $cleaned[0] == '9') {
+                $cleaned = '7' . $cleaned;
+            }
+            
+            return $cleaned;
+        }
+        
+
+
+
+
+        /**
          * JSON ответ
          */
         public static function jsonResponse($data, $statusCode = 200) {
@@ -273,6 +282,10 @@
             self::jsonResponse(['success' => false, 'error' => $message], $statusCode);
         }
         
+
+
+
+
         /**
          * Валидация email
          */
@@ -287,6 +300,9 @@
             if (strlen($password) < 6) {
                 return 'Пароль должен быть не менее 6 символов';
             }
+            if (strlen($password) > 30) {
+                return 'Пароль должен быть не более 30 символов';
+            }
             if (!preg_match('/[A-Z]/', $password)) {
                 return 'Пароль должен содержать хотя бы одну заглавную букву';
             }
@@ -299,6 +315,93 @@
             return true;
         }
         
+
+
+
+
+        /**
+         * Проверяет, соответствует ли linkname верному формату (не содержит зарезервированные имена).
+         * 
+         * @param string $linkname  Проверяемый идентификатор
+         *
+         * @return bool true, если linkname соответствует верному формату
+         */
+        public static function isValidLinknameFormat(string $linkname): bool {
+            if (preg_match('/^(user|group)(\d+)$/', $linkname, $matches)) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Проверяет, уникален ли linkname в таблицах users и groups.
+         *
+         * @param Database $db  Подключение к БД
+         * @param string $linkname  Проверяемый идентификатор
+         * @param int|null $excludeUserId  ID пользователя, которого нужно игнорировать (при редактировании)
+         * @param int|null $excludeGroupId  ID группы, которую нужно игнорировать (при редактировании)
+         *
+         * @return bool true, если linkname не используется ни одним пользователем / группой
+         */
+        public static function isLinknameUnique($db, string $linkname, ?int $excludeUserId = null, ?int $excludeGroupId = null): bool {
+            if (empty($linkname)) {
+                return false;
+            }
+
+            // Проверка среди пользователей
+            $userSql = "SELECT COUNT(*) AS cnt FROM users WHERE linkname = ?";
+            $params = [$linkname];
+            if ($excludeUserId !== null) {
+                $userSql .= " AND id != ?";
+                $params[] = $excludeUserId;
+            }
+            $userCount = (int) ($db->fetchOne($userSql, $params)['cnt'] ?? 0);
+
+            // Проверка среди групп
+            $groupSql = "SELECT COUNT(*) AS cnt FROM groups WHERE linkname = ?";
+            $params = [$linkname];
+            if ($excludeGroupId !== null) {
+                $groupSql .= " AND id != ?";
+                $params[] = $excludeGroupId;
+            }
+            $groupCount = (int) ($db->fetchOne($groupSql, $params)['cnt'] ?? 0);
+
+            return ($userCount + $groupCount) === 0;
+        }
+
+
+        
+        /**
+         * Проверить ссылку на верную длину
+         */
+        public static function validateLinknameLength(string $name) {
+            if (empty($name) || strlen($name) < 4) Helpers::errorResponse('Ссылка должна содержать минимум 4 символа', 400);
+            if (strlen($name) > 50) Helpers::errorResponse('Ссылка должна содержать максимум 50 символов', 400);
+        }
+
+        /**
+         * Проверить имя на верную длину
+         */
+        public static function validateNameLength(string $name) {
+            if (empty($name) || strlen($name) < 4) Helpers::errorResponse('Название должно содержать минимум 4 символа', 400);
+            if (strlen($name) > 100) Helpers::errorResponse('Название должно содержать максимум 100 символов', 400);
+        }
+
+
+
+
+
+        /**
+         * Проверка на корректный id
+         */
+        private static function validateId($id, $text) {
+            if (empty($id) || !is_numeric($id) || $id <= 0) {
+                self::errorResponse($text, 400);
+            }
+        }
+
+
+
         /**
          * Проверить id сессии
          */

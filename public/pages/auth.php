@@ -40,11 +40,11 @@
             <div id="loginForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input type="text" id="loginLogin" required autocomplete="username">
+                        <input min="1" max="100" type="text" id="loginLogin" required autocomplete="username">
                         <label>Телефон или email</label>
                     </div>
                     <div class="input-field">
-                        <input type="password" id="loginPassword" required autocomplete="current-password">
+                        <input min="6" max="30" type="password" id="loginPassword" required autocomplete="current-password">
                         <label>Пароль</label>
                     </div>
                 </div>
@@ -64,19 +64,19 @@
             <div id="registerForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input type="text" id="registerLogin" inputmode="numeric" pattern="^\+7[1-9]{10}$" required autocomplete="username">
+                        <input min="1" max="20" type="text" id="registerLogin" inputmode="numeric" pattern="^\+7[1-9]{10}$" required autocomplete="username">
                         <label class="required">Телефон</label>
                     </div>
                     <div class="input-field">
-                        <input type="password" id="registerPassword" required autocomplete="new-password" minlength="6">
+                        <input min="6" max="30" type="password" id="registerPassword" required autocomplete="new-password" minlength="6">
                         <label class="required">Пароль</label>
                     </div>
                     <div class="input-field">
-                        <input type="text" id="registerFirstname" required autocomplete="given-name">
+                        <input min="1" max="100" type="text" id="registerFirstname" required autocomplete="given-name">
                         <label class="required">Имя</label>
                     </div>
                     <div class="input-field">
-                        <input type="text" id="registerLastname" required autocomplete="family-name">
+                        <input min="1" max="100" type="text" id="registerLastname" required autocomplete="family-name">
                         <label class="required">Фамилия</label>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
             <div id="recoveryForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input type="text" id="recoveryLogin" required autocomplete="username">
+                        <input min="1" max="100" type="text" id="recoveryLogin" required autocomplete="username">
                         <label>Телефон или email</label>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
             <div id="codeForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input type="text" id="codeInput" required autocomplete="one-time-code">
+                        <input min="1" max="6" type="text" id="codeInput" required autocomplete="one-time-code">
                         <label>Код</label>
                     </div>
                 </div>

@@ -1,0 +1,22 @@
+/* ============================================================
+   МирПрофи — group_profile_edit.css
+   Редактирование группы.
+   Основные примитивы (форма, message-panel, категории,
+   кнопка возврата, .standart-btn) — в containers.css.
+   ============================================================ */
+
+#editGroupDataPanel { gap: 18px; }
+
+#editGroupDataPanel #saveData {
+  align-self: flex-start;
+  min-width: 160px;
+}
+
+/* Поле названия группы — одиночный input без префикса */
+#editGroupDataPanel .input-field input.group-name {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  #editGroupDataPanel #saveData { width: 100%; }
+}

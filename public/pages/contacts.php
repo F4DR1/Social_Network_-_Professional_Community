@@ -89,8 +89,8 @@
 
 
 <div class="centered-container">
-    <div class="container">
-        <h2>Контакты</h2>
+    <section class="container">
+        <h2 class="container-title">Контакты</h2>
 
         <?php foreach ($sections as $section): ?>
             <div class="category" id="<?= $section['type'] ?>">
@@ -99,7 +99,7 @@
             </div>
         <?php endforeach ?>
         
-    </div>
+    </section>
 </div>
 
 

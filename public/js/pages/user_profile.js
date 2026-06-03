@@ -1,4 +1,5 @@
 // user_profile.js
+// LEGACY
 import {
     relationshipsSubscribe, relationshipsUnsubscribe,
     skillLevelsGet, skillsGet,
@@ -330,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
 
-        const hasSkills = userSkillsList.children.length > 0 && !userSkillsList.querySelector(".no-skills-message");
+        const hasSkills = userSkillsList.children.length > 0 && !userSkillsList.querySelector('.no-skills-message');
         if (!hasSkills) {
             const text = userId == currentUserId ? "Вы не добавили ни одного навыка." : "Пользователь не добавил ни одного навыка."
             userSkillsList.innerHTML = `<p class="no-skills-message">${text}</p>`;
@@ -381,11 +382,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 userSkills = result.skills
             } else {
-                console.log(result.error || "Ошибка обработки отношений");
+                console.log(result.error || 'Ошибка обработки отношений');
             }
 
         } catch (err) {
-            console.log("Ошибка сервера");
+            console.log('Ошибка сервера');
         }
         return [];
     }
@@ -402,11 +403,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 allSkills = result.skills;
             } else {
-                console.log(result.error || "Ошибка обработки навыков");
+                console.log(result.error || 'Ошибка обработки навыков');
             }
 
         } catch (err) {
-            console.log("Ошибка сервера");
+            console.log('Ошибка сервера');
         }
     }
 
@@ -418,11 +419,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 skillsLevels = result.levels;
             } else {
-                console.log(result.error || "Ошибка обработки уровней навыков");
+                console.log(result.error || 'Ошибка обработки уровней навыков');
             }
 
         } catch (err) {
-            console.log("Ошибка сервера");
+            console.log('Ошибка сервера');
         }
         return [];
     }
@@ -442,11 +443,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 await getUserSkillsAPI();
                 updateUserSkills(userSkills);
             } else {
-                console.log(result.error || "Ошибка обработки навыков");
+                console.log(result.error || 'Ошибка обработки навыков');
             }
 
         } catch (err) {
-            console.error("Ошибка сервера");
+            console.error('Ошибка сервера');
         }
     }
     
@@ -464,11 +465,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 await getUserSkillsAPI();
                 updateUserSkills(userSkills);
             } else {
-                console.log(result.error || "Ошибка обработки навыков");
+                console.log(result.error || 'Ошибка обработки навыков');
             }
 
         } catch (err) {
-            console.error("Ошибка сервера");
+            console.error('Ошибка сервера');
         }
     }
 
@@ -487,11 +488,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateEditUserSkillsPanel(userSkills);
                 updateUserSkills(userSkills);
             } else {
-                console.log(result.error || "Ошибка обработки навыков");
+                console.log(result.error || 'Ошибка обработки навыков');
             }
 
         } catch (err) {
-            console.log("Ошибка сервера");
+            console.log('Ошибка сервера');
         }
     }
 
@@ -509,11 +510,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateEditUserSkillsPanel(userSkills);
                 updateUserSkills(userSkills);
             } else {
-                console.log(result.error || "Ошибка обработки навыков");
+                console.log(result.error || 'Ошибка обработки навыков');
             }
 
         } catch (err) {
-            console.log("Ошибка сервера");
+            console.log('Ошибка сервера');
         }
     }
 
@@ -532,16 +533,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateEditUserSkillsPanel(userSkills);
                 updateUserSkills(userSkills);
             } else {
-                console.log(result.error || "Ошибка обработки навыков");
+                console.log(result.error || 'Ошибка обработки навыков');
             }
 
         } catch (err) {
-            console.log("Ошибка сервера");
+            console.log('Ошибка сервера');
         }
     }
     
 
-    //=============== ПОДПИСКИ ===============
     // Изменить подписку
     async function subscribeAPI(isSubscribe) {
         const data = {
@@ -554,11 +554,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 location.reload();
             } else {
-                console.log(result.error || "Ошибка обработки отношений");
+                console.log(result.error || 'Ошибка обработки отношений');
             }
 
         } catch (err) {
-            console.log("Ошибка сервера");
+            console.log('Ошибка сервера');
         }
     }
 
@@ -606,59 +606,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (userId != currentUserId) {
         // =============== КНОПКИ В ЧУЖОМ ПРОФИЛЕ ===============
-        document.getElementById("mainMessageUserButton")?.addEventListener("click", (e) => {
+        document.getElementById('mainMessageUserButton')?.addEventListener('click', (e) => {
             // Написать пользователю
             e.preventDefault();
             window.location.href = `${window.APP_CONFIG.BASE_URL}/msg?type=user&id=${userId}`;
         });
-        document.getElementById("baseMessageUserButton")?.addEventListener("click", (e) => {
+        document.getElementById('baseMessageUserButton')?.addEventListener('click', (e) => {
             // Написать пользователю
             e.preventDefault();
             window.location.href = `${window.APP_CONFIG.BASE_URL}/msg?type=user&id=${userId}`;
         });
-        document.getElementById("followButton")?.addEventListener("click", (e) => {
+        document.getElementById('followButton')?.addEventListener('click', (e) => {
             // Отправить заявку
             e.preventDefault();
             subscribeAPI(true);
         });
-        document.getElementById("unfollowButton")?.addEventListener("click", (e) => {
+        document.getElementById('unfollowButton')?.addEventListener('click', (e) => {
             // Отменить заявку
             e.preventDefault();
             subscribeAPI(false);
         });
-        document.getElementById("acceptButton")?.addEventListener("click", (e) => {
+        document.getElementById('acceptButton')?.addEventListener('click', (e) => {
             // Принять заявку
             e.preventDefault();
             subscribeAPI(true);
         });
-        document.getElementById("deleteButton")?.addEventListener("click", (e) => {
+        document.getElementById('deleteButton')?.addEventListener('click', (e) => {
             // Удалить из контактов
             e.preventDefault();
             subscribeAPI(false);
         });
 
-    } else {
-        // =============== КНОПКИ В СВОЁМ ПРОФИЛЕ ===============
-        document.getElementById("selfEditProfile")?.addEventListener("click", (e) => {
-            // Написать пользователю
-            e.preventDefault();
-            window.location.href = `${window.APP_CONFIG.BASE_URL}/edit-profile`;
-        });
-        document.getElementById("selfSettings")?.addEventListener("click", (e) => {
-            // Написать пользователю
-            e.preventDefault();
-            window.location.href = `${window.APP_CONFIG.BASE_URL}/settings`;
-        });
     }
     
 
     // =============== КНОПКИ В ЛЮБОМ ПРОФИЛЕ ===============
-    document.getElementById("postsNavigationButton")?.addEventListener("click", (e) => {
+    document.getElementById('postsNavigationButton')?.addEventListener('click', (e) => {
         // Написать пользователю
         e.preventDefault();
         window.location.href = `${profilePath}`;
     });
-    document.getElementById("skillsNavigationButton")?.addEventListener("click", (e) => {
+    document.getElementById('skillsNavigationButton')?.addEventListener('click', (e) => {
         // Написать пользователю
         e.preventDefault();
         window.location.href = `${profilePath}?p=skills`;

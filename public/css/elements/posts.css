@@ -57,7 +57,7 @@
   border-radius: 0 0 var(--radius) var(--radius);
 }
 .post:hover {
-  background: rgba(255, 255, 255, 0.015);
+  background: rgba(105, 91, 248, 0.025);
 }
  
 /* Акцентная полоска слева при наведении */
@@ -227,7 +227,7 @@
 }
 .post-file-preview:hover {
   transform: scale(1.01);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-md);
 }
 .post-file-preview img {
   display: block;
@@ -337,7 +337,7 @@
   gap: 10px;
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--border);
 }
  
 .post-date {
@@ -361,17 +361,17 @@
  
 /* Кнопка удаления поста — красный акцент */
 .delete-post-btn {
-  color: #f87171 !important;
+  color: #E5484D !important;
 }
 .delete-post-btn svg {
-  fill: #f87171 !important;
+  fill: #E5484D !important;
 }
 .delete-post-btn:hover {
-  background: rgba(248, 113, 113, 0.08) !important;
-  color: #fca5a5 !important;
+  background: rgba(229, 72, 77, 0.08) !important;
+  color: #C2363B !important;
 }
 .delete-post-btn:hover svg {
-  fill: #fca5a5 !important;
+  fill: #C2363B !important;
 }
  
  
