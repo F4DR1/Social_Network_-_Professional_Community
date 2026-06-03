@@ -283,6 +283,14 @@
                                 </svg>
                                 <a href="search">Поиск</a>
                             </li>
+                            <hr>
+                            <li>
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                <a href="about">О нас</a>
+                            </li>
                         <?php endif; ?>
                     </ul>
                 </nav>
@@ -298,14 +306,6 @@
             ?>
         </div>
     </main>
-
-    <?php if ($layout !== Layout::Micro): ?>
-        <!-- Подвал (видно в любом layout, кроме Micro) -->
-        <footer class="global">
-            <p>Связаться с нами: <a href="mailto:support@мирпрофи.рф">support@мирпрофи.рф</a></p>
-            &copy; <?= htmlspecialchars($base_title) ?>
-        </footer>
-    <?php endif; ?>
 
 </body>
 </html>

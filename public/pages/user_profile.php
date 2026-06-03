@@ -319,15 +319,15 @@
             <?php switch ($panel):
                 case 'skills': ?>
                     <!-- Контейнер скиллов -->
-                    <section class="container skills-panel">
+                    <section class="container user-skills-panel">
                         <h2>Навыки</h2>
                         <?php if ($userId === $currentUserId): ?>
                             <!-- Кнопка настройки своих навыков -->
-                            <button class="button user-skills-btn" id="openEditUserSkillsButton">Настроить</button>
+                            <button class="button user-skills-edit-btn" id="openEditUserSkillsButton">Настроить</button>
                         <?php endif; ?>
 
                         <!-- Список навыков пользователя -->
-                        <div id="skillsList" class="skills-list"></div>
+                        <div class="user-skills-list"></div>
                     </section>
 
                 <?php break;
@@ -389,6 +389,12 @@
             );
             switch ($panel) {
                 case 'skills':
+                    array_push($scripts,
+                        'elements/skills.js'
+                    );
+                    array_push($stylesheets,
+                        'elements/skills.css'
+                    );
                     break;
 
                 // Загружаем всё что связано с главным меню профиля (но не связано с другими меню профиля)

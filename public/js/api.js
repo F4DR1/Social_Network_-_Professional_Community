@@ -227,49 +227,49 @@ export async function updateUserProfile(data) {
 
 
 // ========== НАВЫКИ ПОЛЬЗОВАТЕЛЯ ==========
-export async function skillLevelsGet() {
-    return apiRequest(`/skills/levels/get`, {
+export async function userSkillsLevelsGet() {
+    return apiRequest(`/user-skills/levels/get`, {
         method: 'GET'
     });
 }
-export async function skillsGet(data) {
-    return apiRequest(`/skills/get`, {
+export async function userSkillsGet(data) {
+    return apiRequest(`/user-skills/get`, {
         method: 'POST',
         body: data
     });
 }
-export async function userSkillsGet(userId, data) {
-    return apiRequest(`/users/user-skills/get/${userId}`, {
+export async function userSkillsGetByUser(userId, data) {
+    return apiRequest(`/user-skills/get/${userId}`, {
         method: 'POST',
         body: data
     });
 }
 export async function userSkillsAdd(data) {
-    return apiRequest(`/users/user-skills/add`, {
+    return apiRequest(`/user-skills/add`, {
         method: 'POST',
         body: data
     });
 }
 export async function userSkillsEdit(data) {
-    return apiRequest(`/users/user-skills/edit`, {
+    return apiRequest(`/user-skills/edit`, {
         method: 'PUT',
         body: data
     });
 }
 export async function userSkillsDelete(data) {
-    return apiRequest(`/users/user-skills/delete`, {
+    return apiRequest(`/user-skills/delete`, {
         method: 'DELETE',
         body: data
     });
 }
 export async function userSkillEndorsementAdd(data) {
-    return apiRequest(`/users/user-skills/endorsement/add`, {
+    return apiRequest(`/user-skills/endorsement/add`, {
         method: 'POST',
         body: data
     });
 }
 export async function userSkillEndorsementDelete(data) {
-    return apiRequest(`/users/user-skills/endorsement/delete`, {
+    return apiRequest(`/user-skills/endorsement/delete`, {
         method: 'DELETE',
         body: data
     });

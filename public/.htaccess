@@ -1,7 +1,10 @@
+# Запрещаем просмотр содержимого папок
+Options -Indexes
+
 RewriteEngine On
 
 # Запрещаем прямой доступ к системным папкам (403 Forbidden)
-RewriteRule ^(error_pages|pages|includes|config|enums|core)/ index.php?route=403 [L,QSA]
+RewriteRule ^(vendor|config|enums|includes|error_pages|pages)/ index.php?route=403 [L,QSA]
 
 # Для всех остальных: если нет файла и нет папки – роутинг на index.php
 RewriteCond %{REQUEST_FILENAME} !-f

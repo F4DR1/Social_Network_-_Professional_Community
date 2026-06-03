@@ -113,14 +113,14 @@
     $router->add('PUT', '/users/update-profile', 'UserController', 'updateProfile', $db, $auth);
     
     // ========== НАВЫКИ ПОЛЬЗОВАТЕЛЕЙ ==========
-    $router->add('GET', '/skills/levels/get', 'UserSkillController', 'getSkillLevels', $db, $auth);
-    $router->add('POST', '/skills/get', 'UserSkillController', 'getSkills', $db, $auth);
-    $router->add('POST', '/users/user-skills/get/{user_id}', 'UserSkillController', 'getUserSkills', $db, null);
-    $router->add('POST', '/users/user-skills/add', 'UserSkillController', 'addUserSkill', $db, $auth);
-    $router->add('PUT', '/users/user-skills/edit', 'UserSkillController', 'editUserSkill', $db, $auth);
-    $router->add('DELETE', '/users/user-skills/delete', 'UserSkillController', 'deleteUserSkill', $db, $auth);
-    $router->add('POST', '/users/user-skills/endorsement/add', 'UserSkillController', 'addEndorsementUserSkill', $db, $auth);
-    $router->add('DELETE', '/users/user-skills/endorsement/delete', 'UserSkillController', 'deleteEndorsementUserSkill', $db, $auth);
+    $router->add('POST', '/user-skills/add', 'UserSkillController', 'addUserSkill', $db, $auth);
+    $router->add('PUT', '/user-skills/edit', 'UserSkillController', 'editUserSkill', $db, $auth);
+    $router->add('DELETE', '/user-skills/delete', 'UserSkillController', 'deleteUserSkill', $db, $auth);
+    $router->add('POST', '/user-skills/get/{user_id}', 'UserSkillController', 'getUserSkills', $db, null);
+    $router->add('POST', '/user-skills/get', 'UserSkillController', 'getAllSkills', $db, $auth);
+    $router->add('GET', '/user-skills/levels/get', 'UserSkillController', 'getSkillLevels', $db, $auth);
+    $router->add('POST', '/user-skills/endorsement/add', 'UserSkillController', 'addEndorsementUserSkill', $db, $auth);
+    $router->add('DELETE', '/user-skills/endorsement/delete', 'UserSkillController', 'deleteEndorsementUserSkill', $db, $auth);
 
     // ========== ГРУППЫ ==========
     $router->add('GET', '/groups/{group_id}', 'GroupController', 'getGroupById', $db, null);

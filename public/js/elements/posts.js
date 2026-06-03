@@ -1,4 +1,5 @@
 // posts.js
+// LEGACY
 import {
     postsGetByFeed, postsGetAllByUser, postsGetAllByGroup,
     postPublicate, postDelete,
@@ -91,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function createNewPostPanel(id, publicateBtnId, postTextId) {
         const modalFooterId = id + 'Footer';
         const filesPreviewPanelId = 'filesPreview';
-        createModalHTML(id, `
+        const modal = createModalHTML(id, `
             <div class="modal-title">
                 <h2>Новый пост</h2>
             </div>
@@ -138,20 +139,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 postPublicateAPI(postText.value, content);
             }
         });
+        
+        showModal(modal);
     }
     
     function createNewArticlePanel(id, createBtnId, publicateBtnId, titleTextId, articleTextId) {
         const coverMediaInputId = id + 'CoverMedia';
         const filesPreviewPanelId = 'filesPreview';
-        createModalHTML(id, `
+        const modal = createModalHTML(id, `
             <div class="modal-title">
                 <h2>Новая статья</h2>
-                <span title="Для создания статьи используется разметка &quot;Markdown&quot;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                        <path d="M9 9C9 7.89543 9.89543 7 11 7H13C14.1046 7 15 7.89543 15 9C15 10.1046 14.1046 11 13 11H12V13M12 17H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                </span>
             </div>
             <div class="modal-main new-post">
                 <div class="input-cover-media" id="${coverMediaInputId}">
@@ -162,6 +159,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="input-field">
                     <textarea min="1" max="4096" type="text" id="${articleTextId}" required placeholder="Напишите что-нибудь..."></textarea>
+                    <span title="Для создания статьи используется разметка &quot;Markdown&quot;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            <path d="M9 9C9 7.89543 9.89543 7 11 7H13C14.1046 7 15 7.89543 15 9C15 10.1046 14.1046 11 13 11H12V13M12 17H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </span>
                 </div>
             </div>
             <div class="modal-footer">
@@ -194,6 +197,8 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
             handleArticleButton(titleText.value, articleText.value, true);
         });
+        
+        showModal(modal);
     }
  
     function textareaResize(text, createBtn, publicateBtn) {
@@ -553,15 +558,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // =============== ОБРАБОТКА КНОПОК СОЗДАНИЯ ===============
-    document.getElementById('newPostButton')?.addEventListener('click', async (e) => {
+    document.getElementById('newPostButton')?.addEventListener('click', (e) => {
         e.preventDefault();
-        await createNewPostPanel(newPostModalId, publicateNewPostBtnId, newPostTextId);
-        showModal(newPostModalId);
+        createNewPostPanel(newPostModalId, publicateNewPostBtnId, newPostTextId);
     });
     
-    document.getElementById('newArticleButton')?.addEventListener('click', async (e) => {
+    document.getElementById('newArticleButton')?.addEventListener('click', (e) => {
         e.preventDefault();
-        await createNewArticlePanel(newArticleModalId, createNewArticleBtnId, publicateNewArticleBtnId, newArticleTitleId, newArticleTextId);
-        showModal(newArticleModalId);
+        createNewArticlePanel(newArticleModalId, createNewArticleBtnId, publicateNewArticleBtnId, newArticleTitleId, newArticleTextId);
     });
 });

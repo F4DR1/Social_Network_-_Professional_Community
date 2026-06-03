@@ -44,7 +44,7 @@
 
     // ===== СТАТИЧНЫЕ МАРШРУТЫ =====
     $authStaticPages = ['login', 'register', 'recovery'];
-    $allStaticPages = ['feed', 'msg', 'contacts', 'groups', 'search', 'settings'];
+    $allStaticPages = ['feed', 'msg', 'contacts', 'groups', 'search', 'settings', 'about'];
     if (empty($currentUser)) {
         // Доступны только адреса авторизации
         if (in_array($route, $authStaticPages)) {
@@ -80,6 +80,9 @@
                     break;
                 case 'settings':
                     include PAGES_PATH . '/settings.php';
+                    break;
+                case 'about':
+                    include PAGES_PATH . '/about.php';
                     break;
                 default:
                     include PAGES_PATH . '/' . $route . '.php';

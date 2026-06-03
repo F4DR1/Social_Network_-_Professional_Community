@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
             sessionsList.innerHTML = `<h3 class="${noSessionsClass}">Не удалось получить список сеансов. Попробуйте ещё раз.</h3>`;
         } else {
             // Завершить все другие сеансы
-            sessionsList.querySelector('.sessions-active-delete-btn').addEventListener('click', async (e) => {
+            sessionsList.querySelector('.sessions-active-delete-btn')?.addEventListener('click', async (e) => {
                 e.preventDefault();
                 if (!await confirmationModal('Вы точно хотите завершить все сеансы, кроме текущего?')) return;
                 terminateAllOtherSessionsAPI();  // Удаляем сессии
@@ -272,11 +272,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Получить список сессий
     async function getSessionsList() {
+        let sessions = [];
         try {
             const result = await sessionsGet();
 
             if (result.success) {
-                updateSessionsList(result.sessions);
+                sessions = result.sessions;
             } else {
                 updateMessage(result.error || 'Ошибка соединения. Попробуйте ещё раз.', 'error');
             }
@@ -284,6 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (err) {
             updateMessage('Ошибка сервера.', 'error');
         }
+        updateSessionsList(sessions);
     }
     
     // Завершить все другие сеансы
@@ -330,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Категория "Сессии"
-    sessionsDataCategoryBtn.addEventListener('click', (e) => {
+    sessionsDataCategoryBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         // Категория сессий
         if (sessionsDataCategoryBtn.classList.contains('active')) return;

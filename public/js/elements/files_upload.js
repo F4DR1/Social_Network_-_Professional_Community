@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="files-upload-panel">
                 <input type="file" id="${inputId}" accept="image/*" multiple style="display: none;" />
                 <button class="modal-btn files-upload" id="${uploadBtnId}">
-                    Прикрепить файл с устройства
+                    Прикрепить файлы с устройства
                 </button>
             </div>
         `

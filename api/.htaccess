@@ -1,6 +1,12 @@
+# Запрещаем просмотр содержимого папок
+Options -Indexes
+
 RewriteEngine On
 
-# Все запросы к API направляем в index.php
+# Блокируем доступ к системным папкам (403 Forbidden)
+RewriteRule ^(controllers|core|vendor|config|enums|includes|models|views|database|migrations|tests|storage)(/|$) - [F,L]
+
+# Все запросы, которые не соответствуют реальному файлу или папке, направляем на index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [L,QSA]

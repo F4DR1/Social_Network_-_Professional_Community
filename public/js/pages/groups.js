@@ -121,8 +121,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =============== МОДАЛЬНОЕ ОКНО ===============
     // Модальное окно создания группы
-    async function createCreateGroupPanel(id) {
-        const modal = await createModalHTML(id, `
+    async function createCreateGroupPanel() {
+        const modal = await createModalHTML('createGroupModal', `
             <div class="modal-title">
                 <h2>Создание группы</h2>
             </div>
@@ -135,14 +135,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         <input class="group-name" type="text" name="name" required autocomplete="name">
                     </div>
                 </div>
-                <p class="message create-group-message" id="createGroupErrorMessage"></p>
+                <p class="message create-group-message"></p>
 
             </div>
             <div class="modal-footer">
-                <button class="create-group-cancel-btn">Отмена</button>
                 <button class="create-group-accept-btn">Создать группу</button>
+                <button class="create-group-cancel-btn">Отмена</button>
             </div>
         `);
+        showModal(modal)
 
         
 
@@ -167,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Закрыть панель создания группы
         cancelBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            hideModal(id, true);
+            hideModal(modal, true);
         });
         
         // Создание группы
@@ -199,10 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         if (!isNoModals()) return;
         
-        const createGroupModalId = 'createGroupModal';
-
         // Создать панель создания группы
-        createCreateGroupPanel(createGroupModalId);
-        showModal(createGroupModalId)
+        createCreateGroupPanel();
     });
 });

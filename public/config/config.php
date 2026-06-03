@@ -22,7 +22,6 @@
 
     
     // Автоматически получаем основной домен (без поддомена api.)
-    error_log('host: ' . HOST);
     $host = preg_replace('/:\d+$/', '', HOST);  // Удаляем порт
     $DOMAIN = preg_replace('/^api\./', '', $host);  // Убираем 'api.' (если есть, на всякий случай)
 
@@ -30,7 +29,6 @@
 
     define('API', $API);
     define('DOMAIN', $DOMAIN);
-    error_log('domain: ' . DOMAIN);
     
 
     // Настройки, которые доступны в JavaScript

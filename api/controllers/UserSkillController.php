@@ -14,7 +14,7 @@
 
 
         /**
-         * GET /skills/levels/get - получить список уровней
+         * GET /user-skills/levels/get - получить список уровней
          */
         public function getSkillLevels() {
             $levels = $this->db->fetchAll("
@@ -30,9 +30,9 @@
         }
         
         /**
-         * POST /skills/get - получить список навыков с указанием, есть ли навык у пользователя
+         * POST /user-skills/get - получить список навыков с указанием, выбран ли уже навык
          */
-        public function getSkills() {
+        public function getAllSkills() {
             $this->auth->check();
             $currentUserId = $this->auth->getCurrentUser()['id'];
 
@@ -70,7 +70,7 @@
         }
         
         /**
-         * POST /users/user-skills/get/{user_id} - получить скиллы пользователя
+         * POST /user-skills/get/{user_id} - получить скиллы пользователя
          */
         public function getUserSkills($userId) {
             Helpers::validateUserId($userId);
@@ -88,6 +88,7 @@
             $userSkills = $this->db->fetchAll("
                     SELECT
                         us.id AS user_skill_id,
+                        s.id AS skill_id,
                         s.name AS name,
                         lvl.id AS level_id,
                         lvl.name AS level_name,
@@ -127,7 +128,7 @@
         }
         
         /**
-         * POST /users/user-skills/add - добавить скилл пользователя
+         * POST /user-skills/add - добавить скилл пользователя
          */
         public function addUserSkill() {
             $this->auth->check();
@@ -219,7 +220,7 @@
         }
         
         /**
-         * PUT /users/user-skills/edit - редактировать скилл пользователя
+         * PUT /user-skills/edit - редактировать скилл пользователя
          */
         public function editUserSkill() {
             $this->auth->check();
@@ -285,7 +286,7 @@
         }
         
         /**
-         * DELETE /users/user-skills/delete - удалить скилл пользователя
+         * DELETE /user-skills/delete - удалить скилл пользователя
          */
         public function deleteUserSkill() {
             $this->auth->check();
@@ -334,7 +335,7 @@
         }
         
         /**
-         * POST /users/user-skills/endorsement/add - добавить подтверждение скилла пользователя
+         * POST /user-skills/endorsement/add - добавить подтверждение скилла пользователя
          */
         public function addEndorsementUserSkill() {
             $this->auth->check();
@@ -402,7 +403,7 @@
         }
         
         /**
-         * DELETE /users/user-skills/endorsement/delete - удалить подтверждение скилла пользователя
+         * DELETE /user-skills/endorsement/delete - удалить подтверждение скилла пользователя
          */
         public function deleteEndorsementUserSkill() {
             $this->auth->check();
