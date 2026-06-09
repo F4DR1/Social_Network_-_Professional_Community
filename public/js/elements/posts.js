@@ -55,14 +55,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     <img src="${article.coverMediaUrl}" alt="${article.coverMediaTitle}" width="350" height="200">
                     <h2>${article.title}</h2>
                     <p>Время прочтения: <span>${article.readTime} мин.</span></p>
-                `
+                `;
                 contentHTML = article.contentHtml;
                 footerHTML = `
                     <p>
                         ${article.updatedAt !== article.createdAt ? 'Обновлено' : 'Создано'}:
                         <time class="article-date" datetime="${article.updatedAt}">${relativeTime(article.updatedAt, true)}</time>
                     </p>
-                `
+                `;
             } else {
                 console.log(result.error || 'Ошибка обработки контента');
             }
@@ -72,19 +72,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
  
         
-        const modalFooterId = id + 'Footer';
-        createModalHTML(id, `
+        const modal = await createModalHTML(id, `
             <div class="modal-title">
                 ${titleHTML ?? '<h2>Ошибка получения статьи</h2>'}
             </div>
             <div class="modal-main new-post">
                 ${contentHTML ?? '<p>Не удалось получить данные статьи. Попробуйте ещё раз позже.</p>'}
             </div>
-            <div class="modal-footer" id="${modalFooterId}">
+            <div class="modal-footer" id="${id}Footer">
                 ${footerHTML ?? ''}
             </div>
         `);
-        showModal(id);
+        showModal(modal);
     }
  
     

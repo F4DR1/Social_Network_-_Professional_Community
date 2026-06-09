@@ -3,12 +3,14 @@ import {
     relationshipsSubscribe, relationshipsUnsubscribe
 } from '../api.js';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     if (!window.appData) {
         console.error('appData не определен');
         return;
     }
     
+    const currentPanel = window.appData.panel;
+
     const profilePath = window.appData.path;
 
     const currentUserId = window.appData.currentUserId;
@@ -78,17 +80,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
     }
+
+
+
+    
+
+    // =============== КНОПКИ МЕНЮ В ЛЮБОМ ПРОФИЛЕ ===============
+    const postsNavBtn = document.getElementById('postsNavigationButton');
+    const skillsNavBtn = document.getElementById('skillsNavigationButton');
+
+
+    postsNavBtn.classList.toggle('selected', (currentPanel == 'posts' || currentPanel == ''));
+    skillsNavBtn.classList.toggle('selected', currentPanel == 'skills');
     
 
 
-    // =============== КНОПКИ В ЛЮБОМ ПРОФИЛЕ ===============
-    document.getElementById('postsNavigationButton')?.addEventListener('click', (e) => {
-        // Посты
+    // =============== ОБРАБОТЧИКИ КНОПОК ===============
+    postsNavBtn.addEventListener('click', (e) => {
         e.preventDefault();
         window.location.href = `${profilePath}`;
     });
-    document.getElementById('skillsNavigationButton')?.addEventListener('click', (e) => {
-        // Навыки
+    skillsNavBtn.addEventListener('click', (e) => {
         e.preventDefault();
         window.location.href = `${profilePath}?p=skills`;
     });

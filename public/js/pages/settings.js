@@ -1,3 +1,4 @@
+// settings.js
 import {
     sessionsGet, sessionsTerminate, sessionsTerminateAllOther
 } from '../api.js';
@@ -31,6 +32,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageTitle = messagePanel.querySelector('.message-title');
     const messageText = messagePanel.querySelector('.message-text');
 
+
+    // Кнопка сохранения данных
+    const saveDataBtn = document.getElementById('saveData');
 
     
     // Элементы категории сессий
@@ -212,6 +216,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Кнопки категорий
         sessionsDataCategoryBtn.classList.toggle('active', panel === sessionsDataPanel);
+
+        // Переключение кнопки сохранения данных (не показываем и не даём нажать, если категория сессий)
+        switch (currentCategory) {
+            case 'sessions':
+                saveDataBtn.classList.remove('active');
+                saveDataBtn.disabled = true;
+                break;
+        
+            default:
+                saveDataBtn.classList.add('active');
+                saveDataBtn.disabled = false;
+                break;
+        }
     }
 
 
@@ -224,50 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function editSettingsDataAPI() {
         setMessageVisible(false);
         
-        // const data = {
-        //     groupId: groupId,
-        //     category: currentCategory
-        // };
-
-        // // Подгружаем данные для каждой категории отдельно
-        // let successMsg = '';
-        // switch (currentCategory) {
-        //     case 'base':
-        //         successMsg = 'Основная информация была обновлена.';
-        //         const baseInfo = {
-        //             name: groupName.value,
-        //             linkname: groupLinkname.value === '' ? `group${groupId}` : groupLinkname.value
-        //         };
-        //         data.base = JSON.stringify(baseInfo);
-        //         break;
-        
-        //     default:
-        //         break;
-        // }
-
-        // try {
-        //     const result = await groupsEdit(data);
-
-        //     if (result.success) {
-        //         updateMessage(successMsg, 'success');
-        //         if (currentCategory === 'base') {
-        //             groupLinkname.value = result.linkname;
-        //             groupBackBtn.href = result.linkname;
-                    
-        //             // Устанавливаем новый адрес (без поддержки истории)
-        //             const pathParts = window.location.pathname.split('/');
-        //             pathParts[pathParts.length - 1] = result.linkname;
-        //             const newPath = pathParts.join('/');
-        //             const newUrl = newPath + window.location.search + window.location.hash;
-        //             window.history.replaceState({}, '', newUrl);
-        //         }
-        //     } else {
-        //         updateMessage(result.error || 'Ошибка соединения. Попробуйте ещё раз.', 'error');
-        //     }
-            
-        // } catch (err) {
-        //     updateMessage('Ошибка сервера.', 'error');
-        // }
+        // Пока без функционала...
     }
 
     // Получить список сессий
@@ -326,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =============== КНОПКИ ===============
     // Сохранение данных группы
-    document.getElementById('saveData').addEventListener('click', (e) => {
+    saveDataBtn.addEventListener('click', (e) => {
         e.preventDefault();
         editSettingsDataAPI();
     });
