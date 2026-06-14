@@ -16,9 +16,10 @@
     // Отформатированные данные пользователя
     $userId = $user['id'];
     $userFullname = $user['fullname'];
-    $userNumber = "group$userId";
+    $userNumber = "user$userId";
     $userLinkname = $user['linkname'] ?? $userNumber;
     $userPhoto = $user['photo'];
+    $userBanner = $user['banner'];
 
 
 
@@ -27,6 +28,8 @@
         $response = relationshipsGet($currentUserId, $userId);
         $currentIsFollow = $response['success'] ? $response['data']['isFollow'] : false;
         $relatedIsFollow = $response['success'] ? $response['data']['relatedIsFollow'] : false;
+
+        $currentIsBlock = $response['success'] ? $response['data']['isBlock'] : false;
     }
 
     
@@ -128,21 +131,39 @@
         <!-- (находится над центральным и боковым контейнерами) -->
         <div class="main-container">
             <section class="container profile-panel">
-                <img src="<?= $userPhoto ?>" alt="<?= htmlspecialchars($userFullname) ?>" class="user-profile-photo">
-                <h2 class="user-profile-name"><?= htmlspecialchars($userFullname) ?></h2>
+                <div class="profile-main-info">
+                    <!-- Основная информация о пользователе -->
+                    <img src="<?= $userBanner ?>" class="user-profile-banner">
+                    <img src="<?= $userPhoto ?>" alt="<?= htmlspecialchars($userFullname) ?>" class="user-profile-photo">
+                    <h2 class="user-profile-name"><?= htmlspecialchars($userFullname) ?></h2>
+                </div>
 
                 <?php if ($userIsAuthorized): ?>
-                    <!-- Панель действий с пользователем -->
+                    <!-- Панель действий с пользователем (только авторизованные пользователи) -->
                     <div class="profile-actions-panel">
-                        <?php if ($userId !== $currentUserId): ?>
+                        
+                        <!-- Главная кнопка (большая) -->
+                        <div class="main-action">
+                            <?php if ($userId === $currentUserId): ?>
+                                <div>
+                                    <!-- Кнопка "Редактировать профиль" -->
+                                    <a class="standart-btn" href="<?= htmlspecialchars(PATH . '?act=edit') ?>">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                                        </svg>
+                                        <span>Редактировать профиль</span>
+                                    </a>
+                                </div>
 
-                            <!-- Главная кнопка (большая) -->
-                            <div class="main-action">
+                            <?php else: ?>
                                 <?php if ($currentIsFollow && $relatedIsFollow): ?>
                                     <div>
-                                        <button class="standart-btn" id="mainMessageUserButton">
+                                        <a class="standart-btn" href="<?= BASE_URL ?>/msg?type=user&id=<?= $userId ?>">
+                                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                            </svg>
                                             <span>Сообщение</span>
-                                        </button>
+                                        </a>
                                     </div>
 
                                 <?php elseif ($currentIsFollow): ?>
@@ -186,7 +207,7 @@
                                             <li>
                                                 <!-- Кнопка "Принять заявку" -->
                                                 <button class="dropdown-button" id="acceptButton">
-                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                         <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                                                     </svg>
                                                     <span>Принять заявку</span>
@@ -207,80 +228,122 @@
                                     </div>
                                     
                                 <?php endif; ?>
-                            </div>
+
+                            <?php endif; ?>
+                        </div>
 
 
-                            <!-- Дополнительные действия (маленькие кнопки) -->
-                            <div class="base-actions">
-                                <?php if (!$currentIsFollow || !$relatedIsFollow): ?>
-                                    <!-- Кнопка "Написать сообщение" -->
-                                    <button class="small-btn" id="baseMessageUserButton">
-                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
-                                        </svg>
-                                    </button>
-                                <?php endif; ?>
-                            </div>
-
-
-                            <!-- Остальные действия (выпадающее меню со списком кнопок) -->
-                            <div class="contact-actions">
-                                <?php if ($currentIsFollow && $relatedIsFollow): ?>
-                                    <!-- Кнопка-выпадающий список -->
-                                    <div class="custom-dropdown">
-                                        <!-- Кнопка-триггер для открытия выпадающего списка -->
-                                        <button class="dropdown-trigger" type="button">
-                                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                            </svg>
-                                        </button>
-
-                                        <!-- Список действий -->
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                <!-- Кнопка "Удалить из контактов" -->
-                                                <button class="dropdown-button" id="deleteButton">
-                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                                                    </svg>
-                                                    <span>Удалить из контактов</span>
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                <?php endif; ?>
-                            </div>
-                            
-                        <?php else: ?>
-                            <!-- Главная кнопка (большая) -->
-                            <div class="main-action">
-                                <div>
-                                    <a href="<?= htmlspecialchars(PATH . '?act=edit') ?>" class="standart-btn">
-                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
-                                        </svg>
-                                        <span>Редактировать профиль</span>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Дополнительные действия (маленькие кнопки) -->
-                            <div class="base-actions">
+                        <!-- Дополнительные действия (маленькие кнопки) -->
+                        <div class="base-actions">
+                            <?php if ($userId === $currentUserId): ?>
                                 <!-- Кнопка "Настройки" -->
                                 <a href="<?= htmlspecialchars(BASE_URL . '/settings') ?>" class="small-btn">
                                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.22.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
                                     </svg>
                                 </a>
-                            </div>
+                                
+                            <?php else: ?>
+                                <?php if (!$currentIsFollow || !$relatedIsFollow): ?>
+                                    <!-- Кнопка "Написать сообщение" -->
+                                    <a class="small-btn" id="baseMessageUserButton" href="<?= BASE_URL ?>/msg?type=user&id=<?= $userId ?>">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/>
+                                        </svg>
+                                    </a>
 
-                        <?php endif; ?>
+                                <?php endif; ?>
+
+                            <?php endif; ?>
+                        </div>
+
+
+                        <!-- Остальные действия (выпадающее меню со списком кнопок) -->
+                        <div class="contact-actions">
+                            <!-- Кнопка-выпадающий список -->
+                            <div class="custom-dropdown">
+                                <!-- Кнопка-триггер для открытия выпадающего списка -->
+                                <button class="dropdown-trigger" type="button">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </button>
+
+                                <!-- Список действий -->
+                                <ul class="dropdown-menu">
+                                    <?php if ($userId === $currentUserId): ?>
+                                        <span class="stub-message">Пока нет действий</span>
+
+                                    <?php else: ?>
+                                        <?php if ($currentIsFollow && $relatedIsFollow): ?>
+                                            <li>
+                                                <!-- Кнопка "Удалить из контактов" -->
+                                                <button class="dropdown-button" id="deleteButton">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                                    </svg>
+                                                    <span>Удалить из контактов</span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <!-- Добавить в список контактов (выпадающее меню со списком кнопок) -->
+                                                <div class="contact-list-actions">
+                                                    <!-- Кнопка-выпадающий список -->
+                                                    <div class="custom-dropdown">
+                                                        <!-- Кнопка-триггер для открытия выпадающего списка -->
+                                                        <button class="dropdown-trigger" type="button">
+                                                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                                            </svg>
+                                                            <span>Добавить в список контактов</span>
+                                                        </button>
+
+                                                        <!-- Список действий -->
+                                                        <ul class="dropdown-menu" id="contactList">
+                                                            <!-- Списки контактов получаются в js -->
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            
+                                        <?php endif; ?>
+                                        <?php if ($currentIsBlock): ?>
+                                            <li>
+                                                <!-- Кнопка "Удалить из чёрного списка" -->
+                                                <button class="dropdown-button" id="removeBlackListButton">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <circle cx="12" cy="12" r="10"/>
+                                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke-dasharray="4 3"/>
+                                                    </svg>
+                                                    <span>Удалить из чёрного списка</span>
+                                                </button>
+                                            </li>
+
+                                        <?php else: ?>
+                                            <li>
+                                                <!-- Кнопка "Добавить в чёрный список" -->
+                                                <button class="dropdown-button" id="addBlackListButton">
+                                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <circle cx="12" cy="12" r="10"/>
+                                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                                                    </svg>
+                                                    <span>Добавить в чёрный список</span>
+                                                </button>
+                                            </li>
+
+                                        <?php endif; ?>
+
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                        </div>
+                        
                     </div>
                 <?php endif; ?>
 
-                <div>
+                <div class="profile-description-info">
                     <!-- Тут информация о пользователе в дальнейшем -->
+                    <span class="stub-message">Здесь скоро будет различная информация о пользователе (из настроек профиля)</span>
                 </div>
             </section>
         </div>
@@ -347,6 +410,7 @@
 
         <script>
             window.appData = <?= json_encode([
+                'currentIsBlock' => ($userIsAuthorized && $userId !== $currentUserId) ? $currentIsBlock : false,
                 'path' => PATH,
                 'currentUserId' => $currentUserId,
                 'userId' => $userId,

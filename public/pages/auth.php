@@ -64,7 +64,7 @@
             <div id="registerForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input min="1" max="20" type="text" id="registerLogin" inputmode="numeric" pattern="^\+7[1-9]{10}$" required autocomplete="username">
+                        <input min="1" max="20" type="tel" id="registerLogin" inputmode="numeric" pattern="^\+7[1-9]{10}$" required autocomplete="username">
                         <label class="required">Телефон</label>
                     </div>
                     <div class="input-field">
@@ -72,7 +72,7 @@
                         <label class="required">Пароль</label>
                     </div>
                     <div class="input-field">
-                        <input min="1" max="100" type="text" id="registerFirstname" required autocomplete="given-name">
+                        <input min="1" max="100" type="text" id="registerFirstname" required autocomplete="name">
                         <label class="required">Имя</label>
                     </div>
                     <div class="input-field">
@@ -108,7 +108,7 @@
             <div id="codeForm" class="auth-form">
                 <div class="form-fields">
                     <div class="input-field">
-                        <input min="1" max="6" type="text" id="codeInput" required autocomplete="one-time-code">
+                        <input min="1" max="6" class="code" type="tel" id="codeInput" required autocomplete="one-time-code">
                         <label>Код</label>
                     </div>
                 </div>

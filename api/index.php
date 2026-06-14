@@ -100,6 +100,7 @@
 
     // ========== ОТНОШЕНИЯ ==========
     $router->add('GET', '/relationships/list', 'RelationshipController', 'getList', $db, null);
+    $router->add('GET', '/relationships/list/{user_id}', 'RelationshipController', 'getUserList', $db, $auth);
     $router->add('GET', '/relationships/get/users/{user_id}', 'RelationshipController', 'getRelationshipUsers', $db, null);
     $router->add('GET', '/relationships/get/{user_id}/{related_user_id}', 'RelationshipController', 'getRelationshipWithUser', $db, null);
     $router->add('PUT', '/relationships/subscribe', 'RelationshipController', 'subscribe', $db, $auth);

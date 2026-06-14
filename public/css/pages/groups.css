@@ -1,19 +1,32 @@
 /* ============================================================
-   МирПрофи — groups.css
-   Страница «Группы»: список групп пользователя + панель создания.
-   Карточки групп — group_card.css, секции — category.css.
+   groups.css — МирПрофи · «Аврора»
+   Страница «Группы» (groups.php): списки групп +
+   кнопка создания группы в правом контейнере.
    ============================================================ */
 
-.user-groups-list-panel {
+/* ---------- панель списков групп ---------- */
+.user-groups-list-panel .category:first-of-type { margin-top: 0; }
+
+/* ---------- кнопка «Создать группу» (правый контейнер) ---------- */
+.group-create-panel { padding: 10px; }
+.group-create-panel button {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 16px;
+  background: var(--acc-grad);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14.5px;
+  box-shadow: 0 6px 18px var(--acc-shadow);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-
-/* Отступ между секциями «Мои группы» / «Мои подписки» */
-.user-groups-list-panel .category + .category {
-  margin-top: 24px;
-  padding-top: 22px;
-  border-top: 1px solid var(--border);
+.group-create-panel button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 24px var(--acc-shadow);
 }
-
-/* Боковая панель создания группы — оформление в group_create.css */
+.group-create-panel button:active { transform: none; }
+.group-create-panel button svg { flex: none; }

@@ -1,83 +1,50 @@
 /* ============================================================
-   МирПрофи — search.css
-   Поиск пользователей и групп.
-   Левая панель — результаты, правая — поле и фильтры.
-   Карточки — user_card.css / group_card.css, секции — category.css.
+   search.css — МирПрофи · «Аврора»
+   Страница «Поиск» (search.php): результаты слева,
+   поле поиска и категории в правом контейнере.
    ============================================================ */
 
-/* Список результатов */
-.search-result-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* ---------- результаты поиска ---------- */
+.search-result-panel .search-result-list .category { margin-top: 0; }
+
+.no-elements-message {
+  font-size: 13.5px;
+  color: var(--ink-3);
+  padding: 4px 0;
 }
 
-/* Пустой результат */
-.search-result-list .no-elements-message {
-  margin-top: 4px;
-}
+/* ---------- правая панель поиска ---------- */
+.category-navigation-panel .container-title { font-size: 15px; margin-bottom: 12px; }
 
-/* ── Поле поиска (правая панель) ── */
+/* поле поиска: label стоит после input — поднимаем подпись наверх */
 .category-navigation-panel .input-field {
   display: flex;
-  flex-direction: column-reverse;   /* label над input (в разметке label идёт после) */
-  gap: 7px;
-  margin-bottom: 16px;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
 }
 .category-navigation-panel .input-field label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--text-2);
+  order: -1;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
 }
-.category-navigation-panel .input-field input {
+.category-navigation-panel .input-field input { padding: 11px 14px; }
+
+/* ---------- кнопки категорий ---------- */
+.category-navigation { display: flex; flex-direction: column; gap: 4px; }
+.category-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
   padding: 11px 14px;
-  background: var(--bg-3);
-  border: 1px solid var(--border-input);
-  border-radius: var(--radius-sm);
-  font-size: 0.95rem;
-  font-family: var(--font-sans);
-  color: var(--text);
-  outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
-}
-.category-navigation-panel .input-field input::placeholder { color: var(--text-3); }
-.category-navigation-panel .input-field input:focus {
-  border-color: var(--accent);
-  background: var(--bg-2);
-  box-shadow: 0 0 0 3px var(--accent-ghost);
-}
-/* Сброс системной иконки очистки в search-поле */
-.category-navigation-panel .input-field input[type="search"]::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-}
-
-/* ── Фильтры-категории (горизонтальные чипы) ── */
-#searchButtonsList {
-  flex-direction: row;
-  gap: 8px;
-}
-#searchButtonsList .category-btn {
-  flex: 1;
-  justify-content: center;
-  border: 1px solid var(--border);
-  background: var(--bg-2);
-  padding: 9px 12px;
+  border-radius: var(--r-s);
+  font-size: 14.5px;
   font-weight: 600;
+  color: var(--ink-2);
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
 }
-#searchButtonsList .category-btn:hover {
-  border-color: var(--border-hover);
-  background: var(--bg-3);
-}
-#searchButtonsList .category-btn:focus-visible,
-#searchButtonsList .category-btn.active {
-  background: var(--accent-ghost);
-  border-color: var(--accent-ghost-2);
-  color: var(--accent-dim);
-  outline: none;
-}
-
-@media (max-width: 600px) {
-  #searchButtonsList { flex-direction: column; }
-}
+.category-btn:hover { background: var(--surface-2); }
+.category-btn.active { background: var(--acc-soft); color: var(--acc); font-weight: 700; }

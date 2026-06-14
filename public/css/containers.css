@@ -1,352 +1,168 @@
 /* ============================================================
-   МирПрофи — containers.css
-   Система контейнеров для страниц: main-container, centered-container,
-   right-container. Подключается только для Layout::Standart.
+   containers.css — МирПрофи · вариант «Аврора»
+   Подключается ТОЛЬКО в Layout::Standart.
+   Сетка страницы: меню навигации + контейнеры контента.
+
+   ВАЖНО: все контейнеры имеют ФИКСИРОВАННУЮ ширину —
+   они не сужаются и не расширяются от наличия/отсутствия
+   правого контейнера или количества контента.
    ============================================================ */
- 
-/* ── Сетка контейнеров внутри .page-content ── */
-/*
-  Структура страницы (пример user_profile):
-  ┌─────────────────────────────────────────────────┐
-  │  .main-container   (полная ширина, над сеткой)  │
-  ├─────────────────────────┬───────────────────────┤
-  │  .centered-container    │  .right-container     │
-  │  (основной контент)     │  (боковая панель)     │
-  └─────────────────────────┴───────────────────────┘
-*/
- 
-.page-content {
+
+:root {
+  --page-w: 1280px;   /* общая ширина страницы (как у .header-container) */
+  --page-pad: 28px;   /* боковые поля страницы */
+  --nav-w: 220px;     /* меню навигации */
+  --content-w: 980px; /* зона контента (.page-content) */
+  --center-w: 640px;  /* центральный контейнер */
+  --right-w: 316px;   /* правый (боковой) контейнер */
+  --gap: 24px;        /* расстояние между контейнерами */
+}
+
+/* ---------- основная сетка ---------- */
+main {
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: 24px var(--page-pad) 56px;
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-start;
+}
+
+/* ---------- меню навигации (слева) ---------- */
+.navigation-menu {
+  width: var(--nav-w);
+  flex: none;
+  position: sticky;
+  top: calc(var(--header-h) + 24px);
+}
+nav.navigation ul {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  /* Важно: НЕ overflow: hidden.
-     Выпадающие меню внутри .main-container и других блоков
-     используют position: absolute и должны выходить за пределы
-     своих контейнеров. Любой overflow: hidden/clip на предке
-     обрежет их. */
-  overflow: visible;
+  gap: 3px;
 }
- 
-/* ── Верхний широкий контейнер ── */
+nav.navigation hr {
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--line-2);
+  margin: 9px 0;
+}
+nav.navigation li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--r-s);
+  color: var(--ink-3);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+nav.navigation li:hover { background: var(--surface); color: var(--acc); }
+nav.navigation li svg { flex: none; }
+
+/* активная (текущая) страница — класс .active из layout.php */
+nav.navigation li.active { background: var(--acc-soft); color: var(--acc); }
+nav.navigation li.active a { color: var(--acc); font-weight: 700; }
+nav.navigation li.active:hover { background: var(--acc-soft-2); }
+
+/* пункт «Меню» — только в мобильной версии (пока скрыт) */
+nav.navigation li.mobile-only { display: none; }
+nav.navigation li a {
+  color: var(--ink-2);
+  font-size: 14.5px;
+  font-weight: 600;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* вся строка меню кликабельна */
+nav.navigation li a::before { content: ''; position: absolute; inset: 0; border-radius: var(--r-s); }
+nav.navigation li:hover a { color: var(--acc); }
+
+/* ---------- зона контента ---------- */
+.page-content {
+  width: var(--content-w);
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+/* главный контейнер (профиль) — на всю ширину зоны контента */
 .main-container {
   width: 100%;
-  /* visible, чтобы дропдауны в шапке профиля не обрезались */
-  overflow: visible;
-}
- 
-/* Автоматическая двухколоночная сетка для centered + right */
-.page-content:has(.centered-container):has(.right-container) {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto;
-  grid-template-areas:
-    "top"
-    "center"
-    "right";
-}
-.page-content > .main-container    { grid-area: top; }
-.page-content > .centered-container { grid-area: center; }
-.page-content > .right-container    { grid-area: right; }
- 
-@media (min-width: 860px) {
-  .page-content:has(.centered-container):has(.right-container) {
-    grid-template-columns: 1fr 280px;
-    grid-template-areas:
-      "top   top"
-      "center right";
-    gap: 20px 20px;
-  }
-}
- 
-/* ── Базовая «карточка» контейнера ── */
-.container {
-  background: var(--card-bg);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow-card);
-  transition: border-color var(--transition), box-shadow var(--transition);
-  /* НЕ overflow: hidden — иначе выпадающие меню обрезаются.
-     border-radius сам по себе не клипает потомков без overflow: hidden.
-     Если нужно скрыть что-то конкретное внутри контейнера —
-     добавляй overflow на конкретный дочерний элемент, а не на .container. */
-}
- 
-/* ── Заголовок контейнера (общий для страниц) ── */
-.container-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--text);
-  line-height: 1.25;
-}
-/* Заголовок-секция с нижней линией (контакты, группы, поиск, настройки) */
-.container > .container-title {
-  margin-bottom: 18px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--border);
-}
-.container > .container-title:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
+  flex: none;
+  min-width: 0;
 }
 
-/* ── centered-container: вертикальный стек карточек ── */
+/* центральный контейнер — всегда одной ширины,
+   независимо от наличия правого контейнера */
 .centered-container {
+  width: var(--center-w);
+  flex: none;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  min-width: 0;
-  overflow: visible;
+  gap: var(--gap);
 }
- 
-/* ── right-container: вертикальный стек виджетов ── */
+
+/* если правого контейнера НЕТ — центральный занимает всю ширину зоны контента */
+.page-content:not(:has(.right-container)) .centered-container { width: 100%; }
+
+/* правый (боковой) контейнер */
 .right-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  width: var(--right-w);
+  flex: none;
   min-width: 0;
-  overflow: visible;
-}
- 
-/* Виджет в боковой панели */
-.right-container .container {
-  padding: 16px;
-}
- 
-/* ── Адаптив ── */
-@media (max-width: 720px) {
-  .page-content:has(.centered-container):has(.right-container) {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "top"
-      "center"
-      "right";
-    gap: 14px;
-  }
-}
-
-
-/* ============================================================
-   ОБЩИЕ ПРИМИТИВЫ ФОРМ И НАВИГАЦИИ ПО КАТЕГОРИЯМ
-   (страницы редактирования профиля/группы, настройки, поиск)
-   Подключаются повсеместно через containers.css.
-   ============================================================ */
-
-/* ── Стандартная акцентная кнопка ── */
-.standart-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 0.925rem;
-  font-weight: 600;
-  font-family: var(--font-sans);
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  box-shadow: 0 2px 12px var(--accent-glow);
-  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
-  white-space: nowrap;
-}
-.standart-btn:hover {
-  background: var(--accent-dim);
-  box-shadow: 0 4px 18px var(--accent-glow);
-  transform: translateY(-1px);
-}
-.standart-btn:active { transform: translateY(0); }
-.standart-btn svg { fill: rgba(255, 255, 255, 0.9); stroke: rgba(255, 255, 255, 0.9); flex-shrink: 0; }
-
-/* ── Панель сообщения (успех/ошибка) в формах ── */
-.message-panel {
-  display: none;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-3);
-  margin-bottom: 4px;
-}
-.message-panel.active { display: flex; }
-.message-panel.success { background: rgba(31, 146, 84, 0.08); border-color: rgba(31, 146, 84, 0.25); }
-.message-panel.error   { background: var(--error-ghost); border-color: rgba(229, 72, 77, 0.25); }
-.message-panel .message-icon { width: 36px; height: 36px; flex-shrink: 0; }
-.message-panel.success .message-icon { color: var(--success); }
-.message-panel.error .message-icon { color: var(--error); }
-.message-panel .message-title { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
-.message-panel.success .message-title { color: var(--success); }
-.message-panel.error .message-title { color: var(--error); }
-.message-panel .message-text { margin-top: 3px; font-size: 0.875rem; line-height: 1.5; color: var(--text-2); }
-
-/* ── Форма основных данных ── */
-.main-data { display: none; }
-.main-data.active { display: block; }
-.main-data .form-fields {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--gap);
+  position: sticky;
+  top: calc(var(--header-h) + 24px);
 }
-.main-data .input-field {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  align-items: start;
-  gap: 6px 16px;
-}
-.main-data .input-field > span {
-  padding-top: 11px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-2);
-  letter-spacing: -0.01em;
-}
-.main-data .input-field .field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+
+/* ---------- карточка-контейнер ----------
+   ВАЖНО: без backdrop-filter — в Chromium он обрезает
+   выходящие за рамку дочерние элементы (выпадающие меню).
+   Полупрозрачная поверхность даёт тот же светлый эффект. */
+.container {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  padding: 22px 24px;
   min-width: 0;
 }
-.main-data .input-field input {
-  width: 100%;
-  padding: 11px 14px;
-  background: var(--bg-3);
-  border: 1px solid var(--border-input);
-  border-radius: var(--radius-sm);
-  font-size: 0.95rem;
-  font-family: var(--font-sans);
-  color: var(--text);
-  outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
-}
-.main-data .input-field input:focus {
-  border-color: var(--accent);
-  background: var(--bg-2);
-  box-shadow: 0 0 0 3px var(--accent-ghost);
-}
-.main-data .input-field .hint {
-  font-size: 0.8rem;
-  color: var(--text-3);
-  font-family: var(--font-mono);
-}
-.main-data .input-field .hint u { color: var(--text-2); text-decoration: none; border-bottom: 1px dotted var(--text-3); }
+.right-container .container { padding: 18px 20px; }
+.right-container .container > h2 { font-size: 15px; font-weight: 800; margin-bottom: 12px; }
 
-/* Поле с префиксом адреса (input-typed) */
-.input-typed {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid var(--border-input);
-  border-radius: var(--radius-sm);
-  background: var(--bg-3);
-  overflow: hidden;
-  transition: border-color var(--transition), box-shadow var(--transition);
+.container-title {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.1px;
+  margin-bottom: 16px;
 }
-.input-typed:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-ghost);
-}
-.input-typed .included {
-  display: flex;
-  align-items: center;
-  padding: 0 4px 0 12px;
-  font-size: 0.9rem;
-  font-family: var(--font-mono);
-  color: var(--text-3);
-  white-space: nowrap;
-  background: var(--bg-4);
-  border-right: 1px solid var(--border);
-}
-.input-typed input {
-  flex: 1;
-  border: none !important;
-  background: var(--bg-2) !important;
-  box-shadow: none !important;
-  border-radius: 0;
-}
+.container-title:empty { display: none; }
 
-/* ── Карточка контейнера данных ── */
-.container.data {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.container.data > .container-title {
-  margin: 0;
-  padding: 0 0 14px;
-  border-bottom: 1px solid var(--border);
-}
-
-/* ── Кнопка возврата к профилю ── */
-.back-panel { padding: 0 !important; overflow: hidden; }
-.back-btn {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px;
-  text-decoration: none;
-  transition: background var(--transition);
-}
-.back-btn:hover { background: var(--bg-3); }
-.back-btn img {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--bg-3);
-  flex-shrink: 0;
-}
-.back-btn-text h2 { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text); line-height: 1.2; }
-.back-btn-text span { font-size: 0.83rem; color: var(--accent-dim); }
-
-/* ── Панель навигации по категориям ── */
-.category-navigation-panel > h2 {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-3);
-  margin-bottom: 12px;
-}
-.category-navigation {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.category-btn {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 0.92rem;
-  font-weight: 500;
-  font-family: var(--font-sans);
-  color: var(--text-2);
-  background: transparent;
-  border: 1px solid transparent;
-  cursor: pointer;
-  text-align: left;
-  transition: background var(--transition), color var(--transition), border-color var(--transition);
-}
-.category-btn:hover { background: var(--bg-3); color: var(--text); }
-.category-btn.active {
-  background: var(--accent-ghost);
-  border-color: var(--accent-ghost-2);
-  color: var(--accent-dim);
-  font-weight: 600;
-}
-
-/* Адаптив форм */
-@media (max-width: 600px) {
-  .main-data .input-field {
-    grid-template-columns: 1fr;
-    gap: 6px;
+/* ---------- адаптивность ----------
+   Ширины контейнеров не «плавают»: до 1259px меню сжимается
+   до иконок, ниже 1079px страница прокручивается по горизонтали,
+   но контейнеры сохраняют свою фиксированную ширину. */
+@media (max-width: 1259px) {
+  .navigation-menu { width: 56px; }
+  nav.navigation li { justify-content: center; padding: 12px 0; }
+  nav.navigation li a {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    text-indent: -9999px;
   }
-  .main-data .input-field > span { padding-top: 0; }
+  nav.navigation li a .counter {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    text-indent: 0;
+  }
 }

@@ -181,6 +181,11 @@ export async function relationshipsList() {
         method: 'GET'
     });
 }
+export async function relationshipsUserList(userId) {
+    return apiRequest(`/relationships/list/${userId}`, {
+        method: 'GET'
+    });
+}
 export async function relationshipsUsersGet(userId) {
     return apiRequest(`/relationships/get/users/${userId}`, {
         method: 'GET'

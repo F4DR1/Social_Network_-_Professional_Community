@@ -1,274 +1,129 @@
 /* ============================================================
-   МирПрофи — group_profile.css
-   Профиль группы: шапка, действия (вступить/участник/владелец),
-   список участников, панель управления (для админа).
-   Посты — posts.css, дропдаун в шапке — собственный (.action-dropdown).
+   group_profile.css — МирПрофи · «Аврора»
+   Страница группы (group_profile.php): панель группы,
+   панель действий, участники и управление группой.
    ============================================================ */
 
-/* ════════════════════════════════════════════════════════════
-   ШАПКА ГРУППЫ
-   ════════════════════════════════════════════════════════════ */
-.main-container > .container.profile-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 28px;
-  position: relative;
-  overflow: visible;
-}
-.main-container > .container.profile-panel::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-dim), transparent);
-  border-radius: var(--radius) var(--radius) 0 0;
-  pointer-events: none;
-}
+/* ---------- панель профиля группы ----------
+   overflow видимый, чтобы выпадающие меню не обрезались */
+.profile-panel { padding: 0; overflow: visible; }
 
-/* Фото группы — скруглённый прямоугольник */
-.main-container > .container.profile-panel > img {
-  width: 150px;
-  height: 150px;
-  border-radius: var(--radius-lg);
+.profile-main-info { position: relative; }
+.group-profile-banner {
+  width: 100%;
+  height: 220px;
   object-fit: cover;
-  border: 3px solid var(--bg-3);
-  box-shadow: 0 0 0 2px var(--accent-ghost), var(--shadow-md);
-  flex-shrink: 0;
+  display: block;
+  background: var(--acc-soft);
+  border-radius: var(--r) var(--r) 0 0;
 }
-
-.main-container > .container.profile-panel > h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  color: var(--text);
+.group-profile-photo {
+  position: relative;
+  width: 124px;
+  height: 124px;
+  border-radius: 28px;
+  object-fit: cover;
+  border: 5px solid var(--surface-solid);
+  box-shadow: 0 8px 24px rgba(40, 25, 110, 0.16);
+  display: block;
+  margin: -62px 0 0 28px;
+  background: var(--surface-solid);
+}
+.group-profile-name {
+  margin: -46px 0 0 178px;
+  padding-right: 28px;
+  font-size: 22px;
+  font-weight: 800;
   line-height: 1.2;
+  min-height: 46px;
 }
 
-/* ════════════════════════════════════════════════════════════
-   ПАНЕЛЬ ДЕЙСТВИЙ С ГРУППОЙ
-   ════════════════════════════════════════════════════════════ */
+/* ---------- панель действий ---------- */
 .profile-actions-panel {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
-  position: relative;
-  overflow: visible;
+  padding: 18px 28px 0;
 }
+.main-action { display: flex; }
+.main-action .custom-dropdown .dropdown-trigger { padding: 11px 20px; }
+.second-action { display: flex; }
 
-/* Показываем только активный вариант действия */
-#mainRequestSubscribe,
-#mainRequestUnsubscribe,
-#secondMessage { display: none; }
-#mainRequestSubscribe.active,
-#mainRequestUnsubscribe.active,
-#secondMessage.active { display: flex; }
+/* ---------- описание группы ---------- */
+.profile-description-info {
+  margin: 18px 28px 24px;
+  padding: 13px 16px;
+  border-radius: var(--r-s);
+  background: var(--surface-2);
+}
+.profile-description-info .stub-message { font-size: 13px; }
+.profile-main-info + .profile-description-info { margin-top: 18px; }
 
-.main-action,
-.second-action { display: flex; overflow: visible; position: relative; }
-
-/* Вторичная кнопка «Написать в чат» */
-.second-action .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 18px;
-  background: var(--bg-2);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 0.925rem;
-  font-weight: 600;
-  font-family: var(--font-sans);
-  text-decoration: none;
-  transition: background var(--transition), border-color var(--transition), color var(--transition);
-}
-.second-action .btn:hover {
-  background: var(--bg-3);
-  border-color: var(--border-hover);
-  color: var(--accent-dim);
-}
-
-/* ── Дропдаун «Вы участник / Вы владелец» ── */
-.action-dropdown {
-  position: relative;
-  display: inline-flex;
-  overflow: visible;
-}
-.action-trigger.standart-btn {
-  background: var(--bg-2);
-  color: var(--text);
-  border: 1px solid var(--border);
-  box-shadow: none;
-}
-.action-trigger.standart-btn:hover {
-  background: var(--bg-3);
-  border-color: var(--border-hover);
-  transform: none;
-  box-shadow: none;
-}
-.action-trigger.standart-btn svg {
-  fill: var(--text-3);
-  stroke: none;
-  transition: transform var(--transition), fill var(--transition);
-}
-.action-dropdown:hover .action-trigger.standart-btn svg { transform: rotate(180deg); fill: var(--text-2); }
-
-.action-dropdown .dropdown-list {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  min-width: 220px;
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 5px;
-  list-style: none;
-  box-shadow: var(--shadow-lg);
-  z-index: 1000;
-  opacity: 0;
-  transform: translateY(-6px) scale(0.97);
-  pointer-events: none;
-  transform-origin: top left;
-  transition: opacity 0.14s ease, transform 0.14s ease;
-}
-.action-dropdown:hover .dropdown-list {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
-}
-.action-dropdown .dropdown-button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-weight: 500;
-  font-family: var(--font-sans);
-  color: var(--text-2);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: background var(--transition), color var(--transition);
-}
-.action-dropdown .dropdown-button svg { fill: var(--text-3); flex-shrink: 0; transition: fill var(--transition); }
-.action-dropdown .dropdown-button:hover { background: var(--bg-3); color: var(--text); }
-.action-dropdown .dropdown-button:hover svg { fill: var(--text-2); }
-/* «Выйти из группы» — красный акцент */
-#unsubscribeButton:hover { background: var(--error-ghost); color: var(--error); }
-#unsubscribeButton:hover svg { fill: var(--error); }
-
-/* ════════════════════════════════════════════════════════════
-   ПАНЕЛЬ УПРАВЛЕНИЯ (для админа)
-   ════════════════════════════════════════════════════════════ */
-.group-edit { padding: 14px; }
+/* ---------- управление группой (правый контейнер) ---------- */
+.group-edit { padding: 10px; }
 .group-edit .btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 11px 16px;
-  background: var(--accent-ghost);
-  color: var(--accent-dim);
-  border: 1px solid var(--accent-ghost-2);
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 16px;
+  color: var(--ink-2);
+  font-size: 14.5px;
   font-weight: 600;
-  font-family: var(--font-sans);
-  text-decoration: none;
-  transition: background var(--transition), border-color var(--transition);
+  transition: background 0.15s ease, color 0.15s ease;
 }
-.group-edit .btn:hover {
-  background: var(--accent-ghost-2);
-  border-color: var(--accent);
-}
-.group-edit .btn svg { stroke: var(--accent-dim); flex-shrink: 0; }
+.group-edit .btn:hover { background: var(--acc-soft); color: var(--acc); }
+.group-edit .btn svg { flex: none; color: var(--ink-3); }
+.group-edit .btn:hover svg { color: var(--acc); }
 
-/* ════════════════════════════════════════════════════════════
-   СПИСОК УЧАСТНИКОВ
-   ════════════════════════════════════════════════════════════ */
+/* ---------- участники (правый контейнер) ---------- */
 .members-panel > h2 {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-3);
-  margin-bottom: 14px;
 }
-.members-panel > h2 .count {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--accent-dim);
-  background: var(--accent-ghost);
-  border: 1px solid var(--accent-ghost-2);
-  padding: 1px 8px;
+.members-panel .count:not(:empty) {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
   border-radius: 999px;
+  background: var(--acc-soft);
+  color: var(--acc);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 22px;
+  text-align: center;
 }
 
 .members-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
+.members-list > p { grid-column: 1 / -1; font-size: 13px; color: var(--ink-3); }
+
 .member-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 7px;
-  padding: 10px 6px;
-  text-decoration: none;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  padding: 8px 4px;
+  border-radius: 13px;
+  min-width: 0;
+  transition: background 0.15s ease;
 }
-.member-item:hover {
-  background: var(--bg-3);
-  border-color: var(--border);
-  transform: translateY(-2px);
-}
+.member-item:hover { background: var(--surface-2); }
 .member-item img {
   width: 52px;
   height: 52px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--bg-2);
-  box-shadow: var(--shadow-sm);
 }
 .member-item p {
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--text-2);
-  text-align: center;
-  line-height: 1.25;
-  word-break: break-word;
-  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
   max-width: 100%;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color var(--transition);
 }
-.member-item:hover p { color: var(--accent-dim); }
-
-/* ════════════════════════════════════════════════════════════
-   АДАПТИВ
-   ════════════════════════════════════════════════════════════ */
-@media (max-width: 600px) {
-  .main-container > .container.profile-panel {
-    padding: 20px 16px;
-    align-items: center;
-    text-align: center;
-  }
-  .main-container > .container.profile-panel > img { width: 120px; height: 120px; }
-  .profile-actions-panel { width: 100%; justify-content: center; }
-  .action-dropdown:hover .dropdown-list { left: 50%; transform: translateX(-50%) translateY(0) scale(1); transform-origin: top center; }
-}
+.member-item:hover p { color: var(--acc); }

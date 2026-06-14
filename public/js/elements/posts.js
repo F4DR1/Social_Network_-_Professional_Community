@@ -105,7 +105,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button class="modal-btn" id="${publicateBtnId}">Опубликовать пост</button>
             </div>
         `);
-        createUploadFilesPanelHTML(modalFooterId, filesPreviewPanelId);
+
+        // Обработчик загрузки файла
+        function fileUploadHandler() {
+            const filesPreviewList = document.getElementById(filesPreviewPanelId);
+
+            const hasFiles = filesPreviewList.childElementCount > 0;
+            publicateBtn.classList.toggle('active', hasFiles);
+            publicateBtn.disabled = !hasFiles;
+        }
+
+
+        // Создание панели загрузки файлов
+        createUploadFilesPanelHTML(modalFooterId, filesPreviewPanelId, fileUploadHandler);
  
         const publicateBtn = document.getElementById(publicateBtnId);
         const postText = document.getElementById(postTextId);
@@ -113,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
         publicateBtn.classList.toggle('active', false);
         publicateBtn.disabled = true;
         
-        postText.addEventListener('input', function() {
+        postText.addEventListener('input', () => {
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 5 + 'px';
  

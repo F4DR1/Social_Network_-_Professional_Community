@@ -25,12 +25,14 @@
                     u.lastname,
                     u.firstname,
                     CONCAT(u.firstname, ' ', u.lastname) AS fullname,
-                    f.file_path AS photo,
+                    fp.file_path AS photo,
+                    fb.file_path AS banner,
                     u.phone,
                     u.email
                 FROM
                     users u
-                    LEFT JOIN files f ON f.id = u.photo_id
+                    LEFT JOIN files fp ON fp.id = u.photo_id
+                    LEFT JOIN files fb ON fb.id = u.banner_id
                 WHERE
                     $where
             ";
@@ -38,6 +40,7 @@
             if (!$user) Helpers::errorResponse('Пользователь не найден', 404);
             
             $user['photo'] = Helpers::fileUrl($user['photo'] ?? Helpers::imagePlaceholder('user'));
+            $user['banner'] = Helpers::fileUrl($user['banner'] ?? Helpers::imagePlaceholder('banner'));
             
             Helpers::jsonResponse(['success' => true, 'user' => $user]);
         }

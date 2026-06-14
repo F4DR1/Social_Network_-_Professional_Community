@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
     // Модальное окно с информацией
-    window.informationModal = async function(text, title = null, cancelBtnText = null) {
+    window.informationModal = async function(text, title = null, cancelBtnText = 'Ок') {
         title = title ?? 'Информация';
         const modalId = 'informationModal';
         return await formatedModal(modalId, text, title, true, 1, cancelBtnText);

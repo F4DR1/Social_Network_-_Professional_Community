@@ -9,6 +9,7 @@
     require_once ENUMS_PATH . '/layout.php';
 
 
+    $currentRoute = $_GET['current_route'];
     $userToken = !empty($currentUser) ? $_COOKIE['auth_token'] : null;
     
     $profileLink = '';
@@ -118,7 +119,7 @@
         </script>
     <?php endif; ?>
 </head>
-<body class="layout-<?= strtolower($layout->name) ?>">
+<body class="layout-<?= strtolower($layout->name) ?>" style="background-image: url('<?= API ?>/images/static/background.webp'); width: 100%;">
     <?php if ($layout !== Layout::Micro): ?>
         <!-- Шапка (видно в любом layout, кроме Micro) -->
         <header>
@@ -126,7 +127,7 @@
                 <!-- Логотип и название соцсети -->
                 <a href="/" class="logo-row">
                     <img src="<?= API ?>/images/static/logotype.png" alt="Логотип соцсети" class="logo">
-                    <h1><?= htmlspecialchars($base_title) ?></h1>
+                    <h1 class="no-select"><?= htmlspecialchars($base_title) ?></h1>
                 </a>
                 <?php if ($layout === Layout::Standart): ?>
                     <!-- Элементы пользователя (видно в стандартном layout) -->
@@ -229,14 +230,14 @@
                             <li><a href="<?= Auth::Register->text() ?>">Регистрация</a></li>
                         <?php else: ?>
                             <!-- Кнопки навигации -->
-                            <li>
+                            <li class="<?= ($currentRoute == $profileLink || $currentRoute == 'user' . $currentUser['id']) ? 'active' : '' ?>">
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="7" r="4"/>
-                                    <path d="M5.5 21a8.5 8.5 0 0 1 13 0"/>
+                                    <circle cx="12" cy="8" r="4"/>
+                                    <path d="M5.5 19a7 7 0 0 1 13 0"/>
                                 </svg>
                                 <a href="<?= $profileLink ?>">Профиль</a>
                             </li>
-                            <li>
+                            <li class="main <?= $currentRoute == 'feed' ? 'active' : '' ?>">
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="3" width="18" height="18" rx="2"/>
                                     <line x1="7" y1="8" x2="17" y2="8"/>
@@ -245,7 +246,7 @@
                                 </svg>
                                 <a href="feed">Лента</a>
                             </li>
-                            <li>
+                            <li class="main <?= $currentRoute == 'msg' ? 'active' : '' ?>">
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                                 </svg>
@@ -254,7 +255,7 @@
                                     <span class="counter messages-counter" id="messagesCounter"></span>
                                 </a>
                             </li>
-                            <li>
+                            <li class="<?= $currentRoute == 'contacts' ? 'active' : '' ?>">
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="4" width="18" height="16" rx="2"/>
                                     <circle cx="10" cy="10" r="2.5"/>
@@ -265,7 +266,7 @@
                                 </svg>
                                 <a href="contacts">Контакты</a>
                             </li>
-                            <li>
+                            <li class="<?= $currentRoute == 'groups' ? 'active' : '' ?>">
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="7" cy="6" r="2.2"/>
                                     <path d="M3.5 13c0-1.5 1.5-2.5 3.5-2.5s3.5 1 3.5 2.5"/>
@@ -276,18 +277,28 @@
                                 </svg>
                                 <a href="groups">Группы</a>
                             </li>
-                            <li>
+                            <li class="<?= $currentRoute == 'search' ? 'active' : '' ?>">
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="11" cy="11" r="8"/>
                                     <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                                 </svg>
                                 <a href="search">Поиск</a>
                             </li>
-                            <hr>
-                            <li>
+                            <li class="main mobile-only <?= $currentRoute == 'menu' ? 'active' : '' ?>">
+                                <!-- Видно только в мобильной версии -->
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="11" cy="11" r="8"/>
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                    <line x1="3" y1="6" x2="21" y2="6"/>
+                                    <line x1="3" y1="12" x2="21" y2="12"/>
+                                    <line x1="3" y1="18" x2="21" y2="18"/>
+                                </svg>
+                                <a href="menu">Меню</a>
+                            </li>
+                            <hr>
+                            <li class="<?= $currentRoute == 'about' ? 'active' : '' ?>">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="11" r="8"/>
+                                    <line x1="12" y1="15" x2="12" y2="11"/>
+                                    <line x1="12" y1="7" x2="12.01" y2="7"/>
                                 </svg>
                                 <a href="about">О нас</a>
                             </li>

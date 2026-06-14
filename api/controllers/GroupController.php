@@ -70,10 +70,12 @@
                     g.id,
                     g.linkname,
                     g.name,
-                    f.file_path AS photo
+                    fp.file_path AS photo,
+                    fb.file_path AS banner
                 FROM
                     `groups` g
-                    LEFT JOIN files f ON f.id = g.photo_id
+                    LEFT JOIN files fp ON fp.id = g.photo_id
+                    LEFT JOIN files fb ON fb.id = g.banner_id
                 WHERE
                     $where
             ";
@@ -81,6 +83,7 @@
             if (!$group) Helpers::errorResponse('Группа не найдена', 404);
             
             $group['photo'] = Helpers::fileUrl($group['photo'] ?? Helpers::imagePlaceholder('group'));
+            $group['banner'] = Helpers::fileUrl($group['banner'] ?? Helpers::imagePlaceholder('banner'));
             
             Helpers::jsonResponse(['success' => true, 'group' => $group]);
         }

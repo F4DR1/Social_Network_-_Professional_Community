@@ -1,133 +1,57 @@
 /* ============================================================
-   МирПрофи — 403.css (светлая тема)
-   Страница ошибки 403. Layout::Micro (без header/footer/nav).
-   Палитра наследуется из layout.css (он всегда подключён).
+   403.css — МирПрофи · «Аврора»
+   Страница ошибки 403 (Layout::Micro — без шапки и меню).
    ============================================================ */
 
-body.layout-micro {
+main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.error-403 {
+  width: 440px;
+  max-width: 100%;
+  text-align: center;
+  background: var(--surface);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow-pop);
+  padding: 44px 36px 38px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background:
-    radial-gradient(120% 80% at 50% -10%, rgba(105, 91, 248, 0.07), transparent 60%),
-    var(--bg);
-  color: var(--text);
-}
-
-body.layout-micro main {
-  flex: 1;
-  display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 24px;
-  width: 100%;
+  gap: 6px;
 }
 
-body.layout-micro .page-content {
-  width: 100%;
-  max-width: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* ── Карточка ошибки ── */
-.error-403 {
-  position: relative;
-  text-align: center;
-  padding: 48px 32px;
-  max-width: 520px;
-  margin: 0 auto;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .error-403 { animation: errFadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
-}
-
-@keyframes errFadeIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Призрачная крупная цифра позади */
-.error-403::before {
-  content: '403';
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 16rem;
-  font-weight: 700;
-  letter-spacing: -0.05em;
-  color: rgba(105, 91, 248, 0.06);
-  z-index: -1;
-  user-select: none;
-  pointer-events: none;
-  line-height: 1;
-}
-
-.error-icon {
-  font-size: 3rem;
-  margin-bottom: 18px;
-  animation: errBounce 2.4s ease-in-out infinite;
-}
-
-@keyframes errBounce {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-8px); }
-}
-
+.error-403 .error-icon { font-size: 40px; margin-bottom: 4px; }
 .error-403 h1 {
-  font-size: 6.5rem;
+  font-size: 72px;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: -0.05em;
-  color: var(--accent);
-  margin-bottom: 8px;
+  letter-spacing: 1px;
+  background: var(--acc-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
-
-.error-403 p {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--text-2);
-  letter-spacing: -0.01em;
-  margin-bottom: 32px;
-}
-
+.error-403 p { font-size: 15px; color: var(--ink-2); margin-top: 6px; }
 .error-403 a {
+  margin-top: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 13px 30px;
-  background: var(--accent);
+  padding: 12px 26px;
+  border-radius: var(--r-s);
+  background: var(--acc-grad);
   color: #fff;
-  text-decoration: none;
-  border-radius: var(--radius-sm);
-  font-size: 0.975rem;
-  font-weight: 600;
-  font-family: var(--font-sans);
-  letter-spacing: -0.01em;
-  box-shadow: 0 4px 16px var(--accent-glow);
-  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  font-weight: 700;
+  font-size: 14.5px;
+  box-shadow: 0 6px 18px var(--acc-shadow);
+  transition: transform 0.12s ease;
 }
-
-.error-403 a:hover {
-  background: var(--accent-dim);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px var(--accent-glow);
-}
-
-.error-403 a:active {
-  transform: translateY(0);
-}
-
-/* ── Адаптив ── */
-@media (max-width: 600px) {
-  .error-403 { padding: 36px 18px; }
-  .error-403 h1 { font-size: 5rem; }
-  .error-403::before { font-size: 11rem; }
-  .error-403 p { font-size: 1.1rem; }
-  .error-403 a { width: 100%; max-width: 300px; }
-}
+.error-403 a:hover { color: #fff; transform: translateY(-1px); }

@@ -1,0 +1,12 @@
+/* ============================================================
+   about.css — МирПрофи · «Аврора»
+   Страница «О нас» (about.php).
+   ============================================================ */
+
+.container.data p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.container.data p + p { margin-top: 10px; }
+.container.data a { font-weight: 600; }

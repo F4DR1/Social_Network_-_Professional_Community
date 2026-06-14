@@ -129,9 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <time class="session-last-activity-time" datetime="${lastActivity}">${lastActivityHuman}</time>
                         </div>
                     </div>
-                    <div class="session-is-active">
-
-                    </div>
+                    ${!!isCurrent ? `<div class="session-is-active"></div>` : ''}
                 </div>
                 ${deleteSessionBtn}
 
@@ -148,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let sessionsHTML = '';
             sessions.forEach(session => {
                 const {sessionId, isCurrent, elementHTML} = formateSessionHTML(session);
-                if (sessionsList.querySelector(`.session[data-session-id="${sessionId}"]`)) return;  // Пропускаем уже существующее сообщение в чате
+                if (sessionsList.querySelector(`.session[data-session-id="${sessionId}"]`)) return;  // Пропускаем уже существующую сессию в списке
 
                 if (isCurrent) {
                     const deleteActiveSessionsBtn = sessions.length == 1 ? '' : `

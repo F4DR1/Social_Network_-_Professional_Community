@@ -1,404 +1,189 @@
 /* ============================================================
-   МирПрофи — post.css
-   Лента постов и карточки постов
+   posts.css — МирПрофи · «Аврора»
+   Панель постов (elements.php → postsPanel), посты в ленте
+   (posts.js → createElementPostsList) и окно чтения статьи.
    ============================================================ */
- 
- 
-/* ════════════════════════════════════════════════════════════
-   СЕКЦИЯ ПОСТОВ — заголовок и список
-   ════════════════════════════════════════════════════════════ */
- 
-/* Контейнер секции постов */
-.centered-container > .container:has(#postsList) {
-  padding: 0;
-  overflow: visible;
-}
- 
-/* Заголовок секции */
-.centered-container > .container:has(#postsList) > h2 {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-3);
-  padding: 18px 20px 0;
-}
- 
-/* Список постов */
-.posts {
-  display: flex;
-  flex-direction: column;
-}
- 
-/* Пустое состояние */
+
+/* ---------- панель постов ---------- */
+.posts-panel > h2 { font-size: 19px; font-weight: 800; }
+.posts { display: flex; flex-direction: column; }
+
 .no-posts-message {
-  padding: 48px 20px;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--text-3);
-  letter-spacing: -0.01em;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  padding: 18px 0 6px;
 }
- 
- 
-/* ════════════════════════════════════════════════════════════
-   КАРТОЧКА ПОСТА
-   ════════════════════════════════════════════════════════════ */
- 
+
+/* ---------- пост ---------- */
 .post {
+  padding: 20px 0 16px;
   display: flex;
   flex-direction: column;
-  padding: 18px 20px 16px;
-  border-bottom: 1px solid var(--border);
-  transition: background var(--transition);
-  position: relative;
+  gap: 13px;
 }
-.post:last-child {
-  border-bottom: none;
-  border-radius: 0 0 var(--radius) var(--radius);
-}
-.post:hover {
-  background: rgba(105, 91, 248, 0.025);
-}
- 
-/* Акцентная полоска слева при наведении */
-.post::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--accent);
-  border-radius: 0 1px 1px 0;
-  opacity: 0;
-  transform: scaleY(0.4);
-  transform-origin: center;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  pointer-events: none;
-}
-.post:hover::before {
-  opacity: 1;
-  transform: scaleY(1);
-}
- 
- 
-/* ── Шапка поста ── */
-.post-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 12px;
-}
- 
-/* Автор */
+.post + .post { border-top: 1px solid var(--line-2); }
+.posts > .post:first-child { padding-top: 16px; }
+
+/* шапка поста */
+.post-head { display: flex; align-items: flex-start; gap: 12px; }
 .post-author {
   display: flex;
   align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: inherit;
+  gap: 12px;
   min-width: 0;
-  flex: 1;
+  color: var(--ink);
 }
 .post-author img {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
-  border: 2px solid var(--bg-4);
-  transition: border-color var(--transition), transform var(--transition);
+  flex: none;
+  display: block;
 }
-.post-author:hover img {
-  border-color: var(--accent-ghost);
-  transform: scale(1.04);
-}
-.post-author p {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color var(--transition);
-}
-.post-author:hover p {
-  color: var(--accent-dim);
-}
- 
- 
-/* ── Действия поста: кнопка "···" ── */
-.post-actions {
-  flex-shrink: 0;
-  overflow: visible;
-  position: relative;
-}
- 
-/* Дропдаун внутри поста — переопределяем триггер */
-.post-actions .custom-dropdown {
-  overflow: visible;
-}
- 
-.post-actions .custom-dropdown .dropdown-trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  color: var(--text-3);
-  cursor: pointer;
-  transition:
-    background var(--transition),
-    border-color var(--transition),
-    color var(--transition);
-}
-.post-actions .custom-dropdown .dropdown-trigger:hover {
-  background: var(--bg-3);
-  border-color: var(--border);
-  color: var(--text-2);
-}
-.post-actions .custom-dropdown.open .dropdown-trigger {
-  background: var(--bg-3);
-  border-color: var(--border);
-  box-shadow: 0 0 0 3px var(--accent-ghost);
-}
-.post-actions .custom-dropdown .dropdown-trigger svg {
-  fill: var(--text-3);
-  transition: fill var(--transition);
-  pointer-events: none;
-}
-.post-actions .custom-dropdown .dropdown-trigger:hover svg,
-.post-actions .custom-dropdown.open .dropdown-trigger svg {
-  fill: var(--text-2);
-}
- 
-/* Меню дропдауна — открывается вправо/влево от иконки */
-.post-actions .custom-dropdown .dropdown-menu {
+.post-author p { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.post-author:hover p { color: var(--acc); }
+
+/* действия поста (выпадающее меню справа) */
+.post-actions { margin-left: auto; }
+
+/* базовые стили дропдауна — на ленте custom_dropdown.css не подключается */
+.post-actions .custom-dropdown { position: relative; display: inline-block; }
+.post-actions .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
   left: auto;
   right: 0;
-  min-width: 180px;
-  transform-origin: top right;
-  z-index: 500;
+  z-index: 600;
+  min-width: 220px;
+  padding: 8px;
+  background: var(--surface-solid);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-pop);
+  list-style: none;
+  margin: 0;
 }
- 
- 
-/* ── Тело поста ── */
-.post-content {
+.post-actions .custom-dropdown.open .dropdown-menu { display: block; }
+.post-actions .dropdown-button {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  transition: background 0.15s ease;
 }
- 
-.post-text {
-  font-size: 0.925rem;
-  line-height: 1.65;
-  color: var(--text-2);
-  letter-spacing: -0.01em;
-  word-break: break-word;
-  white-space: pre-wrap;
-}
-.post-text:empty {
-  display: none;
-}
- 
- 
-/* ── Файлы в посте ── */
-.post-file {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
- 
-.post-file-preview {
-  display: block;
+.post-actions .dropdown-button:hover { background: var(--surface-2); }
+
+.post-actions .dropdown-trigger {
+  width: 36px;
+  height: 36px;
   padding: 0;
+  border-radius: 10px;
   background: none;
-  border: none;
-  cursor: pointer;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  transition: transform var(--transition), box-shadow var(--transition);
+  color: var(--ink-3);
 }
-.post-file-preview:hover {
-  transform: scale(1.01);
-  box-shadow: var(--shadow-md);
+.post-actions .dropdown-trigger:hover { background: var(--surface-2); color: var(--ink-2); }
+.delete-post-btn { color: var(--err); }
+.delete-post-btn:hover { color: var(--err); }
+.delete-post-btn svg, .delete-post-btn:hover svg { color: var(--err); }
+
+/* ---------- содержимое поста ---------- */
+.post-content { display: flex; flex-direction: column; gap: 12px; }
+.post-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+  text-wrap: pretty;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.post-text:empty { display: none; }
+
+/* файлы (изображения) поста */
+.post-file { display: flex; flex-wrap: wrap; gap: 8px; }
+.post-file-preview {
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
 }
 .post-file-preview img {
-  display: block;
   width: 100%;
-  max-width: 380px;
-  max-height: 260px;
+  height: 230px;
   object-fit: cover;
-  border-radius: var(--radius-sm);
+  display: block;
+  transition: transform 0.2s ease;
 }
-.post-file:has(.post-file-preview:nth-child(2)) .post-file-preview img {
-  max-width: 180px;
-  max-height: 180px;
-}
-.post-file:has(.post-file-preview:nth-child(3)) .post-file-preview img {
-  max-width: 120px;
-  max-height: 120px;
-}
- 
- 
-/* ── Статья в посте ── */
+.post-file-preview:hover img { transform: scale(1.02); }
+
+/* статья в посте */
 .post-article-preview {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
   width: 100%;
   padding: 0;
-  background: var(--bg-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
   text-align: left;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
   overflow: hidden;
-  transition:
-    border-color var(--transition),
-    box-shadow var(--transition),
-    background var(--transition);
-}
-.post-article-preview:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-ghost);
-  background: var(--bg-4);
-}
- 
-.article-preview {
+  background: var(--surface-solid);
   display: flex;
-  align-items: center;
-  gap: 14px;
-  flex: 1;
-  min-width: 0;
-  padding: 12px 14px;
+  flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+.post-article-preview:hover { border-color: var(--acc-soft-2); box-shadow: var(--shadow); }
+.article-preview { display: flex; flex-direction: column; }
 .article-preview img {
-  width: 64px;
-  height: 52px;
+  width: 100%;
+  height: 190px;
   object-fit: cover;
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
-  background: var(--bg-5);
+  display: block;
 }
-.article-preview h3 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  line-height: 1.35;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.article-preview p {
-  margin-top: 3px;
-  font-size: 0.78rem;
-  color: var(--text-3);
-  font-family: var(--font-mono);
-}
-.article-preview p span {
-  color: var(--text-2);
-}
- 
+.article-preview h3 { font-size: 16.5px; font-weight: 800; padding: 15px 18px 0; }
+.article-preview p { font-size: 13px; color: var(--ink-3); padding: 5px 18px 0; }
+.article-preview p span { font-weight: 700; color: var(--ink-2); }
 .read-btn-text {
-  flex-shrink: 0;
-  padding: 0 16px;
-  align-self: stretch;
-  display: flex;
-  align-items: center;
-  font-size: 0.8rem;
+  margin: 12px 18px 16px;
+  align-self: flex-start;
+  padding: 8px 18px;
+  border-radius: var(--r-s);
+  background: var(--acc-soft);
+  color: var(--acc);
+  font-size: 13.5px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--accent-dim);
-  border-left: 1px solid var(--border);
-  background: var(--accent-ghost);
-  transition: background var(--transition), color var(--transition);
 }
-.post-article-preview:hover .read-btn-text {
-  background: rgba(105, 91, 248, 0.15);
-  color: var(--accent);
-}
- 
- 
-/* ── Подвал поста ── */
+.post-article-preview:hover .read-btn-text { background: var(--acc-soft-2); }
+
+/* ---------- подвал поста ---------- */
 .post-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink-3);
 }
- 
-.post-date {
-  font-size: 0.775rem;
-  color: var(--text-3);
-  font-family: var(--font-mono);
-  letter-spacing: 0.02em;
-  margin-left: auto;
+.group-post-author { color: var(--acc); font-weight: 600; }
+.post-date { margin-left: auto; }
+
+/* ---------- окно чтения статьи ---------- */
+.modal-title img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+  margin-bottom: 14px;
 }
- 
-.group-post-author {
-  font-size: 0.8rem;
-  color: var(--text-3);
-  text-decoration: none;
-  letter-spacing: -0.01em;
-  transition: color var(--transition);
-}
-.group-post-author:hover {
-  color: var(--accent-dim);
-}
- 
-/* Кнопка удаления поста — красный акцент */
-.delete-post-btn {
-  color: #E5484D !important;
-}
-.delete-post-btn svg {
-  fill: #E5484D !important;
-}
-.delete-post-btn:hover {
-  background: rgba(229, 72, 77, 0.08) !important;
-  color: #C2363B !important;
-}
-.delete-post-btn:hover svg {
-  fill: #C2363B !important;
-}
- 
- 
-/* ════════════════════════════════════════════════════════════
-   АДАПТИВ
-   ════════════════════════════════════════════════════════════ */
- 
-@media (max-width: 600px) {
-  .post {
-    padding: 14px 14px 12px;
-  }
-  .post-author img {
-    width: 32px;
-    height: 32px;
-  }
-  .post-author p {
-    font-size: 0.85rem;
-  }
-  .post-text {
-    font-size: 0.9rem;
-  }
-  .article-preview img {
-    width: 50px;
-    height: 42px;
-  }
-  .read-btn-text {
-    padding: 0 10px;
-    font-size: 0.75rem;
-  }
-}
+.modal-title > p { font-size: 13px; color: var(--ink-3); margin-top: 6px; }
+.modal-title > p span { font-weight: 700; color: var(--ink-2); }
+.modal-main.new-post > p,
+.modal-main.new-post > div > p { font-size: 14.5px; line-height: 1.6; }
+.modal-footer .article-date { font-size: 12.5px; color: var(--ink-3); }
+.modal-footer > p { font-size: 12.5px; color: var(--ink-3); margin-right: auto; }

@@ -1,0 +1,143 @@
+/* ============================================================
+   skills.css — МирПрофи · «Аврора»
+   Панель навыков пользователя (user_profile.php + skills.js):
+   список навыков, шкала уровня, подтверждения,
+   модальные окна редактирования и добавления навыков.
+   ============================================================ */
+
+/* ---------- панель навыков на странице ---------- */
+.user-skills-panel { position: relative; }
+.user-skills-panel > h2 { font-size: 19px; font-weight: 800; }
+
+.user-skills-edit-btn {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+}
+
+.user-skills-panel .user-skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.no-skills-message { font-size: 13.5px; color: var(--ink-3); padding: 4px 0; }
+
+/* ---------- карточка навыка ---------- */
+.user-skill {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 16px 18px;
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  background: var(--surface-solid);
+}
+
+.user-skill .skill-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.user-skill .skill-title { font-size: 15.5px; font-weight: 800; }
+.user-skill .skill-endorsements-count { font-size: 13px; color: var(--ink-3); }
+.user-skill .skill-endorsements-count b { color: var(--ink-2); }
+
+/* шкала уровня навыка */
+.user-skill .skill-level { display: flex; align-items: center; gap: 12px; }
+.skill-level-title { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+
+/* пустой div: деления шкалы рисуются фоновыми градиентами */
+.progress-scale {
+  flex: 1;
+  max-width: 220px;
+  height: 8px;
+  border-radius: 999px;
+  --fill-1: var(--line-2);
+  --fill-2: var(--line-2);
+  --fill-3: var(--line-2);
+}
+.progress-scale.fullness-1 { --fill-1: var(--acc); }
+.progress-scale.fullness-2 { --fill-1: var(--acc); --fill-2: var(--acc); }
+.progress-scale.fullness-3 { --fill-1: var(--acc); --fill-2: var(--acc); --fill-3: var(--acc); }
+.progress-scale.max-fullness-3 {
+  background-image:
+    linear-gradient(90deg, var(--fill-1), var(--fill-1)),
+    linear-gradient(90deg, var(--fill-2), var(--fill-2)),
+    linear-gradient(90deg, var(--fill-3), var(--fill-3));
+  background-size: calc((100% - 10px) / 3) 100%;
+  background-position: 0 0, 50% 0, 100% 0;
+  background-repeat: no-repeat;
+}
+
+/* кнопки подтверждения навыка */
+.btn-skill-endorsement-add,
+.btn-skill-endorsement-delete { align-self: flex-start; }
+.btn-skill-endorsement-add svg { color: var(--ok); }
+.btn-skill-endorsement-delete svg { color: var(--err); }
+
+/* ---------- окно «Ваши навыки» (редактирование) ---------- */
+.modal-main.user-skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.modal-main.user-skills-list .user-skill {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 15px;
+}
+.modal-main.user-skills-list .user-skill h3 {
+  flex: 1;
+  min-width: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.modal-main.user-skills-list .user-skill .custom-dropdown .dropdown-trigger {
+  padding: 9px 14px;
+  font-size: 13.5px;
+}
+.user-skill-delete-btn { flex: none; }
+.user-skill-delete-btn:hover { border-color: var(--err); color: var(--err); }
+
+/* кнопка «Добавить новый навык» */
+.modal-main.user-skills-list > .add-new-skill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px;
+  border-radius: var(--r-s);
+  border: 1.5px dashed var(--line-2);
+  color: var(--acc);
+  font-size: 14px;
+  font-weight: 700;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.modal-main.user-skills-list > .add-new-skill-btn:hover {
+  border-color: var(--acc);
+  background: var(--acc-soft);
+}
+
+/* ---------- окно «Список навыков» (добавление) ---------- */
+.modal-main.add-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.modal-main.add-skills-list .add-new-skill-btn {
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: var(--acc-soft);
+  color: var(--acc);
+  transition: background 0.15s ease;
+}
+.modal-main.add-skills-list .add-new-skill-btn h3 { font-size: 13.5px; font-weight: 700; }
+.modal-main.add-skills-list .add-new-skill-btn:hover { background: var(--acc-soft-2); }
+.modal-main.add-skills-list .add-new-skill-btn.has-skill {
+  background: var(--surface-2);
+  color: var(--ink-3);
+  cursor: default;
+}

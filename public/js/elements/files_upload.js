@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 await confirmationModal(
                     `Файл "${file.name}" не поддерживается. Разрешены: JPEG, PNG, GIF, WebP.`,
                     'Неразрешённый тип файла',
-                    1,
                     'Хорошо'
                 );
                 return;
@@ -74,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 await confirmationModal(
                     `Файл "${fileToUpload.name}" слишком большой (максимум 10 МБ).`,
                     'Файл слишком большой',
-                    1,
                     'Хорошо'
                 );
                 return;
@@ -101,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Создать HTML панели загрузки файлов
-    window.createUploadFilesPanelHTML = function(parentId, filesPreviewPanelId) {
+    window.createUploadFilesPanelHTML = function(parentId, filesPreviewPanelId, handlerFunction = null) {
         const inputId = 'filesInput';
         const uploadBtnId = 'filesUploadButton';
 
@@ -143,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 await confirmationModal(
                     `Можно загрузить не более ${MAX_FILES} файлов.`,
                     'Слишком много файлов',
-                    1,
                     'Хорошо'
                 );
                 fileInput.value = '';
@@ -161,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     await confirmationModal(
                         `Файл "${file.name}" не поддерживается. Разрешены: JPEG, PNG, GIF, WebP.`,
                         'Неразрешённый тип файла',
-                        1,
                         'Хорошо'
                     );
                     continue;
@@ -170,7 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     await confirmationModal(
                         `Файл "${file.name}" слишком большой (максимум 10 МБ).`,
                         'Файл слишком большой',
-                        1,
                         'Хорошо'
                     );
                     continue;
@@ -188,11 +183,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.selectedFileIds.push(uploadedFile.id);
 
                 // Показываем превью
-                await renderPreviewHTML(uploadedFile, previewDiv);
+                await renderPreviewHTML(uploadedFile, previewDiv, handlerFunction);
             }
 
             // Сбрасываем input, чтобы можно было повторно выбрать те же файлы
             fileInput.value = '';
+
+
+            handlerFunction();  // Вызов кастомного обработчика при прикреплении файла
         });
     }
 
@@ -211,7 +209,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 await confirmationModal(
                     'Произошла ошибка при загрузке файла: ' + result.error,
                     'Ошибка загрузки',
-                    1,
                     'Хорошо'
                 );
             }
@@ -221,7 +218,6 @@ document.addEventListener('DOMContentLoaded', function() {
             await confirmationModal(
                 'Произошла сетевая ошибка. Попробуйте загрузить файл позднее.',
                 'Сетевая ошибка',
-                1,
                 'Хорошо'
             );   
         }
@@ -237,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Создаём HTML предпросмотра
-    function renderPreviewHTML(file, previewDiv) {
+    function renderPreviewHTML(file, previewDiv, handlerFunction) {
         const previewId = 'FilePreviewId' + file.id;
         const previewDeleteBtnId = 'RemoveBtn' + previewId;
 
@@ -307,6 +303,8 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteBtn.addEventListener('click', async () => {
             previewElement.remove();
             window.selectedFileIds = window.selectedFileIds.filter(id => id !== file.id);
+
+            handlerFunction();  // Вызов кастомного обработчика при прикреплении файла
         });
     }
 });

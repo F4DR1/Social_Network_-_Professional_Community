@@ -19,6 +19,7 @@
     $groupNumber = "group$groupId";
     $groupLinkname = $group['linkname'] ?? $groupNumber;
     $groupPhoto = $group['photo'];
+    $groupBanner = $group['banner'];
 
     
     $isAdmin = false;
@@ -138,13 +139,19 @@
     <?php break;
     default: ?>
 
+        <!-- Контейнер с информацией о группе -->
+        <!-- (находится над центральным и боковым контейнерами) -->
         <div class="main-container">
             <section class="container profile-panel">
-                <img src="<?= $groupPhoto ?>" alt="<?= htmlspecialchars($groupName) ?>" width=200>
-                <h2><?= htmlspecialchars($groupName) ?></h2>
+                <div class="profile-main-info">
+                    <!-- Основная информация о группе -->
+                    <img src="<?= $groupBanner ?>" class="group-profile-banner">
+                    <img src="<?= $groupPhoto ?>" alt="<?= htmlspecialchars($groupName) ?>" class="group-profile-photo">
+                    <h2 class="group-profile-name"><?= htmlspecialchars($groupName) ?></h2>
+                </div>
                 
                 <?php if ($userIsAuthorized): ?>
-                    <!-- Панель действий с группой -->
+                    <!-- Панель действий с группой (только авторизованные пользователи) -->
                     <div class="profile-actions-panel">
 
                         <!-- Главная кнопка -->
@@ -211,9 +218,14 @@
                     </div>
                 <?php endif; ?>
 
+                <div class="profile-description-info">
+                    <!-- Тут информация о группе в дальнейшем -->
+                    <span class="stub-message">Здесь скоро будет различная информация о группе (из настроек профиля)</span>
+                </div>
             </section>
         </div>
 
+        <!-- Центральный контейнер -->
         <div class="centered-container">
             <?php if ($userIsAuthorized && $isSubscribe && $isAdmin): ?>
                 <?= postCreationField(); ?>

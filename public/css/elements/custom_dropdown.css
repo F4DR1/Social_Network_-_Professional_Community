@@ -1,139 +1,110 @@
 /* ============================================================
-   МирПрофи — custom_dropdown.css
-   Кастомный выпадающий список (.custom-dropdown)
-   Используется в profile actions, skill levels и т.д.
+   custom_dropdown.css — МирПрофи · «Аврора»
+   Кастомные выпадающие списки (.custom-dropdown):
+   профиль, посты, выбор уровня навыка, списки контактов.
    ============================================================ */
- 
-/* ── Обёртка ── */
-.custom-dropdown {
-  position: relative;
-  display: inline-flex;
-}
- 
-/* ── Кнопка-триггер ── */
+
+.custom-dropdown { position: relative; display: inline-block; }
+
+/* ---------- кнопка-триггер ---------- */
 .custom-dropdown .dropdown-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: var(--bg-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-weight: 500;
-  font-family: var(--font-sans);
-  color: var(--text-2);
-  cursor: pointer;
-  transition:
-    background var(--transition),
-    border-color var(--transition),
-    color var(--transition);
-  white-space: nowrap;
-  user-select: none;
+  justify-content: center;
+  gap: 9px;
+  padding: 11px 18px;
+  border-radius: var(--r-s);
+  background: var(--acc-soft);
+  color: var(--acc);
+  font-weight: 700;
+  font-size: 14.5px;
+  transition: background 0.15s ease;
 }
-.custom-dropdown .dropdown-trigger:hover {
-  background: var(--bg-4);
-  border-color: var(--border-hover);
-  color: var(--text);
-}
-.custom-dropdown.open .dropdown-trigger {
-  background: var(--bg-4);
-  border-color: var(--accent);
-  color: var(--text);
-  box-shadow: 0 0 0 3px var(--accent-ghost);
-}
- 
-/* Стрелочка */
+.custom-dropdown .dropdown-trigger:hover { background: var(--acc-soft-2); }
+
 .custom-dropdown .dropdown-arrow {
-  fill: var(--text-3);
-  flex-shrink: 0;
-  transition: transform var(--transition), fill var(--transition);
+  opacity: 0.6;
+  transition: transform 0.2s ease;
 }
-.custom-dropdown.open .dropdown-arrow {
-  transform: rotate(180deg);
-  fill: var(--text-2);
-}
- 
-/* ── Выпадающий список ── */
+.custom-dropdown.open > .dropdown-trigger .dropdown-arrow { transform: rotate(180deg); }
+
+/* ---------- выпадающее меню ---------- */
 .custom-dropdown .dropdown-menu {
+  display: none;
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   left: 0;
-  min-width: 100%;
-  max-height: 220px;
-  overflow-y: auto;
-  background: var(--bg-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 5px;
-  list-style: none;
-  box-shadow:
-    0 12px 40px rgba(19,19,8,0.10),
-    0 0 0 1px rgba(19,19,8,0.03);
-  z-index: 300;
-  /* Анимация появления */
-  opacity: 0;
-  transform: translateY(-6px) scale(0.97);
-  pointer-events: none;
-  transform-origin: top left;
-  transition: opacity 0.14s ease, transform 0.14s ease;
+  z-index: 600;
+  min-width: 240px;
+  padding: 8px;
+  background: var(--surface-solid);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-pop);
 }
-.custom-dropdown.open .dropdown-menu {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
-}
- 
-/* Пункт списка */
+.custom-dropdown.open > .dropdown-menu { display: block; }
+
 .custom-dropdown .dropdown-menu li {
-  display: flex;
-  align-items: center;
-  padding: 9px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-2);
-  cursor: pointer;
-  transition: background var(--transition), color var(--transition);
-  white-space: nowrap;
-  user-select: none;
+  border-radius: 11px;
+  font-size: 14px;
+  color: var(--ink-2);
 }
-.custom-dropdown .dropdown-menu li:hover {
-  background: var(--bg-4);
-  color: var(--text);
+.custom-dropdown .dropdown-menu li:hover { background: var(--surface-2); }
+
+/* пункты-значения (выбор уровня навыка и т.п.) */
+.custom-dropdown .dropdown-menu li[data-element-id] {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 500;
 }
 .custom-dropdown .dropdown-menu li.selected {
-  color: var(--accent-dim);
-  background: var(--accent-ghost);
+  background: var(--acc-soft);
+  color: var(--acc);
+  font-weight: 700;
 }
-.custom-dropdown .dropdown-menu li.selected::after {
-  content: '';
-  display: block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent);
-  margin-left: auto;
-  flex-shrink: 0;
+
+/* ---------- кнопки-действия внутри меню ---------- */
+.dropdown-button {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
 }
- 
-/* Скроллбар внутри меню */
-.custom-dropdown .dropdown-menu::-webkit-scrollbar { width: 4px; }
-.custom-dropdown .dropdown-menu::-webkit-scrollbar-thumb {
-  background: var(--bg-5);
-  border-radius: 999px;
+.dropdown-button:hover { background: var(--surface-2); color: var(--ink); }
+.dropdown-button svg { flex: none; color: var(--ink-3); }
+.dropdown-button:hover svg { color: var(--acc); }
+
+/* заглушка «нет действий» */
+.dropdown-menu .stub-message { display: block; padding: 10px 12px; }
+
+/* ---------- вложенный выпадающий список ----------
+   («Добавить в список контактов» внутри меню профиля) */
+.dropdown-menu .custom-dropdown { display: block; }
+.dropdown-menu .custom-dropdown .dropdown-trigger {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  background: none;
+  color: var(--ink-2);
+  font-weight: 500;
+  font-size: 14px;
 }
- 
-/* ── Вариант: открытие вверх (класс .drop-up) ── */
-.custom-dropdown.drop-up .dropdown-menu {
-  top: auto;
-  bottom: calc(100% + 6px);
-  transform-origin: bottom left;
-}
- 
-/* ── Вариант: выравнивание вправо (класс .drop-right) ── */
-.custom-dropdown.drop-right .dropdown-menu {
-  left: auto;
-  right: 0;
-  transform-origin: top right;
+.dropdown-menu .custom-dropdown .dropdown-trigger:hover { background: var(--surface-2); color: var(--ink); }
+.dropdown-menu .custom-dropdown .dropdown-trigger svg { color: var(--ink-3); }
+.dropdown-menu .custom-dropdown .dropdown-menu {
+  position: static;
+  min-width: 0;
+  margin-top: 4px;
+  box-shadow: none;
+  border: 1px solid var(--line-2);
+  background: var(--surface-2);
 }

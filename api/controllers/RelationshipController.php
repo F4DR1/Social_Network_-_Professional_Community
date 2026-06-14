@@ -70,26 +70,8 @@
         }
 
 
-        
-        /**
-         * GET /relationships/list - получить данные список всех доступных взаимоотношений
-         */
-        public function getList() {
-            $list = $this->db->fetchAll("
-                    SELECT
-                        *
-                    FROM
-                        relationship_lists
-                ",
-                []
-            );
-            
-            if (!$list) {
-                Helpers::errorResponse('Список не найден', 404);
-            }
-            
-            Helpers::jsonResponse(['success' => true, 'list' => $list]);
-        }
+
+
         
         /**
          * GET /relationships/get/users/{user_id} - получить списки всех пользователей с которыми есть отношения
@@ -218,6 +200,9 @@
                 'success' => true,
                 'isFollow' => $userIsFollow,
                 'relatedIsFollow' => $relatedUserIsFollow,
+                'isBlock' => !empty($relationship) ? (bool)$relationship['is_blocked'] : false,
+
+                // Убрать?..
                 'relationship' => $relationship ?: null,
                 'relatedRelationship' => $relatedRelationship ?: null
             ]);
@@ -280,14 +265,71 @@
             $this->auth->check();
 
             $data = json_decode(file_get_contents('php://input'), true);
+            $relatedUserId = $data['related_user_id'] ?? null;
             $isBlocked = $data['is_blocked'] ?? false;
             
             if ($isBlocked)
-                $this->upsertRelation($data['related_user_id'], ['is_blocked' => $isBlocked]);
+                $this->upsertRelation($relatedUserId, ['is_blocked' => $isBlocked]);
             else
-                $this->deleteRelation($data['related_user_id']);
+                $this->deleteRelation($relatedUserId);
 
             Helpers::jsonResponse(['success' => true]);
+        }
+
+        
+        
+        /**
+         * GET /relationships/list - получить список всех доступных взаимоотношений
+         */
+        public function getList() {
+            $list = $this->db->fetchAll("
+                    SELECT
+                        *
+                    FROM
+                        relationship_lists
+                ",
+                []
+            );
+            if (!$list) Helpers::errorResponse('Списки контактов не найдены.', 404);
+
+            Helpers::jsonResponse(['success' => true, 'list' => $list]);
+        }
+        
+        /**
+         * GET /relationships/list/{user_id} - получить список всех доступных взаимоотношений с указанием отмеченных
+         */
+        public function getUserList($relatedUserId) {
+            $this->auth->check();
+            $currentUserId = $this->auth->getCurrentUser()['id'];
+
+            Helpers::validateUserId($relatedUserId);
+
+            $list = $this->db->fetchAll("
+                    SELECT
+                        rl.*,
+                        CASE
+                            WHEN rc.id IS NOT NULL
+                                THEN 1
+                                ELSE 0
+                        END AS is_selected
+                    FROM
+                        relationship_lists rl
+                        LEFT JOIN relationships r ON r.user_id = ? AND r.related_user_id = ?
+                        LEFT JOIN relationship_contacts rc ON rc.relationship_id = r.id AND rc.list_id = rl.id
+                    ORDER BY
+                        rl.id
+                ",
+                [$currentUserId, $relatedUserId]
+            );
+            if (!$list) Helpers::errorResponse('Списки контактов не найдены.', 404);
+            
+            // Приводим is_selected к булеву типу для удобства фронта
+            foreach ($list as &$item) {
+                $item['is_selected'] = (bool)$item['is_selected'];
+            }
+            unset($item);
+
+            Helpers::jsonResponse(['success' => true, 'list' => $list]);
         }
 
         /**
@@ -295,17 +337,87 @@
          */
         public function changeList() {
             $this->auth->check();
+            $currentUserId = $this->auth->getCurrentUser()['id'];
 
             $data = json_decode(file_get_contents('php://input'), true);
+            $relatedUserId = $data['related_user_id'] ?? null;
             $listId = $data['list_id'] ?? null;
 
-            // if (!empty($listId))
-            // {
-            //     $this->upsertRelation($data['related_user_id'], ['relationship_list_id' => $listId]);
-            //     Helpers::jsonResponse(['success' => true]);
-            // } else {
-            //     Helpers::errorResponse('Ошибка отношений', 409);
-            // }
+            try {
+                Helpers::validateId($relatedUserId, 'Неверный ID пользователя.');
+
+                // Проверяем, есть ли любое отношение между текущим пользователем и целевым
+                $relationship = $this->db->fetchOne("
+                        SELECT
+                            id
+                        FROM
+                            relationships
+                        WHERE
+                            user_id = ?
+                            AND
+                            related_user_id = ?
+                        LIMIT 1
+                    ",
+                    [$currentUserId, $relatedUserId]
+                );
+                if (!$relationship) Helpers::errorResponse('Пользователь не находится в ваших контактах.', 400);
+                $relationshipId = $relationship['id'];
+                
+
+                // Проверка списка
+                Helpers::validateId($listId, 'Неверный ID списка.');
+                $listExists = $this->db->fetchOne("
+                        SELECT 1
+                        FROM
+                            relationship_lists
+                        WHERE
+                            id = ?
+                    ",
+                    [$listId]
+                );
+                if (!$listExists) Helpers::errorResponse('Список не найден.', 400);
+
+                
+                // Проверяем, есть ли контакт в указанном списке текущего пользователя
+                $contactList = $this->db->fetchOne("
+                        SELECT
+                            id
+                        FROM
+                            relationship_contacts
+                        WHERE
+                            relationship_id = ?
+                            AND
+                            list_id = ?
+                    ",
+                    [$relationshipId, $listId]
+                );
+                
+
+                if ($contactList) {
+                    // Отношение существует — удаляем его
+                    $this->db->query("
+                            DELETE
+                            FROM
+                                relationship_contacts
+                            WHERE
+                                id = ?
+                        ",
+                        [$contactList['id']]
+                    );
+                } else {
+                    // Отношения нет — создаём с указанным списком
+                    $this->db->query("
+                            INSERT INTO relationship_contacts (relationship_id, list_id) 
+                            VALUES (?, ?)
+                        ",
+                        [$relationshipId, $listId]
+                    );
+                }
+
+            } catch (Exception $e) {
+                Helpers::errorResponse('Ошибка при изменении списка', 409);
+            }
+
             Helpers::jsonResponse(['success' => true]);
         }
     }

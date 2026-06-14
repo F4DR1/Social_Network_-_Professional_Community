@@ -79,6 +79,9 @@
                     
                 case 'group':
                     return 'images/static/group_empty.webp';
+                    
+                case 'banner':
+                    return 'images/static/banner_empty.webp';
                 
                 default:
                     // Общая заглушка на изображение
@@ -394,7 +397,7 @@
         /**
          * Проверка на корректный id
          */
-        private static function validateId($id, $text) {
+        public static function validateId($id, $text) {
             if (empty($id) || !is_numeric($id) || $id <= 0) {
                 self::errorResponse($text, 400);
             }

@@ -1,180 +1,50 @@
 /* ============================================================
-   МирПрофи — category.css
-   Категории-секции со списками карточек (.category → .title → .list)
-   Используется на страницах: контакты, группы, поиск.
-   Здесь же базовая раскладка карточки .card (общая для user/group),
-   так как category.css подключается вместе с карточками всегда.
+   category.css — МирПрофи · «Аврора»
+   Категории-списки (.category): контакты, группы,
+   результаты поиска. Заголовок со счётчиком + сетка карточек.
    ============================================================ */
 
-/* ════════════════════════════════════════════════════════════
-   СЕКЦИЯ КАТЕГОРИИ
-   ════════════════════════════════════════════════════════════ */
-.category {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.category + .category {
-  margin-top: 28px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
-}
+.category { margin-top: 4px; }
+.category + .category { margin-top: 22px; }
 
-/* Заголовок секции */
-.category > .title {
+/* заголовок категории со счётчиком из data-count */
+.category .title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
+  gap: 8px;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--text);
+  color: var(--ink-2);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line-2);
 }
-
-/* Акцентная засечка слева от заголовка */
-.category > .title::before {
-  content: '';
-  width: 3px;
-  height: 1.05em;
-  border-radius: 3px;
-  background: var(--accent);
-  flex-shrink: 0;
-}
-
-/* Счётчик-бейдж (data-count) */
-.category > .title[data-count]:not([data-count=""])::after {
+.category .title:not([data-count=''])::after {
   content: attr(data-count);
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--accent-dim);
-  background: var(--accent-ghost);
-  border: 1px solid var(--accent-ghost-2);
-  padding: 2px 9px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
   border-radius: 999px;
-  line-height: 1.4;
-}
-
-/* Список карточек */
-.category > .list,
-.search-result-list .list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Пустое состояние (вставляется как <p> внутрь .list) */
-.category .list > p,
-.no-elements-message,
-.no-posts-message {
-  margin: 0;
-  padding: 28px 20px;
+  background: var(--acc-soft);
+  color: var(--acc);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 22px;
   text-align: center;
-  font-size: 0.9rem;
-  color: var(--text-3);
-  letter-spacing: -0.01em;
-  background: var(--bg-3);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-sm);
 }
 
-/* ════════════════════════════════════════════════════════════
-   БАЗОВАЯ КАРТОЧКА .card (профиль / группа)
-   Разметка из category_elements.js:
-   .card → a.photo > img | .main > a.name-line + a.message-line
-   ════════════════════════════════════════════════════════════ */
-.card {
+/* сетка элементов категории */
+.category .list {
   display: grid;
-  grid-template-columns: 56px 1fr;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-  transition:
-    border-color var(--transition),
-    box-shadow var(--transition),
-    transform var(--transition);
-}
-.card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
 }
 
-/* Фото */
-.card .photo {
-  display: block;
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-.card .photo img {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-  border-radius: 50%;            /* по умолчанию круг (пользователь) */
-  border: 2px solid var(--bg-3);
-  background: var(--bg-3);
-  transition: border-color var(--transition);
-}
-.card:hover .photo img {
-  border-color: var(--accent-ghost-2);
-}
-
-/* Основной блок */
-.card .main {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-/* Имя / название */
-.card .name-line {
-  font-size: 0.975rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  text-decoration: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color var(--transition);
-}
-.card .name-line:hover {
-  color: var(--accent-dim);
-}
-
-/* Ссылка «Написать сообщение» */
-.card .message-line {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--accent-dim);
-  text-decoration: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color var(--transition);
-}
-.card .message-line:hover {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-/* ── Адаптив ── */
-@media (max-width: 600px) {
-  .card {
-    grid-template-columns: 48px 1fr;
-    gap: 12px;
-    padding: 10px 12px;
-  }
-  .card .photo,
-  .card .photo img { width: 48px; height: 48px; }
-  .card .name-line { font-size: 0.925rem; }
-  .card .message-line { font-size: 0.8rem; }
+/* текст пустой категории */
+.category .list > p,
+.no-elements-message {
+  grid-column: 1 / -1;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  padding: 4px 2px;
 }

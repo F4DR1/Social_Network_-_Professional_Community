@@ -4,13 +4,23 @@ import {
 } from '../api.js';
 
 document.addEventListener('DOMContentLoaded', function() {
+    if (!window.searchData) {
+        console.error('searchData не определен');
+        return;
+    }
+    
+    let searchCategory = window.searchData.searchCategory;
+    let searchText = window.searchData.searchText;
+
+    if (searchCategory == null) searchCategory = 'users';
+    if (searchText == null) searchText = '';
+
+
+
+
     const searchInput = document.getElementById('searchInput');
 
     const searchResultList = document.getElementById('searchResultList');
-
-
-
-    let currentCategory = 'users';
 
 
 
@@ -46,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         const insertHTML = `
             <div class="category ${category}">
-                <h3 class="title">${title}</h3>
+                <h3 class="title" data-count="${list.length}">${title}</h3>
                 <div class="list">${elList}</div>
             </div>
         `;
@@ -67,17 +77,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============== API ===============
     // Поиск
     async function searchAPI() {
-        const category = currentCategory;
-        const data = {
-            category: category,
-            text: searchInput.value.trim()
-        }
-        
+        // Устанавливаем новый адрес (без поддержки истории)
+        const url = new URL(window.location);
+        url.searchParams.set('category', searchCategory);
+        url.searchParams.set('text', searchText);
+        window.history.replaceState({}, '', url);
+
+        const currentCategory = searchCategory;
         try {
+            const data = {
+                category: currentCategory,
+                text: searchText
+            }
+
             const result = await searchesSearch(data);
 
             if (result.success) {
-                updateResultList(category, result.list);
+                updateResultList(currentCategory, result.list);
 
             } else {
                 console.log(result.error || 'Ошибка поиска');
@@ -92,10 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-    searchAPI();
-
-
-
 
 
     // =============== ОБРАБОТЧИКИ ===============
@@ -105,6 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ищем после того, как пользователь перестал печатать (исключаем спам к API)
         clearTimeout(typingTimer);
         typingTimer = setTimeout(() => {
+            searchText = searchInput.value.trim();
+
             // Поиск
             searchAPI();
 
@@ -113,12 +127,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Обработчики для кнопок категорий
-    document.getElementById('searchButtonsList').querySelectorAll('.category-btn').forEach(btn => {
+    const categoryBtns = document.getElementById('searchButtonsList').querySelectorAll('.category-btn');
+    categoryBtns.forEach(btn => {
         btn.addEventListener('click', async (e) => {
             e.preventDefault();
-            currentCategory = btn.dataset.category;
-            // Переключаем поиск на категорию
+            
+            if (btn.classList.contains('active')) return;
+
+            const category = btn.dataset.category;
+            categoryBtns.forEach(el => {
+                el.classList.toggle('active', el.dataset.category == category);
+            });
+            
+            // Поиск
+            searchCategory = category;
             searchAPI();
         });
     });
+
+
+
+    // Стартовая настройка страницы
+    searchInput.value = searchText;
+    document.querySelector(`#searchButtonsList .category-btn[data-category="${searchCategory}"]`).click();
 });

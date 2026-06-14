@@ -11,6 +11,8 @@
     $route = ltrim($route, '/');
     unset($_GET['route']);
 
+    $_GET['current_route'] = $route ?? '';
+
 
     // Перенаправляем URL с конечным слешем на версию без слеша (301)
     if ($route !== '' && str_ends_with($route, '/')) {
@@ -44,7 +46,7 @@
 
     // ===== СТАТИЧНЫЕ МАРШРУТЫ =====
     $authStaticPages = ['login', 'register', 'recovery'];
-    $allStaticPages = ['feed', 'msg', 'contacts', 'groups', 'search', 'settings', 'about'];
+    $allStaticPages = ['feed', 'msg', 'menu', 'contacts', 'groups', 'search', 'settings', 'about'];
     if (empty($currentUser)) {
         // Доступны только адреса авторизации
         if (in_array($route, $authStaticPages)) {
@@ -68,6 +70,9 @@
                     break;
                 case 'msg':
                     include PAGES_PATH . '/messenger.php';
+                    break;
+                case 'menu':
+                    include PAGES_PATH . '/menu.php';
                     break;
                 case 'contacts':
                     include PAGES_PATH . '/contacts.php';

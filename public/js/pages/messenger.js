@@ -5,7 +5,7 @@ import {
     chatsGet, chatsGetInfo, chatsGetIdByUser, chatsGetIdByGroup
 } from '../api.js?v=5';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     if (!window.appData) {
         console.error('appData не определен');
         return;
@@ -631,9 +631,23 @@ document.addEventListener('DOMContentLoaded', function() {
     async function updateActiveChat() {
         await getActiveChatId();  // Получаем id активного чата (если чата нет - null)
         
-        showActiveChatHTML((activeChatId !== null));  // Отображаем разметку чата и его информацию
+        showActiveChatHTML((activeChatId !== null || chatSubId !== null));  // Отображаем разметку чата и его информацию
 
-        getMessagesAPI();  // Загружаем сообщения в чате
+        await getMessagesAPI();  // Загружаем сообщения в чате
+
+        
+        // Листаем чат
+        if (!chatMessages) return;
+        
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            // Скроллим к прошлой позиции
+            chatMessages.scrollTop = parseInt(savedPosition, 10);
+            sessionStorage.removeItem('scrollPosition');
+        } else {
+            // Скроллим к концу
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
     }
 
 
@@ -694,7 +708,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     (async () => {
         // Обновляем данные
-        startUpdateData();
+        await startUpdateData();
+
+        // Сохраняем позицию скролла перед уходом со страницы
+        window.addEventListener('beforeunload', () => {
+            if (activeChatId !== null || chatSubId !== null) sessionStorage.setItem('scrollPosition', chatMessages.scrollTop.toString());
+        });
+
 
         // Обновлять время сообщений у чатов
         updateLastMessageTimes();
@@ -786,8 +806,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 author_photo: currentUser.photo ?? null,
                 isLocal: true
             }
-            sendMessageAPI(message);
+            await sendMessageAPI(message);
             localMessageId -= 1;
+            
+            // Листаем чат в конец
+            if (!chatMessages) return;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     });
 });
