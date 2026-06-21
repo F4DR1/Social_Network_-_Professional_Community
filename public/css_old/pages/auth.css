@@ -143,13 +143,3 @@ main {
 .success-icon { font-size: 44px; margin-bottom: 12px; }
 .success-screen h3 { font-size: 19px; font-weight: 800; }
 .success-screen p { font-size: 14px; color: var(--ink-3); margin-top: 6px; }
-
-
-/* ============================================================
-   МОБИЛЬНЫЙ ДИЗАЙН: ≤640px
-   ============================================================ */
-@media (max-width: 640px) {
-  main { padding: 24px 14px 40px; }
-  .auth-panel { padding: 26px 20px 24px; border-radius: 24px; }
-  .auth-header h2 { font-size: 20px; }
-}

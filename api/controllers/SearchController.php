@@ -58,7 +58,7 @@
                             g.name,
                             f.file_path AS photo
                         FROM
-                            groups g
+                            `groups` g
                             LEFT JOIN files f ON g.photo_id = f.id
                     ";
                     if (!empty($text)) {

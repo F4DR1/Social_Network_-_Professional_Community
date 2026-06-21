@@ -144,19 +144,3 @@
 }
 .category-btn:hover { background: var(--surface-2); }
 .category-btn.active { background: var(--acc-soft); color: var(--acc); font-weight: 700; }
-
-
-/* ============================================================
-   МОБИЛЬНЫЙ ДИЗАЙН: ≤640px
-   ============================================================ */
-@media (max-width: 640px) {
-  /* контейнеры местами: категории (правый контейнер) сверху, настройки снизу */
-  .page-content { display: flex; flex-direction: column; }
-  .right-container { order: -1; }
-
-  .session { flex-wrap: wrap; padding: 12px 13px; }
-  .session .session-main { gap: 11px; }
-  .session .session-photo { width: 40px; height: 40px; }
-  .session-delete-btn { margin-left: auto; }
-  .sessions-active-delete-btn { width: 100%; }
-}

@@ -147,7 +147,7 @@
                         c.id
                     FROM
                         chats c
-                        INNER JOIN groups g ON g.chat_id = c.id
+                        INNER JOIN `groups` g ON g.chat_id = c.id
                     WHERE
                         g.id = ?
                 ",
@@ -235,7 +235,7 @@
                             (SELECT COUNT(*) FROM chat_members WHERE chat_id = c.id) AS chat_members_count,
                             c.is_private
                         FROM
-                            groups g
+                            `groups` g
                             INNER JOIN chats c ON c.id = g.chat_id
                             LEFT JOIN files f ON f.id = c.photo_id
                         WHERE
@@ -380,6 +380,7 @@
                 // Проставляем полные URL для фото
                 $chat['chat_photo'] = Helpers::fileUrl($chat['chat_photo'] ?? Helpers::imagePlaceholder(($chat['is_private'] ? 'user' : 'chat')));
                 $chat['last_message_author_photo'] = Helpers::fileUrl($chat['last_message_author_photo'] ?? Helpers::imagePlaceholder('user'));
+                $chat['last_message_time'] = gmdate('Y-m-d\TH:i:s\Z', strtotime($chat['last_message_time']));
 
                 // Счётчик прочтений показываем только автору последнего сообщения
                 if ($chat['last_message_author_id'] != $currentUserId) {

@@ -141,20 +141,3 @@
   color: var(--ink-3);
   cursor: default;
 }
-
-
-/* ============================================================
-   МОБИЛЬНЫЙ ДИЗАЙН: ≤640px
-   ============================================================ */
-@media (max-width: 640px) {
-  .user-skills-edit-btn { top: 16px; right: 16px; }
-  .user-skill .skill-level { flex-wrap: wrap; gap: 8px 12px; }
-  .progress-scale { max-width: none; width: 100%; flex-basis: 100%; order: 2; }
-  .skill-level-title { order: 1; }
-
-  /* окно «Ваши навыки»: строка навыка переносит управление вниз */
-  .modal-main.user-skills-list .user-skill { flex-wrap: wrap; }
-  .modal-main.user-skills-list .user-skill h3 { flex-basis: 100%; }
-  .modal-main.user-skills-list .user-skill .custom-dropdown { flex: 1; }
-  .modal-main.user-skills-list .user-skill .custom-dropdown .dropdown-trigger { width: 100%; }
-}

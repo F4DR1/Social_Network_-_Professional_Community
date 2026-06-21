@@ -79,59 +79,54 @@
             if ($userId !== $currentUserId) Helpers::errorResponse('Редактировать можно только свой профиль!', 400);
             
             
-            try {
-                switch ($category) {
-                    case 'base':
-                        // Изменяем базовую информацию
-                        $baseJson = $data['base'] ?? null;
-                        $base = json_decode($baseJson, true);
+            switch ($category) {
+                case 'base':
+                    // Изменяем базовую информацию
+                    $baseJson = $data['base'] ?? null;
+                    $base = json_decode($baseJson, true);
 
-                        if (!$base) Helpers::errorResponse('Неверные данные.', 400);
-
-
-                        $userLinkname = trim($base['linkname']);
-
-                        // Валидация входных данных
-                        Helpers::validateLinknameLength($userLinkname);
+                    if (!$base) Helpers::errorResponse('Неверные данные.', 400);
 
 
-                        // Проверяем ссылку
-                        $noneLinkname = "user$userId";
-                        if ($userLinkname === $noneLinkname) {
-                            $userLinkname = null;
-                        } else {
-                            // Проверка ссылки на верный формат
-                            if (!Helpers::isValidLinknameFormat($userLinkname))
-                                Helpers::errorResponse('Ссылка не должна быть формата "user123" или "group123"!', 400);
-                            
-                            // Проверка ссылки на занятость
-                            if (!Helpers::isLinknameUnique($this->db, $userLinkname, excludeUserId: $userId))
-                                Helpers::errorResponse('Ссылка уже занята.', 400);
-                        }
+                    $userLinkname = trim($base['linkname']);
+
+                    // Валидация входных данных
+                    Helpers::validateLinknameLength($userLinkname);
 
 
-                        // Обновляем данные
-                        $this->db->query("
-                                UPDATE
-                                    `users`
-                                SET
-                                    linkname = ? 
-                                WHERE
-                                    id = ?
-                            ",
-                            [$userLinkname, $userId]
-                        );
+                    // Проверяем ссылку
+                    $noneLinkname = "user$userId";
+                    if ($userLinkname === $noneLinkname) {
+                        $userLinkname = null;
+                    } else {
+                        // Проверка ссылки на верный формат
+                        if (!Helpers::isValidLinknameFormat($userLinkname))
+                            Helpers::errorResponse('Ссылка не должна быть формата "user123" или "group123"!', 400);
                         
-                        Helpers::jsonResponse(['success' => true, 'linkname' => $userLinkname ?: $noneLinkname]);
-                        break;
-                    
-                    default:
-                        Helpers::errorResponse('Не удалось получить данные для редактирования.', 400);
-                        break;
-                }
+                        // Проверка ссылки на занятость
+                        if (!Helpers::isLinknameUnique($this->db, $userLinkname, excludeUserId: $userId))
+                            Helpers::errorResponse('Ссылка уже занята.', 400);
+                    }
 
-            } catch (Exception $e) {
-                Helpers::errorResponse('Ошибка редактирования профиля', 500);
+
+                    // Обновляем данные
+                    $this->db->query("
+                            UPDATE
+                                `users`
+                            SET
+                                linkname = ? 
+                            WHERE
+                                id = ?
+                        ",
+                        [$userLinkname, $userId]
+                    );
+                    
+                    Helpers::jsonResponse(['success' => true, 'linkname' => $userLinkname ?: $noneLinkname]);
+                    break;
+                
+                default:
+                    Helpers::errorResponse('Не удалось получить данные для редактирования.', 400);
+                    break;
             }
         }
     }

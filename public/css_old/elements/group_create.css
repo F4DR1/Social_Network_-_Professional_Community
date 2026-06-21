@@ -1,0 +1,69 @@
+/* ============================================================
+   group_create.css — МирПрофи · «Аврора»
+   Модальное окно создания группы (создаётся в groups.js).
+   ============================================================ */
+
+/* ---------- содержимое окна ---------- */
+.modal-main.create-group { display: flex; flex-direction: column; gap: 10px; }
+
+.modal-main.create-group .input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.modal-main.create-group .input-field > span {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.modal-main.create-group .input-field > span.required::after {
+  content: ' *';
+  color: var(--err);
+}
+
+/* сообщение об ошибке создания */
+.create-group-message {
+  display: none;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--err);
+  background: color-mix(in srgb, var(--err) 9%, transparent);
+  border-radius: 11px;
+  padding: 10px 13px;
+}
+.create-group-message.active { display: block; }
+
+/* ---------- кнопки окна ---------- */
+.create-group-accept-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: var(--r-s);
+  background: var(--surface-2);
+  color: var(--ink-3);
+  font-weight: 700;
+  font-size: 14.5px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.create-group-accept-btn:disabled { cursor: default; }
+.create-group-accept-btn.active {
+  background: var(--acc-grad);
+  color: #fff;
+  box-shadow: 0 6px 18px var(--acc-shadow);
+}
+
+.create-group-cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 20px;
+  border-radius: var(--r-s);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-weight: 700;
+  font-size: 14.5px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.create-group-cancel-btn:hover { background: var(--acc-soft); color: var(--acc); }

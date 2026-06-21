@@ -1,0 +1,110 @@
+/* ============================================================
+   custom_dropdown.css — МирПрофи · «Аврора»
+   Кастомные выпадающие списки (.custom-dropdown):
+   профиль, посты, выбор уровня навыка, списки контактов.
+   ============================================================ */
+
+.custom-dropdown { position: relative; display: inline-block; }
+
+/* ---------- кнопка-триггер ---------- */
+.custom-dropdown .dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 11px 18px;
+  border-radius: var(--r-s);
+  background: var(--acc-soft);
+  color: var(--acc);
+  font-weight: 700;
+  font-size: 14.5px;
+  transition: background 0.15s ease;
+}
+.custom-dropdown .dropdown-trigger:hover { background: var(--acc-soft-2); }
+
+.custom-dropdown .dropdown-arrow {
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+.custom-dropdown.open > .dropdown-trigger .dropdown-arrow { transform: rotate(180deg); }
+
+/* ---------- выпадающее меню ---------- */
+.custom-dropdown .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 600;
+  min-width: 240px;
+  padding: 8px;
+  background: var(--surface-solid);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-pop);
+}
+.custom-dropdown.open > .dropdown-menu { display: block; }
+
+.custom-dropdown .dropdown-menu li {
+  border-radius: 11px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.custom-dropdown .dropdown-menu li:hover { background: var(--surface-2); }
+
+/* пункты-значения (выбор уровня навыка и т.п.) */
+.custom-dropdown .dropdown-menu li[data-element-id] {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.custom-dropdown .dropdown-menu li.selected {
+  background: var(--acc-soft);
+  color: var(--acc);
+  font-weight: 700;
+}
+
+/* ---------- кнопки-действия внутри меню ---------- */
+.dropdown-button {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.dropdown-button:hover { background: var(--surface-2); color: var(--ink); }
+.dropdown-button svg { flex: none; color: var(--ink-3); }
+.dropdown-button:hover svg { color: var(--acc); }
+
+/* заглушка «нет действий» */
+.dropdown-menu .stub-message { display: block; padding: 10px 12px; }
+
+/* ---------- вложенный выпадающий список ----------
+   («Добавить в список контактов» внутри меню профиля) */
+.dropdown-menu .custom-dropdown { display: block; }
+.dropdown-menu .custom-dropdown .dropdown-trigger {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  background: none;
+  color: var(--ink-2);
+  font-weight: 500;
+  font-size: 14px;
+}
+.dropdown-menu .custom-dropdown .dropdown-trigger:hover { background: var(--surface-2); color: var(--ink); }
+.dropdown-menu .custom-dropdown .dropdown-trigger svg { color: var(--ink-3); }
+.dropdown-menu .custom-dropdown .dropdown-menu {
+  position: static;
+  min-width: 0;
+  margin-top: 4px;
+  box-shadow: none;
+  border: 1px solid var(--line-2);
+  background: var(--surface-2);
+}

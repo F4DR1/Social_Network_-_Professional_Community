@@ -1,0 +1,73 @@
+/* ============================================================
+   files_upload.css — МирПрофи · «Аврора»
+   Панели загрузки файлов/обложек и предпросмотр (files_upload.js).
+   ============================================================ */
+
+/* ---------- панели загрузки ---------- */
+.files-upload-panel,
+.image-upload-panel {
+  display: flex;
+  align-items: center;
+  margin-right: auto; /* кнопка загрузки прижата влево в подвале окна */
+}
+
+/* кнопка «Прикрепить ...» */
+.modal-btn.files-upload,
+.modal-btn.image-upload {
+  background: none;
+  border: 1.5px dashed var(--line-2);
+  color: var(--ink-3);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.modal-btn.files-upload:hover,
+.modal-btn.image-upload:hover {
+  border-color: var(--acc);
+  background: var(--acc-soft);
+  color: var(--acc);
+}
+
+/* ---------- предпросмотр загруженных файлов ---------- */
+#filesPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+#filesPreview:empty { display: none; }
+
+.image-preview img,
+.video-preview img {
+  border-radius: 12px;
+  border: 1px solid var(--line-2);
+  display: block;
+}
+
+/* кнопка удаления файла из предпросмотра */
+.preview-remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(24, 18, 48, 0.55);
+  color: #fff;
+  transition: background 0.15s ease;
+}
+.preview-remove-btn:hover { background: var(--err); }
+.preview-remove-btn svg { width: 14px; height: 14px; }
+
+/* файл-документ (не изображение) */
+.file-preview {
+  background: var(--surface-2);
+  border: 1px solid var(--line-2) !important;
+  border-radius: 12px !important;
+  position: relative;
+  padding-right: 36px !important;
+}
+.file-preview .extension { border-radius: 9px; font-size: 12px; }
+.file-preview .preview-remove-btn { top: 50%; transform: translateY(-50%); }

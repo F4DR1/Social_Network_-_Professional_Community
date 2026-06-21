@@ -322,39 +322,3 @@
 }
 .message-send-btn:hover { transform: translateY(-1px); }
 .message-send-btn:disabled { opacity: 0.4; pointer-events: none; box-shadow: none; }
-
-
-/* ============================================================
-   МОБИЛЬНЫЙ ДИЗАЙН: ≤640px
-   Структура «одно окно за раз»:
-   — чат НЕ выбран → виден список чатов (без окна сообщений);
-   — чат ВЫБРАН   → видно окно активного чата (без списка чатов).
-   ============================================================ */
-@media (max-width: 640px) {
-  .centered-container > .container:has(.chats-window) {
-    grid-template-columns: 1fr;
-    height: calc(100dvh - var(--header-h) - 116px); /* место под островок */
-    min-height: 0;
-  }
-
-  /* по умолчанию (чат не выбран): список чатов на всю ширину */
-  .chats-window { border-right: none; }
-  .chats-list { padding-bottom: 14px; }
-
-  /* окно сообщений скрыто, пока чат не выбран */
-  .messages-window { display: none; }
-
-  /* когда чат открыт — список прячем, активный чат на всё окно;
-     островок навигации скрыт (см. containers.css), высота — почти весь экран */
-  .centered-container > .container:has(.selected-chat.active) {
-    height: calc(100dvh - var(--header-h) - 28px);
-  }
-  .container:has(.selected-chat.active) .chats-window { display: none; }
-  .container:has(.selected-chat.active) .messages-window { display: flex; }
-
-  /* кнопка «назад» к списку чатов видна в мобильной версии */
-  .chat-info-back-btn { display: flex; }
-
-  .messages { padding: 14px 12px; }
-  .message-iput { padding: 8px 10px 12px; }
-}

@@ -47,6 +47,8 @@
             );
             
             $article['coverMediaUrl'] = Helpers::fileUrl($article['coverMediaUrl'] ?? Helpers::imagePlaceholder('cover_article'));
+            $article['created_at'] = gmdate('Y-m-d\TH:i:s\Z', strtotime($article['created_at']));
+            $article['updated_at'] = gmdate('Y-m-d\TH:i:s\Z', strtotime($article['updated_at']));
             
             Helpers::jsonResponse(['success' => true, 'article' => $article]);
         }

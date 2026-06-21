@@ -96,20 +96,3 @@
 }
 .category-btn:hover { background: var(--surface-2); }
 .category-btn.active { background: var(--acc-soft); color: var(--acc); font-weight: 700; }
-
-
-/* ============================================================
-   МОБИЛЬНЫЙ ДИЗАЙН: ≤640px — поля формы в одну колонку
-   ============================================================ */
-@media (max-width: 640px) {
-  /* контейнеры местами: категории (правый контейнер) сверху, настройки снизу */
-  .page-content { display: flex; flex-direction: column; }
-  .right-container { order: -1; }
-
-  .main-data .input-field {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-  .main-data .input-field > span { padding-top: 0; }
-  #saveData { width: 100%; }
-}

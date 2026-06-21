@@ -187,15 +187,3 @@
 .modal-main.new-post > div > p { font-size: 14.5px; line-height: 1.6; }
 .modal-footer .article-date { font-size: 12.5px; color: var(--ink-3); }
 .modal-footer > p { font-size: 12.5px; color: var(--ink-3); margin-right: auto; }
-
-
-/* ============================================================
-   МОБИЛЬНЫЙ ДИЗАЙН: ≤640px
-   ============================================================ */
-@media (max-width: 640px) {
-  .post-file-preview { flex-basis: 100%; }
-  .post-file-preview img { height: 200px; }
-  .article-preview img { height: 160px; }
-  .post-footer { flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; }
-  .modal-title img { height: 160px; }
-}

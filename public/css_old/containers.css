@@ -146,136 +146,23 @@ nav.navigation li:hover a { color: var(--acc); }
 }
 .container-title:empty { display: none; }
 
-/* ============================================================
-   АДАПТИВНОСТЬ
-   ============================================================ */
-
-/* ---------- широкий экран: контент сжимается пропорционально ----------
-   ниже 1280px страница отдаёт боковые поля, центральный блок ужимается
-   вместе с зоной контента, но правый контейнер держит свою ширину */
-@media (max-width: 1279px) {
-  :root { --content-w: auto; --center-w: auto; }
-  .page-content { flex: 1; min-width: 0; }
-  .centered-container { flex: 1; }
-  .page-content:not(:has(.right-container)) .centered-container { width: 100%; }
-}
-
-/* ---------- планшет: 901–1119px — меню сжимается до иконок ---------- */
-@media (min-width: 901px) and (max-width: 1119px) {
-  :root { --nav-w: 60px; }
-  .navigation-menu nav.navigation li { justify-content: center; padding: 12px 0; }
-  .navigation-menu nav.navigation li a {
+/* ---------- адаптивность ----------
+   Ширины контейнеров не «плавают»: до 1259px меню сжимается
+   до иконок, ниже 1079px страница прокручивается по горизонтали,
+   но контейнеры сохраняют свою фиксированную ширину. */
+@media (max-width: 1259px) {
+  .navigation-menu { width: 56px; }
+  nav.navigation li { justify-content: center; padding: 12px 0; }
+  nav.navigation li a {
     position: absolute;
     inset: 0;
     overflow: hidden;
     text-indent: -9999px;
   }
-  .navigation-menu nav.navigation li a .counter {
+  nav.navigation li a .counter {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 4px;
+    right: 4px;
     text-indent: 0;
   }
-}
-
-/* ---------- узкий десктоп / планшет книжный: ≤900px ----------
-   правый контейнер уходит под центральный (одна колонка контента),
-   но меню навигации пока остаётся слева до перехода в мобильный режим */
-@media (max-width: 900px) {
-  .page-content { flex-direction: column; flex-wrap: nowrap; }
-  .centered-container,
-  .right-container { width: 100%; }
-  .right-container { position: static; top: auto; }
-}
-
-/* ============================================================
-   МОБИЛЬНЫЙ ДИЗАЙН: ≤640px
-   — меню навигации превращается в плавающий островок внизу;
-   — видны только кнопки .main (и .mobile-only — только в мобильной);
-   — кнопки островка: крупная иконка + мелкий текст под ней;
-   — контент идёт одной колонкой на всю ширину.
-   ============================================================ */
-@media (max-width: 640px) {
-
-  /* контент одной колонкой, снизу — место под островок */
-  main {
-    display: block;
-    padding: 14px 12px 104px;
-  }
-  .page-content { width: 100%; display: block; }
-  .page-content > * { width: 100%; margin-bottom: 16px; }
-  .page-content > *:last-child { margin-bottom: 0; }
-  .main-container,
-  .centered-container,
-  .right-container {
-    width: 100%;
-    position: static;
-    top: auto;
-  }
-  .container { padding: 18px 16px; border-radius: 20px; }
-  .container-title { font-size: 17.5px; }
-
-  /* ---------- плавающий островок навигации ---------- */
-  .navigation-menu {
-    position: fixed;
-    left: 50%;
-    bottom: 14px;
-    top: auto;
-    transform: translateX(-50%);
-    width: auto;
-    max-width: calc(100vw - 24px);
-    z-index: 400;
-    background: var(--surface-solid);
-    border: 1px solid var(--line);
-    border-radius: 26px;
-    box-shadow: var(--shadow-pop);
-    padding: 7px 9px;
-  }
-  .navigation-menu nav.navigation ul {
-    flex-direction: row;
-    align-items: stretch;
-    gap: 4px;
-  }
-  .navigation-menu nav.navigation hr { display: none; }
-
-  /* в островке видны только кнопки .main; .mobile-only — тоже (только тут) */
-  .navigation-menu nav.navigation li { display: none; }
-  .navigation-menu nav.navigation li.main,
-  .navigation-menu nav.navigation li.mobile-only { display: flex; }
-
-  /* формат кнопки островка: крупная иконка сверху, мелкий текст снизу */
-  .navigation-menu nav.navigation li {
-    position: relative;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    min-width: 66px;
-    padding: 9px 12px;
-    border-radius: 18px;
-  }
-  .navigation-menu nav.navigation li svg { width: 26px; height: 26px; }
-  .navigation-menu nav.navigation li a {
-    position: static;
-    flex: none;
-    flex-direction: column;
-    gap: 0;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1;
-    text-indent: 0;
-    overflow: visible;
-  }
-  /* вся кнопка островка кликабельна */
-  .navigation-menu nav.navigation li a::before { content: ''; display: block; position: absolute; inset: -9px -12px; }
-  /* счётчик-бейдж в углу кнопки */
-  .navigation-menu nav.navigation li a .counter {
-    position: absolute;
-    top: -2px;
-    right: 9px;
-  }
-
-  /* островок прячется, когда в мессенджере открыт чат */
-  body:has(.selected-chat.active) .navigation-menu { display: none; }
-  body:has(.selected-chat.active) main { padding-bottom: 14px; }
 }

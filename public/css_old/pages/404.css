@@ -1,0 +1,57 @@
+/* ============================================================
+   404.css — МирПрофи · «Аврора»
+   Страница ошибки 404 (Layout::Micro — без шапки и меню).
+   ============================================================ */
+
+main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.error-404 {
+  width: 440px;
+  max-width: 100%;
+  text-align: center;
+  background: var(--surface);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow-pop);
+  padding: 44px 36px 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.error-404 .error-icon { font-size: 40px; margin-bottom: 4px; }
+.error-404 h1 {
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 1px;
+  background: var(--acc-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.error-404 p { font-size: 15px; color: var(--ink-2); margin-top: 6px; }
+.error-404 a {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 26px;
+  border-radius: var(--r-s);
+  background: var(--acc-grad);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14.5px;
+  box-shadow: 0 6px 18px var(--acc-shadow);
+  transition: transform 0.12s ease;
+}
+.error-404 a:hover { color: #fff; transform: translateY(-1px); }

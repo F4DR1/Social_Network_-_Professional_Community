@@ -150,6 +150,8 @@
             
             foreach ($posts as &$post) {
                 $post['author_photo'] = Helpers::fileUrl($post['author_photo'] ?? Helpers::imagePlaceholder($type));
+                $post['created_at'] = gmdate('Y-m-d\TH:i:s\Z', strtotime($post['created_at']));
+                $post['updated_at'] = gmdate('Y-m-d\TH:i:s\Z', strtotime($post['updated_at']));
             }
 
             $posts = $this->getContentOfPosts($posts);

@@ -361,7 +361,7 @@
             $userCount = (int) ($db->fetchOne($userSql, $params)['cnt'] ?? 0);
 
             // Проверка среди групп
-            $groupSql = "SELECT COUNT(*) AS cnt FROM groups WHERE linkname = ?";
+            $groupSql = "SELECT COUNT(*) AS cnt FROM `groups` WHERE linkname = ?";
             $params = [$linkname];
             if ($excludeGroupId !== null) {
                 $groupSql .= " AND id != ?";

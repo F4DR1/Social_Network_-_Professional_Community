@@ -37,6 +37,8 @@
             );
             if ($message) {
                 $message['author_photo'] = Helpers::fileUrl($message['author_photo'] ?? Helpers::imagePlaceholder('user'));
+                $message['sent_at'] = gmdate('Y-m-d\TH:i:s\Z', strtotime($message['sent_at']));
+                $message['updated_at'] = gmdate('Y-m-d\TH:i:s\Z', strtotime($message['updated_at']));
             }
             // Убираем счётчик, если пользователь не автор
             if ($message['sender_id'] != $currentUserId) {
@@ -171,6 +173,8 @@
             // Ставим заглушки на фото пользователей, если у них нет фото
             foreach ($messages as &$message) {
                 $message['author_photo'] = Helpers::fileUrl($message['author_photo'] ?? Helpers::imagePlaceholder('user'));
+                $message['sent_at'] = gmdate('Y-m-d\TH:i:s\Z', strtotime($message['sent_at']));
+                $message['updated_at'] = gmdate('Y-m-d\TH:i:s\Z', strtotime($message['updated_at']));
 
                 // Счётчик прочтений показываем только владельцу сообщения
                 if ($message['sender_id'] != $currentUserId) {

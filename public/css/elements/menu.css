@@ -1,0 +1,72 @@
+/* ============================================================
+   menu.css — МирПрофи · «Аврора»
+   Страница «Меню» (menu.php). Все кнопки навигации ВСЕГДА
+   в формате мобильного островка: крупная иконка + мелкий
+   текст под ней (независимо от ширины экрана).
+   ============================================================ */
+
+.container.menu .container-title { margin-bottom: 18px; }
+
+.container.menu nav.navigation ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 12px;
+}
+.container.menu nav.navigation hr { display: none; }
+
+.container.menu nav.navigation li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 22px 12px;
+  border-radius: 20px;
+  background: var(--surface-2);
+  color: var(--acc);
+  text-align: center;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.container.menu nav.navigation li:hover { background: var(--acc-soft); transform: translateY(-2px); }
+.container.menu nav.navigation li.active { background: var(--acc-soft); }
+
+.container.menu nav.navigation li svg {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  color: var(--acc);
+}
+
+.container.menu nav.navigation li a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+/* вся плитка кликабельна */
+.container.menu nav.navigation li a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+}
+.container.menu nav.navigation li:hover a { color: var(--acc); }
+
+/* счётчик внутри плитки — компактный бейдж в углу */
+.container.menu nav.navigation li .counter {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+}
+
+@media (max-width: 640px) {
+  .container.menu nav.navigation ul {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .container.menu nav.navigation li { padding: 18px 8px; gap: 7px; }
+  .container.menu nav.navigation li svg { width: 30px; height: 30px; }
+}

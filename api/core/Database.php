@@ -6,6 +6,7 @@
          * При создании объекта сразу подключаемся к БД
          */
         public function __construct() {
+            date_default_timezone_set('UTC');
             $host = env('DATABASE_HOST') ?: 'localhost';
             $dbname = env('DATABASE_NAME') ?: 'social_network_pc';
             $user = env('DATABASE_USER') ?: 'root';
@@ -17,6 +18,7 @@
                     $user,
                     $pass
                 );
+                $this->pdo->exec("SET time_zone = '+00:00'");
                 // Режим ошибок - исключения
                 $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {

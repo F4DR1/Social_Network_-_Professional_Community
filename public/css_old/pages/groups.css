@@ -30,11 +30,3 @@
 }
 .group-create-panel button:active { transform: none; }
 .group-create-panel button svg { flex: none; }
-
-
-/* ============================================================
-   МОБИЛЬНЫЙ ДИЗАЙН: ≤640px
-   ============================================================ */
-@media (max-width: 640px) {
-  .group-create-panel button { font-size: 15px; padding: 14px; }
-}
